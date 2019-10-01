@@ -1,7 +1,7 @@
 from common.numpy_fast import interp
 import numpy as np
 
-CAMERA_OFFSET = 0.06  # m from center car to camera
+CAMERA_OFFSET = 0.03  # m from center car to camera
 
 def compute_path_pinv(l=50):
   deg = 3
@@ -39,9 +39,9 @@ class LanePlanner(object):
     self.p_poly = [0., 0., 0., 0.]
     self.d_poly = [0., 0., 0., 0.]
 
-    self.lane_width_estimate = 3.7
+    self.lane_width_estimate = 3.
     self.lane_width_certainty = 1.0
-    self.lane_width = 3.7
+    self.lane_width = 3.
 
     self.l_prob = 0.
     self.r_prob = 0.
