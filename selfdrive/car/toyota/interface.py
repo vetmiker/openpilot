@@ -223,11 +223,11 @@ class CarInterface(object):
       stop_and_go = True
       ret.safetyParam = 100
       ret.wheelbase = 2.60
-      ret.steerRatio = 16.
-      tire_stiffness_factor = 0.444
+      ret.steerRatio = 18.6
+      tire_stiffness_factor = 0.517
       ret.mass = 3108 * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2], [0.05]]
-      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kf = 0.00007
 
     ret.steerRateCost = 1.
     ret.centerToFront = ret.wheelbase * 0.44
