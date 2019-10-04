@@ -2192,8 +2192,8 @@ int main(int argc, char* argv[]) {
 
   float smooth_brightness = BRIGHTNESS_B;
 
-  const int MIN_VOLUME = LEON ? 12 : 8;
-  const int MAX_VOLUME = LEON ? 15 : 13;
+  const int MIN_VOLUME = LEON ? 30 : 8;
+  const int MAX_VOLUME = LEON ? 40 : 13;
 
   set_volume(s, MIN_VOLUME);
 #ifdef DEBUG_FPS
