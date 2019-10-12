@@ -267,5 +267,18 @@ def main(gctx=None):
 
   params.delete("AthenadPid")
 
+@dispatcher.add_method
+def delete_all_camera_records():
+  os.system("cd /sdcard/realdata/ && rm-rf")
+
+@dispatcher.add_method
+def reboot_eon():
+  os.system("reboot")
+
+def update_openpilot():
+  os.system("cd /data/openpilot/")
+  os.system("git pull")
+  os.system("reboot")
+
 if __name__ == "__main__":
   main()
