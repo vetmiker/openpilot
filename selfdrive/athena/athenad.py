@@ -275,10 +275,6 @@ def delete_all_camera_records():
 def reboot_eon():
   os.system("reboot")
 
-def update_openpilot():
-  os.system("cd /data/openpilot/")
-  os.system("git pull")
-  os.system("reboot")
 
 if __name__ == "__main__":
   main()
