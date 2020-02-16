@@ -428,13 +428,11 @@ static void ui_draw_vision_maxspeed(UIState *s) {
   int maxspeed_calc = maxspeed * 0.6225 + 0.5;
   float speedlimit = s->scene.speedlimit;
   int speedlim_calc = speedlimit * 2.2369363 + 0.5;
-  int speed_lim_off = s->speed_lim_off * 2.2369363 + 0.5;
   if (s->is_metric) {
     maxspeed_calc = maxspeed + 0.5;
     speedlim_calc = speedlimit * 3.6 + 0.5;
-    speed_lim_off = s->speed_lim_off * 3.6 + 0.5;
   }
-
+  int speed_lim_off = speedlim_calc * (s->speed_lim_off / 100.0);
   bool is_cruise_set = (maxspeed != 0 && maxspeed != SET_SPEED_NA);
   bool is_speedlim_valid = s->scene.speedlimit_valid;
   bool is_set_over_limit = is_speedlim_valid && s->scene.engaged &&
@@ -522,7 +520,7 @@ static void ui_draw_vision_speedlimit(UIState *s) {
   if (s->is_ego_over_limit) {
     hysteresis_offset = 0.0;
   }
-  s->is_ego_over_limit = is_speedlim_valid && s->scene.v_ego > (speedlimit + s->speed_lim_off + hysteresis_offset);
+  s->is_ego_over_limit = is_speedlim_valid && s->scene.v_ego > (speedlimit + hysteresis_offset);
 
   int viz_speedlim_w = 180;
   int viz_speedlim_h = 202;
@@ -928,15 +926,15 @@ static void bb_ui_draw_measures_left(UIState *s, int bb_x, int bb_y, int bb_w ) 
   }
 
   //add grey panda GPS accuracy
-  /*if (true) {
+  if (true) {
     char val_str[16];
     char uom_str[3];
     NVGcolor val_color = nvgRGBA(255, 255, 255, 200);
     //show red/orange if gps accuracy is high
-      if(scene->gpsAccuracy > 0.59) {
+      if(scene->gpsAccuracy > 1.0) {
          val_color = nvgRGBA(255, 188, 3, 200);
       }
-      if(scene->gpsAccuracy > 0.8) {
+      if(scene->gpsAccuracy > 2.0) {
          val_color = nvgRGBA(255, 0, 0, 200);
       }
     // gps accuracy is always in meters
@@ -947,7 +945,7 @@ static void bb_ui_draw_measures_left(UIState *s, int bb_x, int bb_y, int bb_w ) 
         val_color, lab_color, uom_color,
         value_fontSize, label_fontSize, uom_fontSize );
     bb_ry = bb_y + bb_h;
-  }*/
+  }
 
   //add free space - from bthaler1
   if (true) {
