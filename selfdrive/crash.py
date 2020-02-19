@@ -24,7 +24,10 @@ else:
   from raven import Client
   from raven.transport.http import HTTPTransport
   params = Params()
-  dongle_id = params.get("DongleId").decode('utf8')
+  try:
+    dongle_id = params.get("DongleId").decode('utf8')
+  except AttributeError:
+    dongle_id = "None"
   error_tags = {'dirty': dirty, 'username': uniqueID, 'dongle_id': dongle_id}
   
   logging_data = {"branch": "/data/params/d/GitBranch", "commit": "/data/params/d/GitCommit", "remote": "/data/params/d/GitRemote"}
