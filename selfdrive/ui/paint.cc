@@ -412,6 +412,21 @@ static void ui_draw_world(UIState *s) {
     draw_chevron(s, scene->lead_d_rel+2.7, scene->lead_y_rel, 25,
                   nvgRGBA(201, 34, 49, fillAlpha), nvgRGBA(218, 202, 37, 255));
   }
+  if (scene->lead_status2) {
+    // Draw lead2 car indicator
+    float fillAlpha = 0;
+    float speedBuff = 10.;
+    float leadBuff = 40.;
+    if (scene->lead_d_rel2 < leadBuff) {
+      fillAlpha = 255*(1.0-(scene->lead_d_rel2/leadBuff));
+      if (scene->lead_v_rel2 < 0) {
+        fillAlpha += 255*(-1*(scene->lead_v_rel2/speedBuff));
+      }
+      fillAlpha = (int)(fmin(fillAlpha, 255));
+    }
+    draw_chevron(s, scene->lead_d_rel2+2.7, scene->lead_y_rel2, 25,
+                  nvgRGBA(201, 34, 49, fillAlpha), nvgRGBA(218, 202, 37, 255));
+  }
 }
 
 static void ui_draw_vision_maxspeed(UIState *s) {
@@ -786,29 +801,6 @@ static void ui_draw_vision_brake(UIState *s) {
   nvgFill(s->vg);
 }
 
-static void ui_draw_dashcam_button(UIState *s) {
-  int btn_w = 150;
-  int btn_h = 150;
-  int btn_x = 1920 - btn_w;
-  int btn_y = 1080 - btn_h - 50;
-  nvgBeginPath(s->vg);
-  nvgRoundedRect(s->vg, btn_x-110, btn_y-45, btn_w, btn_h, 100);
-  nvgStrokeColor(s->vg, nvgRGBA(255,255,255,80));
-  nvgStrokeWidth(s->vg, 6);
-  nvgStroke(s->vg);
-
-  nvgFontSize(s->vg, 70);
-
-  if (s->scene.recording) {
-    NVGcolor fillColor = nvgRGBA(255,0,0,150);
-    nvgFillColor(s->vg, fillColor);
-    nvgFill(s->vg);
-    nvgFillColor(s->vg, nvgRGBA(255,255,255,200));
-  } else {
-    nvgFillColor(s->vg, nvgRGBA(255, 255, 255, 200));
-  }
-  nvgText(s->vg,btn_x-38,btn_y+50,"REC",NULL);
-}
 
 static void ui_draw_vision_header(UIState *s) {
   const UIScene *scene = &s->scene;
@@ -1142,7 +1134,6 @@ static void ui_draw_vision_footer(UIState *s) {
 
   ui_draw_vision_face(s);
   ui_draw_vision_brake(s);
-  ui_draw_dashcam_button(s);
 
 #ifdef SHOW_SPEEDLIMIT
   ui_draw_vision_map(s);
