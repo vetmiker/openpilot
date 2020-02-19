@@ -3,7 +3,11 @@ import os
 import sys
 import threading
 import capnp
+from common.params import Params
 from selfdrive.version import version, dirty
+from common.op_params import opParams
+op_params = opParams()
+uniqueID = op_params.get('uniqueID', None)
 
 from selfdrive.swaglog import cloudlog
 
@@ -19,8 +23,21 @@ if os.getenv("NOLOG") or os.getenv("NOCRASH"):
 else:
   from raven import Client
   from raven.transport.http import HTTPTransport
+  params = Params()
+  dongle_id = params.get("DongleId").decode('utf8')
+  error_tags = {'dirty': dirty, 'username': uniqueID, 'dongle_id': dongle_id}
+  
+  logging_data = {"branch": "/data/params/d/GitBranch", "commit": "/data/params/d/GitCommit", "remote": "/data/params/d/GitRemote"}
+
+  for key in logging_data:
+    try:
+      with open(logging_data[key], "r") as f:
+        error_tags[key] = str(f.read())
+    except:
+      error_tags[key] = "unknown"
+      
   client = Client('https://137e8e621f114f858f4c392c52e18c6d:8aba82f49af040c8aac45e95a8484970@sentry.io/1404547',
-                  install_sys_hook=False, transport=HTTPTransport, release=version, tags={'dirty': dirty})
+                  install_sys_hook=False, transport=HTTPTransport, release=version, tags=error_tags)
 
   def capture_exception(*args, **kwargs):
     exc_info = sys.exc_info()
