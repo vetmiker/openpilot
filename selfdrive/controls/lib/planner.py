@@ -49,7 +49,7 @@ _A_CRUISE_MAX_V_FOLLOWING = [1.3, 1.6, 1.2, .7, .3]
 _A_CRUISE_MAX_BP = [0., 5., 10., 20., 55.]
 
 # Lookup table for turns
-_A_TOTAL_MAX_V = [2.3, 3.0, 3.9]
+_A_TOTAL_MAX_V = [3.3, 3.0, 3.9]
 _A_TOTAL_MAX_BP = [0., 25., 55.]
 
 # 75th percentile
