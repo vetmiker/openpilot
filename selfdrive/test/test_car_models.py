@@ -408,11 +408,11 @@ routes = {
   #  'enableCamera': False,
   #  'enableDsu': False,
   #},
-  #"1dd19ceed0ee2b48|2018-12-22--17-36-49": {
-  #  'carFingerprint': TOYOTA.LEXUS_IS, # 300 hybrid
-  #  'enableCamera': True,
-  #  'enableDsu': False,
-  #},
+  "1dd19ceed0ee2b48|2018-12-22--17-36-49": {
+    'carFingerprint': TOYOTA.LEXUS_IS, # 300 hybrid
+    'enableCamera': True,
+    'enableDsu': False,
+  },
   "76b83eb0245de90e|2019-10-20--15-42-29": {
     'carFingerprint': VOLKSWAGEN.GOLF,
     'enableCamera': True,
@@ -480,7 +480,7 @@ non_public_routes = [
 ]
 
 # TODO: add routes for these cars
-non_tested_cars = [TOYOTA.LEXUS_CTH, TOYOTA.LEXUS_IS, TOYOTA.LEXUS_ISH, CHRYSLER.PACIFICA_2018, CHRYSLER.PACIFICA_2017, HONDA.ACCORDH, CHRYSLER.JEEP_CHEROKEE_2017, CHRYSLER.JEEP_CHEROKEE_2018]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
+non_tested_cars = [TOYOTA.LEXUS_CTH, TOYOTA.LEXUS_ISH, CHRYSLER.PACIFICA_2018, CHRYSLER.PACIFICA_2017, HONDA.ACCORDH, CHRYSLER.JEEP_CHEROKEE_2017, CHRYSLER.JEEP_CHEROKEE_2018]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
 
 if __name__ == "__main__":
 
