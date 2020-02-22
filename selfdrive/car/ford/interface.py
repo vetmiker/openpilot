@@ -112,32 +112,8 @@ class CarInterface(CarInterfaceBase):
     ret = car.CarState.new_message()
     ret_arne182 = arne182.CarStateArne182.new_message()
 
+
     ret.canValid = self.cp.can_valid
-
-    # speeds
-    ret.vEgo = self.CS.v_ego
-    ret.vEgoRaw = self.CS.v_ego_raw
-    ret.standstill = self.CS.standstill
-    ret.wheelSpeeds.fl = self.CS.v_wheel_fl
-    ret.wheelSpeeds.fr = self.CS.v_wheel_fr
-    ret.wheelSpeeds.rl = self.CS.v_wheel_rl
-    ret.wheelSpeeds.rr = self.CS.v_wheel_rr
-
-    # steering wheel
-    ret.steeringAngle = self.CS.angle_steers
-    ret.steeringPressed = self.CS.steer_override
-
-    # gas pedal
-    ret.gas = self.CS.user_gas / 100.
-    ret.gasPressed = self.CS.user_gas > 0.0001
-    ret.brakePressed = self.CS.brake_pressed
-    ret.brakeLights = self.CS.brake_lights
-
-    ret.cruiseState.enabled = not (self.CS.pcm_acc_status in [0, 3])
-    ret.cruiseState.speed = self.CS.v_cruise_pcm
-    ret.cruiseState.available = self.CS.pcm_acc_status != 0
-
-    ret.genericToggle = self.CS.generic_toggle
 
     # events
     events = []
@@ -171,6 +147,10 @@ class CarInterface(CarInterfaceBase):
     self.cruise_enabled_prev = ret.cruiseState.enabled
 
     return ret.as_reader(), ret_arne182.as_reader()
+
+    #self.CS.out = ret.as_reader()
+
+    return self.CS.out
 
   # pass in a car.CarControl
   # to be called @ 100hz
