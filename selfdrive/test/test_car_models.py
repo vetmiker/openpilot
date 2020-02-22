@@ -67,7 +67,7 @@ routes = {
     'enableCamera': True,
   },
   "0607d2516fc2148f|2019-02-13--23-03-16": {
-    'carFingerprint': CHRYSLER.PACIFICA_2019_2020_HYBRID,
+    'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
     'enableCamera': True,
   },
   "8190c7275a24557b|2020-01-29--08-33-58": {
