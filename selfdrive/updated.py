@@ -359,7 +359,6 @@ def main(gctx=None):
 
         if params.get("IsOffroad") == b"1":
           need_reboot = attempt_update(time_offroad, need_reboot)
-          attempt_update()
           update_failed_count = 0
         else:
           time_offroad = time.time()
