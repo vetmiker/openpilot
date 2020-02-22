@@ -6,6 +6,7 @@ from common.numpy_fast import mean
 import cereal.messaging_arne as messaging_arne
 from common.kalman.simple_kalman import KF1D
 from opendbc.can.can_define import CANDefine
+from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from selfdrive.config import Conversions as CV
 from selfdrive.car.toyota.values import CAR, DBC, STEER_THRESHOLD, TSS2_CAR, NO_DSU_CAR
@@ -83,7 +84,6 @@ def get_can_parser_init(CP):
     checks.append(("GAS_SENSOR", 50))
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
-
 
 def get_can_parser(CP):
 
@@ -186,14 +186,11 @@ def get_cam_can_parser(CP):
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)
 
 
-class CarState():
+class CarState(CarStateBase):
   def __init__(self, CP):
-
-    self.CP = CP
-    self.can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
-    self.shifter_values = self.can_define.dv["GEAR_PACKET"]['GEAR']
-    self.left_blinker_on = 0
-    self.right_blinker_on = 0
+    super().__init__(CP)
+    can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
+    self.shifter_values = can_define.dv["GEAR_PACKET"]['GEAR']
     self.angle_offset = 0.
     self.pcm_acc_active = False
     self.init_angle_offset = False
@@ -243,25 +240,16 @@ class CarState():
       self.pedal_gas = (cp.vl["GAS_SENSOR"]['INTERCEPTOR_GAS'] + cp.vl["GAS_SENSOR"]['INTERCEPTOR_GAS2']) / 2.
     else:
       self.pedal_gas = cp.vl["GAS_PEDAL"]['GAS_PEDAL']
-    self.car_gas = self.pedal_gas
     self.esp_disabled = cp.vl["ESP_CONTROL"]['TC_DISABLED']
 
-    # calc best v_ego estimate, by averaging two opposite corners
     self.v_wheel_fl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FL'] * CV.KPH_TO_MS
     self.v_wheel_fr = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FR'] * CV.KPH_TO_MS
     self.v_wheel_rl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_RL'] * CV.KPH_TO_MS
     self.v_wheel_rr = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_RR'] * CV.KPH_TO_MS
-    v_wheel = mean([self.v_wheel_fl, self.v_wheel_fr, self.v_wheel_rl, self.v_wheel_rr])
+    self.v_ego_raw = mean([self.v_wheel_fl, self.v_wheel_fr, self.v_wheel_rl, self.v_wheel_rr])
+    self.v_ego, self.a_ego = self.update_speed_kf(self.v_ego_raw)
 
-    # Kalman filter
-    if abs(v_wheel - self.v_ego) > 2.0:  # Prevent large accelerations when car starts at non zero speed
-      self.v_ego_kf.x = [[v_wheel], [0.0]]
-
-    self.v_ego_raw = v_wheel
-    v_ego_x = self.v_ego_kf.update(v_wheel)
-    self.v_ego = float(v_ego_x[0])
-    self.a_ego = float(v_ego_x[1])
-    self.standstill = not v_wheel > 0.001
+    self.standstill = not self.v_ego_raw > 0.001
 
     if self.CP.carFingerprint in TSS2_CAR:
       self.angle_steers = cp.vl["STEER_TORQUE_SENSOR"]['STEER_ANGLE']
@@ -319,7 +307,7 @@ class CarState():
         self.rightblindspot = False
         self.rightblindspotD1 = 0
         self.rightblindspotD2 = 0
-        
+
     msg.arne182Status.leftBlindspot = self.leftblindspot
     msg.arne182Status.rightBlindspot = self.rightblindspot
     msg.arne182Status.rightBlindspotD1 = self.rightblindspotD1
