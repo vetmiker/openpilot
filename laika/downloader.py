@@ -32,11 +32,11 @@ def download_file(url_base, folder_path, cacheDir, filename, compression='', ove
     try:
       print("pulling from", url_cache, "to", filepath)
       urlf = urllib.request.urlopen(url_cache, timeout=5)
-    except IOError as e:
+    except IOError:
       print("cache download failed, pulling from", url, "to", filepath)
       try:
         urlf = urllib.request.urlopen(url)
-      except IOError as e:
+      except IOError:
         raise IOError("Could not download file from: " + url)
 
     data_zipped = urlf.read()
