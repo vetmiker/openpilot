@@ -60,7 +60,6 @@ try:
     comma_remote = origin.startswith('git@github.com:arne182') or origin.startswith('https://github.com/arne182')
 
     dirty = not comma_remote
-    dirty = dirty or ('master' in branch)
     dirty = dirty or (subprocess.call(["git", "diff-index", "--quiet", branch, "--"]) != 0)
 
     if dirty:

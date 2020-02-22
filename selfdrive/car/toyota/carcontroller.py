@@ -33,7 +33,6 @@ LEFT_BLINDSPOT = b'\x41'
 RIGHT_BLINDSPOT = b'\x42'
 BLINDSPOTALWAYSON = False
 
-
 def set_blindspot_debug_mode(lr,enable):
   if enable:
     m = lr + b'\x02\x10\x60\x00\x00\x00\x00'
@@ -172,10 +171,10 @@ class CarController():
       apply_steer_req = 0
     else:
       apply_steer_req = 1
-      
+
     apply_steer = apply_toyota_steer_torque_limits(new_steer, self.last_steer, CS.steer_torque_motor, SteerLimitParams)
     self.steer_rate_limited = new_steer != apply_steer
-    
+
     if not enabled:
       apply_steer = 0
       apply_steer_req = 0
@@ -217,7 +216,7 @@ class CarController():
     self.last_standstill = CS.standstill
 
     can_sends = []
-    
+
     #*** control msgs ***
     #print("steer {0} {1} {2} {3}".format(apply_steer, min_lim, max_lim, CS.steer_torque_motor)
 
@@ -281,7 +280,7 @@ class CarController():
     for (addr, ecu, cars, bus, fr_step, vl) in STATIC_MSGS:
       if frame % fr_step == 0 and ecu in self.fake_ecus and self.car_fingerprint in cars:
         can_sends.append(make_can_msg(addr, vl, bus))
-        
+
     # Enable blindspot debug mode once
     if frame > 1000: # 10 seconds after start
       if BLINDSPOTALWAYSON:
@@ -333,5 +332,5 @@ class CarController():
         #can_sends.append(make_can_msg(0x750, b'\x42\x02\x21\x69\x00\x00\x00\x00', 0))
         can_sends.append(poll_blindspot_status(RIGHT_BLINDSPOT))
         #print("debug Right blindspot poll")
-        
+
     return can_sends

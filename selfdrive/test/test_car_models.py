@@ -58,7 +58,6 @@ def get_route_log(route_name):
       sys.exit(-1)
 
 routes = {
-
   "975b26878285314d|2018-12-25--14-42-13": {
     'carFingerprint': CHRYSLER.PACIFICA_2018_HYBRID,
     'enableCamera': True,
@@ -71,19 +70,19 @@ routes = {
     'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
     'enableCamera': True,
   },
-  #"8190c7275a24557b|2020-01-29--08-33-58": {
-  #  'carFingerprint': CHRYSLER.PACIFICA_2020_HYBRID,
-  #  'enableCamera': True,
-  #},
+  "8190c7275a24557b|2020-01-29--08-33-58": {
+    'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
+    'enableCamera': True,
+  },
   # This pacifica was removed because the fingerprint seemed from a Volt
   #"9f7a7e50a51fb9db|2019-01-03--14-05-01": {
   #  'carFingerprint': CHRYSLER.PACIFICA_2018,
   #  'enableCamera': True,
   #},
-  #"9f7a7e50a51fb9db|2019-01-17--18-34-21": {
-  #  'carFingerprint': CHRYSLER.JEEP_CHEROKEE,
-  #  'enableCamera': True,
-  #},
+  "9f7a7e50a51fb9db|2019-01-17--18-34-21": {
+    'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2017,
+    'enableCamera': True,
+  },
   "192a598e34926b1e|2019-04-04--13-27-39": {
     'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2019,
     'enableCamera': True,
@@ -189,19 +188,10 @@ routes = {
     'carFingerprint': HONDA.ACCORD_15,
     'enableCamera': True,
   },
-  # TODO: This doesnt fingerprint because the fingerprint overlaps with the Insight
-  # "690c4c9f9f2354c7|2018-09-15--17-36-05": {
-  #   'carFingerprint': HONDA.ACCORDH,
-  #   'enableCamera': True,
-  # },
   "1632088eda5e6c4d|2018-06-07--08-03-18": {
     'carFingerprint': HONDA.CIVIC_BOSCH,
     'enableCamera': True,
   },
-  #"18971a99f3f2b385|2018-11-14--19-09-31": {
-  #  'carFingerprint': HONDA.INSIGHT,
-  #  'enableCamera': True,
-  #},
   "38bfd238edecbcd7|2018-08-22--09-45-44": {
     'carFingerprint': HYUNDAI.SANTA_FE,
     'enableCamera': False,
@@ -290,6 +280,7 @@ routes = {
     "7e34a988419b5307|2019-12-18--19-13-30": {
     'carFingerprint': TOYOTA.RAV4H_TSS2,
     'enableCamera': True,
+    'fingerprintSource': 'fixed'
   },
   "e6a24be49a6cd46e|2019-10-29--10-52-42": {
     'carFingerprint': TOYOTA.LEXUS_ES_TSS2,
@@ -403,16 +394,16 @@ routes = {
   #  'enableCamera': True,
   #  'enableDsu': False,
   #},
-  #"2e07163a1ba9a780|2019-08-29--09-35-42": {
-  #  'carFingerprint': TOYOTA.LEXUS_IS,
-  #  'enableCamera': False,
-  #  'enableDsu': False,
-  #},
-  #"1dd19ceed0ee2b48|2018-12-22--17-36-49": {
-  #  'carFingerprint': TOYOTA.LEXUS_IS, # 300 hybrid
-  #  'enableCamera': True,
-  #  'enableDsu': False,
-  #},
+  "2e07163a1ba9a780|2019-08-29--09-35-42": {
+    'carFingerprint': TOYOTA.LEXUS_IS,
+    'enableCamera': False,
+    'enableDsu': False,
+  },
+  "1dd19ceed0ee2b48|2018-12-22--17-36-49": {
+    'carFingerprint': TOYOTA.LEXUS_ISH, # 300 hybrid
+    'enableCamera': True,
+    'enableDsu': False,
+  },
   "76b83eb0245de90e|2019-10-20--15-42-29": {
     'carFingerprint': VOLKSWAGEN.GOLF,
     'enableCamera': True,
@@ -480,7 +471,7 @@ non_public_routes = [
 ]
 
 # TODO: add routes for these cars
-non_tested_cars = [TOYOTA.LEXUS_CTH, TOYOTA.LEXUS_IS, TOYOTA.LEXUS_ISH, CHRYSLER.PACIFICA_2018, CHRYSLER.PACIFICA_2017, HONDA.ACCORDH, CHRYSLER.JEEP_CHEROKEE_2017, CHRYSLER.JEEP_CHEROKEE_2018, CHRYSLER.PACIFICA_2020_HYBRID]
+non_tested_cars = [TOYOTA.LEXUS_CTH, HONDA.ACCORDH, CHRYSLER.PACIFICA_2018, CHRYSLER.PACIFICA_2017, CHRYSLER.JEEP_CHEROKEE_2018]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
 
 if __name__ == "__main__":
 
@@ -516,6 +507,11 @@ if __name__ == "__main__":
     params.put("OpenpilotEnabledToggle", "1")
     params.put("CommunityFeaturesToggle", "1")
     params.put("Passive", "1" if route in passive_routes else "0")
+
+    if checks.get('fingerprintSource', None) == 'fixed':
+      os.environ['FINGERPRINT'] = checks['carFingerprint']
+    else:
+      os.environ['FINGERPRINT'] = ""
 
     print("testing ", route, " ", checks['carFingerprint'])
     print("Starting processes")

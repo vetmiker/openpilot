@@ -49,7 +49,7 @@ _A_CRUISE_MAX_V_FOLLOWING = [1.3, 1.6, 1.2, .7, .3]
 _A_CRUISE_MAX_BP = [0., 5., 10., 20., 55.]
 
 # Lookup table for turns
-_A_TOTAL_MAX_V = [2.3, 3.0, 3.9]
+_A_TOTAL_MAX_V = [3.3, 3.0, 3.9]
 _A_TOTAL_MAX_BP = [0., 25., 55.]
 
 # 75th percentile
@@ -174,12 +174,16 @@ class Planner():
     
     # we read offset value every 5 seconds
     
-    if self.last_time > 5:
-      if not travis:
-        self.offset = int(self.params.get("SpeedLimitOffset", encoding='utf8'))
+    if not travis:
+      if self.last_time > 5:
+        try:
+          self.offset = int(self.params.get("SpeedLimitOffset", encoding='utf8'))
+        except ValueError:
+          self.params.delete("SpeedLimitOffset")
+          self.offset = 0
         self.osm = self.params.get("LimitSetSpeed", encoding='utf8') == "1"
-      self.last_time = 0
-    self.last_time = self.last_time + 1
+        self.last_time = 0
+      self.last_time = self.last_time + 1
       
     gas_button_status = arne_sm['arne182Status'].gasbuttonstatus
     v_ego = sm['carState'].vEgo

@@ -1,5 +1,3 @@
-# Welcome to Arne fork of openpilot
-
 This README describes the custom features build by me (Arne Schwarck) on top of [openpilot](http://github.com/commaai/openpilot) of [comma.ai](http://comma.ai). This fork is optimized for the Toyota RAV4 Hybrid 2016 and for driving in Germany but also works with other cars and in other countries. If you would like to support the developement on this project feel free to https://www.patreon.com/arneschwarck 
 - [ ] TODO describe which other cars and countries are known
 [![](https://i.imgur.com/UelUjKAh.png)](#)
@@ -13,7 +11,7 @@ For a demo of this version of openpilot check the video below:
 ## Panda flashing
 
 To get this branch to work, it is required to flash your Panda because:
-- changing acceleration limits and 
+- changing acceleration limits and
 - adapting lane departure warning where it gives you a slight push back into the middle of the lane without needing to be engaged
 - The Panda version is also changed and checked.
 - Run this command `cd /data/openpilot/panda/board; make; reboot` to manually flash the panda.
@@ -28,7 +26,7 @@ More info about how to install this fork can be found [here](https://medium.com/
 
 `release4`: this is the default branch that is most up to date with the openpilot 0.7 release branch. Normally you should use this branch.
 
-`072-clean`: this is my default testing branch. When I finishing testing/adding new structure, I'll merge this into the 
+`073-clean`: this is my default testing branch. When I finishing testing/adding new structure, I'll merge this into the
 `release4` branch.
 
 `release3`: this is my old branch, that is compatible with openpilot 0.6.
@@ -53,17 +51,17 @@ More info about how to install this fork can be found [here](https://medium.com/
 
 # Features
 
-- Braking: 
-    - by angle(carstate), 
-    - by predicted angle in 2.5s(laneplanner), 
-    - by model(commaai), 
-    - acceleration measured by steering angle, 
-    - by curvature (mapd), 
+- Braking:
+    - by angle(carstate),
+    - by predicted angle in 2.5s(laneplanner),
+    - by model(commaai),
+    - acceleration measured by steering angle,
+    - by curvature (mapd),
     - by mapped sign(stop, yield, roundabouts, bump, hump, traffic light, speed sign, road attribute)
 - No disengage for gas, only longitudinal disengage for brake, tire slip or cancel
 - Only disengage on main off and on brake at low speed
 - Reacting Toyota tssp higher acceleration and braking limits.
-- Speed sign reading 
+- Speed sign reading
 - Stock Toyota ldw steering assist
 - Cruise set speed available down to 7 kph
 - Smooth longitudinal controller also at low speeds
@@ -71,12 +69,13 @@ More info about how to install this fork can be found [here](https://medium.com/
 - No fingerprint compatibility problems. A completely different way to combine and split Fingerprints so that they always work I.e. comma is not supporting rav4h 2019 because of this Fingerprint method. Mine is better
 - Custom events and capnp structure so that comma is happy with the drives from my fork
 - Forward collision warning actually brakes for you.
-- Blind Spot Monitoring for all of the toyota which will be added to control ALCA. For right now it is always on. It will flash rapidly when stopped and if the object is detected. 
+- Blind Spot Monitoring for all of the toyota which will be added to control ALCA. For right now it is always on. It will flash rapidly when stopped and if the object is detected.
 - Ability to ruduce or Increase curvature Factor from `op_edit.py` (`python /data/openpilot/op_edit.py`) It will also works with eco and sport mode. If using eco mode then it will start breaking early (350 m before) if using sport mode it will slow down little late (150 m).
 - Ability to change the SpeedLimit Offset directly from APK. It is based in percentages. For Example, if -1% at 60mph, it will be  approx. 59.4mph, -10% is roughly 54mph etc. (Thank you eFini for the help)
 - Dashcam recording button added to the ui. ( it will save video's to the `/data/media/0/video`)
-- GPS Accurecy on the Dev UI. 
-
+- GPS Accurecy on the Dev UI.
+- Live speedlimit_offset in op_tune.py
+- If the model detect's cut in it will draw two different chevron to show the user that it see's both of the car.
 # Licensing
 
 openpilot is released under the MIT license. Some parts of the software are released under other licenses as specified.

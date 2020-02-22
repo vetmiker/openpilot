@@ -313,6 +313,7 @@ def auto_update_reboot(time_offroad, need_reboot, new_version):
 
 
 def main(gctx=None):
+  update_failed_count = 0
   overlay_init_done = False
   wait_helper = WaitTimeHelper()
   params = Params()
@@ -334,6 +335,7 @@ def main(gctx=None):
   time_offroad = time.time()
   need_reboot = False
   while True:
+    update_failed_count += 1
     time_wrong = datetime.datetime.now().year < 2019
     ping_failed = subprocess.call(["ping", "-W", "4", "-c", "1", "8.8.8.8"])
 
@@ -357,6 +359,7 @@ def main(gctx=None):
 
         if params.get("IsOffroad") == b"1":
           need_reboot = attempt_update(time_offroad, need_reboot)
+          update_failed_count = 0
         else:
           time_offroad = time.time()
           cloudlog.info("not running updater, openpilot running")
@@ -371,8 +374,8 @@ def main(gctx=None):
         overlay_init_done = False
       except Exception:
         cloudlog.exception("uncaught updated exception, shouldn't happen")
-        overlay_init_done = False
 
+    params.put("UpdateFailedCount", str(update_failed_count))
     wait_between_updates(wait_helper.ready_event)
     if wait_helper.shutdown:
       break
