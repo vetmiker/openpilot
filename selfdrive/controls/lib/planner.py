@@ -174,16 +174,16 @@ class Planner():
     
     # we read offset value every 5 seconds
     
-    if self.last_time > 5:
-      if not travis:
+    if not travis:
+      if self.last_time > 5:
         try:
           self.offset = int(self.params.get("SpeedLimitOffset", encoding='utf8'))
-        except:
+        except ValueError:
           self.params.delete("SpeedLimitOffset")
           self.offset = 0
         self.osm = self.params.get("LimitSetSpeed", encoding='utf8') == "1"
-      self.last_time = 0
-    self.last_time = self.last_time + 1
+        self.last_time = 0
+      self.last_time = self.last_time + 1
       
     gas_button_status = arne_sm['arne182Status'].gasbuttonstatus
     v_ego = sm['carState'].vEgo
