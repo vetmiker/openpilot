@@ -176,7 +176,11 @@ class Planner():
     
     if self.last_time > 5:
       if not travis:
-        self.offset = int(self.params.get("SpeedLimitOffset", encoding='utf8'))
+        try:
+          self.offset = int(self.params.get("SpeedLimitOffset", encoding='utf8'))
+        except:
+          self.params.delete("SpeedLimitOffset")
+          self.offset = 0
         self.osm = self.params.get("LimitSetSpeed", encoding='utf8') == "1"
       self.last_time = 0
     self.last_time = self.last_time + 1
