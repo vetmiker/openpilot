@@ -116,7 +116,7 @@ class QueryThread(LoggerThread):
                     self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(prev_ecef), str(dist)))
 
                 if dist > 4000:
-                    cache_valid = False
+                    self.sharedParams['cache_valid'] = False
 
             # this line was added because logic broke
             if last_gps is not None:
@@ -127,7 +127,7 @@ class QueryThread(LoggerThread):
                         new_result = api.query(q)
                         self.logger.debug("new_result = %s" % str(new_result))
                     except:
-                        api2 = overpy.Overpass(url=OVERPASS_API_URL2)
+                        api2 = overpy.Overpass(url=self.OVERPASS_API_URL2)
                         self.logger.error("Using backup Server")
                         new_result = api2.query(q)
 
@@ -170,12 +170,12 @@ class QueryThread(LoggerThread):
                     crash.capture_warning(e)
                     query_lock = self.sharedParams.get('query_lock', None)
                     query_lock.acquire()
-                    last_query_result = None
+                    self.sharedParams['last_query_result'] = None
                     query_lock.release()
             else:
                 query_lock = self.sharedParams.get('query_lock', None)
                 query_lock.acquire()
-                last_query_result = None
+                self.sharedParams['last_query_result'] = None
                 query_lock.release()
 
             self.logger.debug("end of one cycle in endless loop ...")
@@ -252,7 +252,7 @@ class MapsdThread(LoggerThread):
 
             if gps.accuracy > 2.0 and not speedLimittrafficvalid:
                 fix_ok = False
-            if not fix_ok or last_query_result is None or not cache_valid:
+            if not fix_ok or self.sharedParams['last_query_result'] is None or not cache_valid:
                 self.logger.debug("fix_ok %s" % fix_ok)
                 self.logger.error("Error in fix_ok logic")
                 cur_way = None
@@ -272,7 +272,7 @@ class MapsdThread(LoggerThread):
                 speed = gps.speed
 
                 query_lock.acquire()
-                cur_way = Way.closest(last_query_result, lat, lon, heading, cur_way)
+                cur_way = Way.closest(self.sharedParams['last_query_result'], lat, lon, heading, cur_way)
                 if cur_way is not None:
                     self.logger.debug("cur_way is not None ...")
                     pnts, curvature_valid = cur_way.get_lookahead(lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE)
@@ -408,9 +408,13 @@ class MapsdThread(LoggerThread):
 
 
 if __name__ == "__main__":
+    params = Params()
+    dongle_id = params.get("DongleId")
+    crash.bind_user(id=dongle_id)
+    crash.bind_extra(version=version, dirty=dirty, is_eon=True)
+    crash.install()
     # initialize gps parameters
     # initialize last_gps
-    import time
     current_milli_time = lambda: int(round(time.time() * 1000))
 
     #from collections import namedtuple
