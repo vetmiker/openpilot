@@ -118,10 +118,8 @@ class QueryThread(LoggerThread):
                 if dist > 4000:
                     self.sharedParams['cache_valid'] = False
 
-            # this line was added because logic broke
-            if last_gps is not None:
+            if last_gps is not None and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
                 q = self.build_way_query(last_gps.latitude, last_gps.longitude, radius=4000)
-            if self.is_connected_to_internet() or self.is_connected_to_internet2():
                 try:
                     try:
                         new_result = api.query(q)
