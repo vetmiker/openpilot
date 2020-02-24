@@ -4,6 +4,7 @@
 import logging
 import logging.handlers
 
+
 # Add phonelibs openblas to LD_LIBRARY_PATH if import fails
 from scipy import spatial
 
@@ -39,7 +40,7 @@ class LoggerThread(threading.Thread):
         f = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
         h.setFormatter(f)
         self.logger.addHandler(h)
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.CRITICAL) # set to logging.DEBUG to enable logging
     
     def run(self):
         pass # will be overridden in the child class
