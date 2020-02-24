@@ -154,7 +154,7 @@ class QueryThread(LoggerThread):
                     nodes = np.asarray(nodes)
                     nodes = geodetic2ecef(nodes)
                     tree = spatial.cKDTree(nodes)
-                    self.logger.debug("query thread, ...", nodes, tree)
+                    #self.logger.debug("query thread, ...", nodes, tree)
 
                     # write result
                     query_lock = self.sharedParams.get('query_lock', None)
