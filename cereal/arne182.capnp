@@ -126,6 +126,10 @@ struct ManagerData {
   runningProcesses @0 :List(Text);
 }
 
+struct SmiskolData {
+  mpcTR @0 :Float32;
+}
+
 struct EventArne182 {
   # in nanoseconds?
   logMonoTime @0 :UInt64;
@@ -138,5 +142,6 @@ struct EventArne182 {
     phantomData @4:PhantomData;
     managerData @5:ManagerData;
     thermalonline @7:ThermalOnlineData;
+    smiskolData @8 :SmiskolData;
   }
 }
