@@ -76,8 +76,12 @@ class LongitudinalMpc():
     self.cur_state[0].a_ego = a
     
   def get_TR(self, CS):
-    if not self.lead_data['status'] or travis:
+    if travis:
       TR = 1.8
+    elif CS.vEgo < 5.0:
+      TRs = [5.0, 3.0, 2.3, 2.0, 1.8]
+      vEgos = [1.0, 2.0, 3.0, 4.0, 5.0]
+      TR = interp(CS.vEgo, vEgos, TRs)
     else:
       self.store_df_data()
       TR = self.dynamic_follow(CS)
@@ -95,8 +99,8 @@ class LongitudinalMpc():
       self.pm.send('smiskolData', dat)
 
   def change_cost(self, TR):
-    TRs = [0.9, 1.8, 2.7]
-    costs = [1.0, 0.1, 0.05]
+    TRs = [0.9, 1.8, 2.7, 5.0]
+    costs = [1.0, 0.1, 0.05, 1.0]
     cost = interp(TR, TRs, costs)
     if self.last_cost != cost:
       self.libmpc.change_tr(MPC_COST_LONG.TTC, cost, MPC_COST_LONG.ACCELERATION, MPC_COST_LONG.JERK)
@@ -133,22 +137,22 @@ class LongitudinalMpc():
 
   def dynamic_follow(self, CS):
     self.df_profile = self.op_params.get('dynamic_follow', 'relaxed').strip().lower()
-    x_vel = [0.0, 1.8627, 3.7253, 5.588, 7.4507, 9.3133, 11.5598, 13.645, 22.352, 31.2928, 33.528, 35.7632, 40.2336]  # velocities
+    x_vel = [5.0, 7.4507, 9.3133, 11.5598, 13.645, 22.352, 31.2928, 33.528, 35.7632, 40.2336]  # velocities
     p_mod_x = [3, 20, 35]  # profile mod speeds
     if self.df_profile == 'roadtrip':
-      y_dist = [1.3847, 1.3946, 1.4078, 1.4243, 1.4507, 1.4837, 1.5327, 1.553, 1.581, 1.617, 1.653, 1.687, 1.74]  # TRs
+      y_dist = [1.8, 1.4507, 1.4837, 1.5327, 1.553, 1.581, 1.617, 1.653, 1.687, 1.74]  # TRs
       p_mod_pos = [0.99, 0.815, 0.57]
       p_mod_neg = [1.0, 1.27, 1.675]
     elif self.df_profile == 'traffic':  # for in congested traffic
-      x_vel = [0.0, 1.8627, 3.7253, 5.588, 7.4507, 9.3133, 11.5598, 13.645, 17.8816, 22.407, 28.8833, 34.8691, 40.3906]
-      y_dist = [1.384, 1.391, 1.403, 1.415, 1.437, 1.468, 1.501, 1.506, 1.38, 1.2216, 1.085, 1.0516, 1.016]
+      x_vel = [5.0, 7.4507, 9.3133, 11.5598, 13.645, 17.8816, 22.407, 28.8833, 34.8691, 40.3906]
+      y_dist = [1.8, 1.437, 1.468, 1.501, 1.506, 1.38, 1.2216, 1.085, 1.0516, 1.016]
       p_mod_pos = [1.015, 2.175, 3.65]
       p_mod_neg = [0.98, 0.08, 0.0]
       # y_dist = [1.384, 1.391, 1.403, 1.415, 1.437, 1.3506, 1.3959, 1.4156, 1.38, 1.1899, 1.026, 0.9859, 0.9432]  # from 071-2 (need to fix FCW)
       # p_mod_pos = [1.015, 2.2, 3.95]
       # p_mod_neg = [0.98, 0.1, 0.0]
     else:  # default to relaxed/stock
-      y_dist = [1.385, 1.394, 1.406, 1.421, 1.444, 1.474, 1.516, 1.534, 1.546, 1.568, 1.579, 1.593, 1.614]
+      y_dist = [1.8, 1.444, 1.474, 1.516, 1.534, 1.546, 1.568, 1.579, 1.593, 1.614]
       p_mod_pos = [1.0, 1.0, 1.0]
       p_mod_neg = [1.0, 1.0, 1.0]
 
