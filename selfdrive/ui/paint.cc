@@ -287,9 +287,11 @@ const UIScene *scene = &s->scene;
     }
 
     if (!started) {
-      nvgMoveTo(s->vg, pvd->v[i].x + 100, pvd->v[i].y);
+      nvgMoveTo(s->vg, pvd->v[i].x, pvd->v[i].y);
+      nvgLineTo(s->vg, pvd->v[i].x + 100, pvd->v[i].y);
       started = true;
     } else {
+      nvgLineTo(s->vg, pvd->v[i].x, pvd->v[i].y);
       nvgLineTo(s->vg, pvd->v[i].x + 100, pvd->v[i].y);
     }
   }
@@ -301,7 +303,7 @@ const UIScene *scene = &s->scene;
     // Draw colored MPC track
     if (scene->steerOverride) {
       track_bg = nvgLinearGradient(s->vg, vwp_w, vwp_h, vwp_w, vwp_h*.4,
-        nvgRGBA(0, 191, 255, 255), nvgRGBA(0, 95, 128, 50));
+        nvgRGBA(155, 0, 0, 255), nvgRGBA(55, 0, 0, 50));
     } else {
       track_bg = nvgLinearGradient(s->vg, vwp_w, vwp_h, vwp_w, vwp_h*.4,
         nvgRGBA(255,0, 0, 255),
@@ -343,10 +345,11 @@ const UIScene *scene = &s->scene;
     }
 
     if (!started) {
-      nvgMoveTo(s->vg, pvd->v[i].x - 100, pvd->v[i].y);
+      nvgMoveTo(s->vg, pvd->v[i].x, pvd->v[i].y);
+      nvgLineTo(s->vg, pvd->v[i].x - 100, pvd->v[i].y);
       started = true;
     } else {
-	    
+      nvgLineTo(s->vg, pvd->v[i].x, pvd->v[i].y);
       nvgLineTo(s->vg, pvd->v[i].x - 100, pvd->v[i].y);
     }
   }
@@ -358,7 +361,7 @@ const UIScene *scene = &s->scene;
     // Draw colored MPC track
     if (scene->steerOverride) {
       track_bg = nvgLinearGradient(s->vg, vwp_w, vwp_h, vwp_w, vwp_h*.4,
-        nvgRGBA(0, 191, 255, 255), nvgRGBA(0, 95, 128, 50));
+        nvgRGBA(155, 0, 0, 255), nvgRGBA(55, 0, 0, 50));
     } else {
       track_bg = nvgLinearGradient(s->vg, vwp_w, vwp_h, vwp_w, vwp_h*.4,
 	
@@ -497,13 +500,13 @@ static void ui_draw_vision_lanes(UIState *s) {
   ui_draw_track(s, false, &s->track_vertices[0]);
   if (scene->engaged) {
     // Draw MPC path when engaged
-    ui_draw_track(s, true, &s->track_vertices[1]);
     if (scene->rightblindspot){
       ui_draw_track_right(s, true, &s->track_vertices[1]);
     }
     if (scene->leftblindspot){
       ui_draw_track_left(s, true, &s->track_vertices[1]);
     }
+    ui_draw_track(s, true, &s->track_vertices[1]);
   }
 }
 
