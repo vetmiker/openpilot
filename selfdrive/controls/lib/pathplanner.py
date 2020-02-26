@@ -7,6 +7,7 @@ from selfdrive.controls.lib.lane_planner import LanePlanner
 from selfdrive.config import Conversions as CV
 from common.params import Params
 import cereal.messaging as messaging
+import cereal.messaging_arne as messaging_arne
 from cereal import log
 from common.op_params import opParams
 #from common.travis_checker import travis
@@ -47,7 +48,7 @@ def calc_states_after_delay(states, v_ego, steer_angle, curvature_factor, steer_
 class PathPlanner():
   def __init__(self, CP):
     self.LP = LanePlanner()
-
+    self.arne_sm = messaging_arne.SubMaster(['arne182Status'])
     self.last_cloudlog_t = 0
     self.steer_rate_cost = CP.steerRateCost
 
@@ -80,6 +81,8 @@ class PathPlanner():
     self.angle_steers_des_time = 0.0
 
   def update(self, sm, pm, CP, VM):
+    self.arne_sm.update(0)
+    
     v_ego = sm['carState'].vEgo
     angle_steers = sm['carState'].steeringAngle
     active = sm['controlsState'].active
@@ -102,7 +105,7 @@ class PathPlanner():
     elif sm['carState'].rightBlinker:
       self.lane_change_direction = LaneChangeDirection.right
 
-    if (not active) or (self.lane_change_timer > LANE_CHANGE_TIME_MAX) or (not one_blinker) or (not self.lane_change_enabled):
+    if (not active) or (self.lane_change_timer > LANE_CHANGE_TIME_MAX) or (not one_blinker) or (not self.lane_change_enabled) or self.arne_sm['arne182Status'].leftBlindspot or self.arne_sm['arne182Status'].rightBlindspot:
       self.lane_change_state = LaneChangeState.off
       self.lane_change_direction = LaneChangeDirection.none
     else:
@@ -112,9 +115,11 @@ class PathPlanner():
         lane_change_direction = LaneChangeDirection.right
 
       if self.alca_nudge_required:
-        torque_applied = sm['carState'].steeringPressed and \
+        torque_applied = (sm['carState'].steeringPressed and \
                          ((sm['carState'].steeringTorque > 0 and lane_change_direction == LaneChangeDirection.left) or \
-                          (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right))
+                          (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right))) or \
+                         (not self.arne_sm['arne182Status'].leftBlindspot and lane_change_direction == LaneChangeDirection.left) or \
+                         (not self.arne_sm['arne182Status'].rightBlindspot and lane_change_direction == LaneChangeDirection.right)
       else:
         torque_applied = True
 
