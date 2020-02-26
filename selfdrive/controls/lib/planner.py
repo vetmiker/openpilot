@@ -172,10 +172,10 @@ class Planner():
   def update(self, sm, pm, CP, VM, PP, arne_sm):
     """Gets called when new radarState is available"""
     cur_time = sec_since_boot()
-    v_ego = sm['carState'].vEgo
+    
     # we read offset value every 5 seconds
     fixed_offset = 0.0
-    if not travis and v_ego > offset_limit:
+    if not travis:
       fixed_offset = op_params.get('speed_offset', 0.0)
       if self.last_time > 5:
         try:
@@ -188,7 +188,7 @@ class Planner():
       self.last_time = self.last_time + 1
       
     gas_button_status = arne_sm['arne182Status'].gasbuttonstatus
-    
+    v_ego = sm['carState'].vEgo
     blinkers = sm['carState'].leftBlinker or sm['carState'].rightBlinker
     if blinkers:
       steering_angle = 0.
@@ -243,7 +243,8 @@ class Planner():
         speed_limit = sm['liveMapData'].speedLimit
         if speed_limit is not None:
           # offset is in percentage,.
-          v_speedlimit = speed_limit * (1. + self.offset/100.0)
+          if v_ego > offset_limit:
+            v_speedlimit = speed_limit * (1. + self.offset/100.0)
           if v_speedlimit > fixed_offset:
             v_speedlimit = v_speedlimit + fixed_offset
       else:
@@ -263,7 +264,8 @@ class Planner():
         else:
           speed_limit_ahead = sm['liveMapData'].speedLimitAhead
         if speed_limit_ahead is not None:
-          v_speedlimit_ahead = speed_limit_ahead * (1. + self.offset/100.0)
+          if v_ego > offset_limit:
+            v_speedlimit_ahead = speed_limit_ahead * (1. + self.offset/100.0)
           if v_speedlimit_ahead > fixed_offset:
             v_speedlimit_ahead = v_speedlimit_ahead + fixed_offset
       if sm['liveMapData'].curvatureValid and osm and self.osm and (sm['liveMapData'].lastGps.timestamp -time.mktime(now.timetuple()) * 1000) < 10000:
