@@ -19,6 +19,7 @@ from common.travis_checker import travis
 from common.op_params import opParams
 op_params = opParams()
 osm = op_params.get('osm', True)
+offset_limit = op_params.get('offset_limit', , default=0.0)
 
 if not travis:
   curvature_factor = opParams().get('curvature_factor', default=1.0)
@@ -171,9 +172,10 @@ class Planner():
   def update(self, sm, pm, CP, VM, PP, arne_sm):
     """Gets called when new radarState is available"""
     cur_time = sec_since_boot()
+    v_ego = sm['carState'].vEgo
     # we read offset value every 5 seconds
     fixed_offset = 0.0
-    if not travis:
+    if not travis and v_ego > offset_limit:
       fixed_offset = op_params.get('speed_offset', 0.0)
       if self.last_time > 5:
         try:
@@ -186,7 +188,7 @@ class Planner():
       self.last_time = self.last_time + 1
       
     gas_button_status = arne_sm['arne182Status'].gasbuttonstatus
-    v_ego = sm['carState'].vEgo
+    
     blinkers = sm['carState'].leftBlinker or sm['carState'].rightBlinker
     if blinkers:
       steering_angle = 0.
