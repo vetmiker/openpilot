@@ -526,7 +526,10 @@ class CarInterface(CarInterfaceBase):
 
     if ret.gasPressed and disengage_event:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
-
+    if ret.rightBlinker self.CS.rightblindspot:
+      eventsArne182.append(create_event_arne('rightALCbsm', [ET.WARNING]))
+    if ret.leftBlinker self.CS.leftblindspot:
+      eventsArne182.append(create_event_arne('leftALCbsm', [ET.WARNING]))
     ret.events = events
     ret_arne182.events = eventsArne182
 
