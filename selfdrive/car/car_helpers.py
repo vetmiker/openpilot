@@ -176,7 +176,7 @@ def fingerprint(logcan, sendcan, has_relay):
   params.put("CachedFingerprint", json.dumps([car_fingerprint, source, {int(key): value for key, value in finger[0].items()}]))
   return car_fingerprint, finger, vin, car_fw, source
 
-def is_connected_to_internet(self, timeout=5):
+def is_connected_to_internet(timeout=5):
     try:
         requests.get("https://sentry.io", timeout=timeout)
         return True
