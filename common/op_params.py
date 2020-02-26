@@ -49,6 +49,7 @@ class opParams:
                            'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
                            'keep_openpilot_engaged': {'default': True, 'allowed_types': [bool], 'description': 'True is stock behavior in this fork. False lets you use the brake and cruise control stalk to disengage as usual', 'live': False},
                            'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
+                           'offset_limit': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed at which apk percent offset will work in m/s', 'live': False},
                            'dynamic_follow': {'default': 'relaxed', 'allowed_types': [str], 'description': "Can be: ('traffic', 'relaxed', 'roadtrip'): Left to right increases in following distance.\n"
                                                                                                            "All profiles support dynamic follow so you'll get your preferred distance while\n"
                                                                                                            "retaining the smoothness and safety of dynamic follow!", 'live': True}}
