@@ -76,7 +76,7 @@ class LongitudinalMpc():
     self.cur_state[0].a_ego = a
     
   def get_TR(self, CS):
-    if travis:
+    if not self.lead_data['status'] or travis:
       TR = 1.8
     elif CS.vEgo < 5.0:
       TRs = [5.0, 3.0, 2.3, 2.0, 1.8]
