@@ -19,7 +19,7 @@ from common.travis_checker import travis
 from common.op_params import opParams
 op_params = opParams()
 osm = op_params.get('osm', True)
-offset_limit = op_params.get('offset_limit', , default=0.0)
+offset_limit = op_params.get('offset_limit', default=0.0)
 
 if not travis:
   curvature_factor = opParams().get('curvature_factor', default=1.0)
