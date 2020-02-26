@@ -178,10 +178,8 @@ def fingerprint(logcan, sendcan, has_relay):
 def is_connected_to_internet(self, timeout=5):
     try:
         requests.get("https://sentry.io", timeout=timeout)
-        self.logger.debug("connection 1 active")
         return True
     except:
-        self.logger.error("No internet connection available.")
         return False 
       
 def crash_log(candidate):
