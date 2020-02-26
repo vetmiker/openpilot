@@ -346,6 +346,7 @@ const UIScene *scene = &s->scene;
       nvgMoveTo(s->vg, pvd->v[i].x - 100, pvd->v[i].y);
       started = true;
     } else {
+	    
       nvgLineTo(s->vg, pvd->v[i].x - 100, pvd->v[i].y);
     }
   }
@@ -359,6 +360,8 @@ const UIScene *scene = &s->scene;
       track_bg = nvgLinearGradient(s->vg, vwp_w, vwp_h, vwp_w, vwp_h*.4,
         nvgRGBA(0, 191, 255, 255), nvgRGBA(0, 95, 128, 50));
     } else {
+      track_bg = nvgLinearGradient(s->vg, vwp_w, vwp_h, vwp_w, vwp_h*.4,
+	
         nvgRGBA(255,0, 0, 255),
         nvgRGBA(155, 0, 0, 50));
     }
