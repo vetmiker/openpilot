@@ -126,8 +126,8 @@ class PathPlanner():
         torque_applied = (sm['carState'].steeringPressed and \
                          ((sm['carState'].steeringTorque > 0 and lane_change_direction == LaneChangeDirection.left) or \
                           (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right))) or \
-                         (self.blindspotTrueCounterleft > 20 and lane_change_direction == LaneChangeDirection.left) or \
-                         (self.blindspotTrueCounterright > 20 and lane_change_direction == LaneChangeDirection.right)
+                         (self.blindspotTrueCounterleft > 50 and lane_change_direction == LaneChangeDirection.left) or \
+                         (self.blindspotTrueCounterright > 50 and lane_change_direction == LaneChangeDirection.right)
       else:
         torque_applied = True
 
@@ -136,6 +136,8 @@ class PathPlanner():
       # State transitions
       # off
       if self.lane_change_state == LaneChangeState.off and one_blinker and not self.prev_one_blinker and not below_lane_change_speed:
+        self.blindspotTrueCounterleft = 0
+        self.blindspotTrueCounterright = 0
         self.lane_change_state = LaneChangeState.preLaneChange
 
       # pre
