@@ -180,7 +180,7 @@ class Planner():
       if self.last_time > 5:
         try:
           self.offset = int(self.params.get("SpeedLimitOffset", encoding='utf8'))
-        except ValueError:
+        except (TypeError,ValueError):
           self.params.delete("SpeedLimitOffset")
           self.offset = 0
         self.osm = self.params.get("LimitSetSpeed", encoding='utf8') == "1"
