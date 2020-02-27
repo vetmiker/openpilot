@@ -87,7 +87,7 @@ class LongitudinalMpc():
       TR = self.dynamic_follow(CS)
 
     if not travis:
-      self.change_cost(TR)
+      self.change_cost(TR,CS.vEgo)
       self.send_cur_TR(TR)
     return TR
 
@@ -98,10 +98,12 @@ class LongitudinalMpc():
       dat.smiskolData.mpcTR = TR
       self.pm.send('smiskolData', dat)
 
-  def change_cost(self, TR):
+  def change_cost(self, TR, vEgo):
     TRs = [0.9, 1.8, 2.7, 5.0]
     costs = [1.0, 0.1, 0.05, 1.0]
     cost = interp(TR, TRs, costs)
+    if vEgo < 5.0:
+      cost = cost * min(max(1.0 , 6.0 - vEgo),5.0)
     if self.last_cost != cost:
       self.libmpc.change_tr(MPC_COST_LONG.TTC, cost, MPC_COST_LONG.ACCELERATION, MPC_COST_LONG.JERK)
       self.last_cost = cost
