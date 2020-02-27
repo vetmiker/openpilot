@@ -113,7 +113,7 @@ class PathPlanner():
     elif sm['carState'].rightBlinker:
       self.lane_change_direction = LaneChangeDirection.right
 
-    if (not active) or (self.lane_change_timer > LANE_CHANGE_TIME_MAX) or (not one_blinker) or (not self.lane_change_enabled) or self.arne_sm['arne182Status'].leftBlindspot or self.arne_sm['arne182Status'].rightBlindspot:
+    if (not active) or (self.lane_change_timer > LANE_CHANGE_TIME_MAX) or (not one_blinker) or (not self.lane_change_enabled):
       self.lane_change_state = LaneChangeState.off
       self.lane_change_direction = LaneChangeDirection.none
     else:
@@ -144,17 +144,26 @@ class PathPlanner():
       elif self.lane_change_state == LaneChangeState.preLaneChange:
         if not one_blinker or below_lane_change_speed:
           self.lane_change_state = LaneChangeState.off
+          self.blindspotTrueCounterleft = 0
+          self.blindspotTrueCounterright = 0
         elif torque_applied:
           self.lane_change_state = LaneChangeState.laneChangeStarting
 
       # starting
-      elif self.lane_change_state == LaneChangeState.laneChangeStarting and lane_change_prob > 0.5:
-        self.lane_change_state = LaneChangeState.laneChangeFinishing
+      elif self.lane_change_state == LaneChangeState.laneChangeStarting: 
+        if lane_change_prob > 0.5:
+          self.lane_change_state = LaneChangeState.laneChangeFinishing
+        if (self.arne_sm['arne182Status'].rightBlindspot and lane_change_direction == LaneChangeDirection.right) or (self.arne_sm['arne182Status'].leftBlindspot and lane_change_direction == LaneChangeDirection.left):
+          self.lane_change_state = LaneChangeState.preLaneChange
+          self.blindspotTrueCounterleft = 0
+          self.blindspotTrueCounterright = 0
 
       # finishing
       elif self.lane_change_state == LaneChangeState.laneChangeFinishing and lane_change_prob < 0.2:
         if one_blinker:
           self.lane_change_state = LaneChangeState.preLaneChange
+          self.blindspotTrueCounterleft = 0
+          self.blindspotTrueCounterright = 0
         else:
           self.lane_change_state = LaneChangeState.off
           self.blindspotTrueCounterright = 0
