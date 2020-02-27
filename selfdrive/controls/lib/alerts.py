@@ -275,7 +275,7 @@ ALERTS = [
       AlertStatus.userPrompt, AlertSize.mid,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 3.),
   
-	Alert(
+  Alert(
       "rightALCbsm",
       "Vehicle in Right Lane",
       "Waiting for Lane to be clear",
