@@ -80,6 +80,9 @@ struct CarEventArne182 @0x9b1657f34caf3ad4 {
     reverseGearArne @2;
     waitingMode @3;
     wrongGearArne @4;
+    rightALCbsm @5;
+    leftALCbsm @6;
+    preventALC @7;
   }
 }
 

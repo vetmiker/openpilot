@@ -8,6 +8,7 @@ from selfdrive.car.toyota.values import Ecu, ECU_FINGERPRINT, CAR, NO_STOP_TIMER
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, is_ecu_disconnected, gen_empty_fingerprint
 from selfdrive.swaglog import cloudlog
 from selfdrive.car.interfaces import CarInterfaceBase
+from common.op_params import opParams
 
 ButtonType = car.CarState.ButtonEvent.Type
 GearShifter = car.CarState.GearShifter
@@ -24,7 +25,8 @@ class CarInterface(CarInterfaceBase):
     self.keep_openpilot_engaged = True
     # *** init the major players ***
     self.CS = CarState(CP)
-
+    self.op_params = opParams()
+    self.alca_min_speed = self.op_params.get('alca_min_speed', default=20.0)
     self.cp = get_can_parser(CP)
     self.cp_init = get_can_parser_init(CP)
     self.cp_cam = get_cam_can_parser(CP)
@@ -526,7 +528,10 @@ class CarInterface(CarInterfaceBase):
 
     if ret.gasPressed and disengage_event:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
-
+    if ret.rightBlinker and self.CS.rightblindspot and ret.vEgo > self.alca_min_speed:
+      eventsArne182.append(create_event_arne('rightALCbsm', [ET.WARNING]))
+    if ret.leftBlinker and self.CS.leftblindspot and ret.vEgo > self.alca_min_speed:
+      eventsArne182.append(create_event_arne('leftALCbsm', [ET.WARNING]))
     ret.events = events
     ret_arne182.events = eventsArne182
 
