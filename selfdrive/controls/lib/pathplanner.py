@@ -59,7 +59,8 @@ class PathPlanner():
     self.lane_change_direction = LaneChangeDirection.none
     self.lane_change_timer = 0.0
     self.prev_one_blinker = False
-
+    self.blindspotTrueCounterleft = 0
+    self.blindspotTrueCounterright = 0
     self.op_params = opParams()
     self.alca_nudge_required = self.op_params.get('alca_nudge_required', default=True)
     self.alca_min_speed = self.op_params.get('alca_min_speed', default=20.0)
@@ -82,7 +83,14 @@ class PathPlanner():
 
   def update(self, sm, pm, CP, VM):
     self.arne_sm.update(0)
-    
+    if self.arne_sm['arne182Status'].rightBlindspot:
+      self.blindspotTrueCounterright = 0
+    else:
+      self.blindspotTrueCounterright = self.blindspotTrueCounterright + 1
+    if self.arne_sm['arne182Status'].leftBlindspot:
+      self.blindspotTrueCounterleft = 0
+    else:
+      self.blindspotTrueCounterleft = self.blindspotTrueCounterleft + 1
     v_ego = sm['carState'].vEgo
     angle_steers = sm['carState'].steeringAngle
     active = sm['controlsState'].active
@@ -118,8 +126,8 @@ class PathPlanner():
         torque_applied = (sm['carState'].steeringPressed and \
                          ((sm['carState'].steeringTorque > 0 and lane_change_direction == LaneChangeDirection.left) or \
                           (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right))) or \
-                         (not self.arne_sm['arne182Status'].leftBlindspot and lane_change_direction == LaneChangeDirection.left) or \
-                         (not self.arne_sm['arne182Status'].rightBlindspot and lane_change_direction == LaneChangeDirection.right)
+                         (self.blindspotTrueCounterleft > 20 and lane_change_direction == LaneChangeDirection.left) or \
+                         (self.blindspotTrueCounterright > 20 and lane_change_direction == LaneChangeDirection.right)
       else:
         torque_applied = True
 
@@ -147,6 +155,8 @@ class PathPlanner():
           self.lane_change_state = LaneChangeState.preLaneChange
         else:
           self.lane_change_state = LaneChangeState.off
+          self.blindspotTrueCounterright = 0
+          self.blindspotTrueCounterleft = 0
 
     if self.lane_change_state in [LaneChangeState.off, LaneChangeState.preLaneChange]:
       self.lane_change_timer = 0.0
