@@ -124,8 +124,8 @@ class PathPlanner():
 
       if self.alca_nudge_required:
         torque_applied = (sm['carState'].steeringPressed and \
-                         ((sm['carState'].steeringTorque > 0 and lane_change_direction == LaneChangeDirection.left) or \
-                          (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right))) or \
+                         ((sm['carState'].steeringTorque > 0 and lane_change_direction == LaneChangeDirection.left and not self.arne_sm['arne182Status'].leftBlindspot) or \
+                          (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right and not self.arne_sm['arne182Status'].rightBlindspot))) or \
                          (self.blindspotTrueCounterleft > 30 and lane_change_direction == LaneChangeDirection.left) or \
                          (self.blindspotTrueCounterright > 30 and lane_change_direction == LaneChangeDirection.right)
       else:
