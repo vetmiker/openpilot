@@ -284,16 +284,22 @@ class CarState(CarStateBase):
     msg.init('arne182Status')
     if frame > 999:
       if cp.vl["DEBUG"]['BLINDSPOTSIDE']==65: #Left
-        self.leftblindspotcounter = 21
-        self.leftblindspotD1 = cp.vl["DEBUG"]['BLINDSPOTD1']
-        self.leftblindspotD2 = cp.vl["DEBUG"]['BLINDSPOTD2']
+        if cp.vl["DEBUG"]['BLINDSPOTD1'] != self.leftblindspotD1:
+          self.leftblindspotD1 = cp.vl["DEBUG"]['BLINDSPOTD1']
+          self.leftblindspotcounter = 21
+        if cp.vl["DEBUG"]['BLINDSPOTD2'] != self.leftblindspotD2:
+          self.leftblindspotD2 = cp.vl["DEBUG"]['BLINDSPOTD2']
+          self.leftblindspotcounter = 21
         if (self.leftblindspotD1 > 10) or (self.leftblindspotD2 > 10):
           self.leftblindspot = bool(1)
           print("Left Blindspot Detected")
       elif  cp.vl["DEBUG"]['BLINDSPOTSIDE']==66: #Right
-        self.rightblindspotcounter = 21
-        self.rightblindspotD1 = cp.vl["DEBUG"]['BLINDSPOTD1']
-        self.rightblindspotD2 = cp.vl["DEBUG"]['BLINDSPOTD2']
+        if cp.vl["DEBUG"]['BLINDSPOTD1'] != self.rightblindspotD1:
+          self.rightblindspotD1 = cp.vl["DEBUG"]['BLINDSPOTD1']
+          self.rightblindspotcounter = 21
+        if cp.vl["DEBUG"]['BLINDSPOTD2'] != self.rightblindspotD2:
+          self.rightblindspotD2 = cp.vl["DEBUG"]['BLINDSPOTD2']
+          self.rightblindspotcounter = 21
         if (self.rightblindspotD1 > 10) or (self.rightblindspotD2 > 10):
           self.rightblindspot = bool(1)
           print("Right Blindspot Detected")
