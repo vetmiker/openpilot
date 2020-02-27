@@ -30,7 +30,7 @@ class LongitudinalMpc():
     self.prev_lead_status = False
     self.prev_lead_x = 0.0
     self.new_lead = False
-
+    self.TR_Mod = 0
     self.last_cloudlog_t = 0.0
     
     if not travis and mpc_id == 1:
@@ -104,6 +104,8 @@ class LongitudinalMpc():
     cost = interp(TR, TRs, costs)
     if vEgo < 5.0:
       cost = cost * min(max(1.0 , 6.0 - vEgo),5.0)
+    if self.TR_Mod > 0:
+      cost = cost + self.TR_Mod
     if self.last_cost != cost:
       self.libmpc.change_tr(MPC_COST_LONG.TTC, cost, MPC_COST_LONG.ACCELERATION, MPC_COST_LONG.JERK)
       self.last_cost = cost
@@ -189,8 +191,8 @@ class LongitudinalMpc():
     # y = [0.94, 1.0]
     # TR_mod *= interp(self.car_data['v_ego'], x, y)  # modify TR less at lower speeds
 
-    TR_mod = sum([mod * p_mod_neg if mod < 0 else mod * p_mod_pos for mod in TR_mod])  # alter TR modification according to profile
-    TR += TR_mod
+    self.TR_Mod = sum([mod * p_mod_neg if mod < 0 else mod * p_mod_pos for mod in TR_mod])  # alter TR modification according to profile
+    TR += self.TR_Mod
 
     if CS.leftBlinker or CS.rightBlinker and self.df_profile != 'traffic':
       x = [8.9408, 22.352, 31.2928]  # 20, 50, 70 mph
