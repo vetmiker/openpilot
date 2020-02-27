@@ -47,8 +47,10 @@ class opParams:
                            'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False},
                            'osm': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use OSM for drives', 'live': False},
                            'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
+                           'alca_nudge_required': {'default': True, 'allowed_types': [bool], 'description': "Require nudge to start ALC", 'live': False},
                            'keep_openpilot_engaged': {'default': True, 'allowed_types': [bool], 'description': 'True is stock behavior in this fork. False lets you use the brake and cruise control stalk to disengage as usual', 'live': False},
                            'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
+                           'alca_min_speed': {'default': 20, 'allowed_types': [float, int], 'description': 'Speed limit to start ALC in m/s', 'live': False},
                            'offset_limit': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed at which apk percent offset will work in m/s', 'live': False},
                            'dynamic_follow': {'default': 'relaxed', 'allowed_types': [str], 'description': "Can be: ('traffic', 'relaxed', 'roadtrip'): Left to right increases in following distance.\n"
                                                                                                            "All profiles support dynamic follow so you'll get your preferred distance while\n"
