@@ -285,14 +285,13 @@ const UIScene *scene = &s->scene;
     if (pvd->v[i].x + 100 < 0 || pvd->v[i].y < 0) {
       continue;
     }
-
+    float offset = 0;
     if (!started) {
-      nvgMoveTo(s->vg, pvd->v[i].x, pvd->v[i].y);
-      nvgLineTo(s->vg, pvd->v[i].x + 100, pvd->v[i].y);
+      nvgMoveTo(s->vg, pvd->v[i].x + offset, pvd->v[i].y);
       started = true;
     } else {
-      nvgLineTo(s->vg, pvd->v[i].x, pvd->v[i].y);
-      nvgLineTo(s->vg, pvd->v[i].x + 100, pvd->v[i].y);
+      if (pvd->v[i].y == pvd->v[i-1].y) offset = 100;
+      nvgLineTo(s->vg, pvd->v[i].x + offset, pvd->v[i].y);
     }
   }
 
@@ -343,14 +342,13 @@ const UIScene *scene = &s->scene;
     if (pvd->v[i].x - 100 < 0 || pvd->v[i].y < 0) {
       continue;
     }
-
+    float offset = -100;
     if (!started) {
-      nvgMoveTo(s->vg, pvd->v[i].x, pvd->v[i].y);
-      nvgLineTo(s->vg, pvd->v[i].x - 100, pvd->v[i].y);
+      nvgMoveTo(s->vg, pvd->v[i].x + offset , pvd->v[i].y);
       started = true;
     } else {
-      nvgLineTo(s->vg, pvd->v[i].x, pvd->v[i].y);
-      nvgLineTo(s->vg, pvd->v[i].x - 100, pvd->v[i].y);
+      if (pvd->v[i].y == pvd->v[i-1].y) offset = 0;
+      nvgLineTo(s->vg, pvd->v[i].x + offset , pvd->v[i].y);
     }
   }
 
