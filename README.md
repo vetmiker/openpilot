@@ -74,7 +74,7 @@ More info about Panda flashing can be found [here](https://community.comma.ai/wi
 - If the model detect's cut in it will draw two different chevron to show the user that it see's both of the car.
 - Control 3 gas profiles with sport eco and normal buttons on car ( only for toyota).
 - Dynamic distance profiles from Shane(In other word three different dynamic profile "Traffic, Relaxed, highway"). Profile can be adjusted from either `python /data/openpilot/op_edit.py` or use live tuner to change the profile live (can take up to 4 sec to for new profile to be adjusted) `python /data/openpilot/op_tune.py`.
-- ALC w/ BSM : (Automatic Lane Change with Blind spot monitoring) you can now change lane automataclly. If the BSM detacts objects it will stop the lane change and will take you back in your original lane. Also, it will notify the user on the eon. 
+- ALC w/ BSM : (Automatic Lane Change with Blind spot monitoring) you can now change lane automataclly. It will wait 1 sec before applying ALC. If the BSM detacts objects it will stop the lane change and will take you back in your original lane. Also, it will notify the user on the eon. 
 
 # Licensing
 
