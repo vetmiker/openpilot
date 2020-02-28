@@ -1,6 +1,7 @@
 from cereal import log
 from common.numpy_fast import clip, interp
 from selfdrive.controls.lib.pid import PIController
+from common.travis_checker import travis
 
 LongCtrlState = log.ControlsState.LongControlState
 
@@ -87,7 +88,7 @@ class LongControl():
 
     v_ego_pid = max(v_ego, MIN_CAN_SPEED)  # Without this we get jumps, CAN bus reports 0 when speed < 0.3
 
-    if self.long_control_state == LongCtrlState.off or brake_pressed or gas_pressed:
+    if self.long_control_state == LongCtrlState.off or (brake_pressed or gas_pressed and not travis):
       self.v_pid = v_ego_pid
       self.pid.reset()
       output_gb = 0.
@@ -141,7 +142,7 @@ class LongControl():
       # Keep applying brakes until the car is stopped
       factor = 1
       if hasLead:
-        factor = interp(dRel,[0.0,1.0,3.0,5.0], [10.0,5.0,2.0,1.0])
+        factor = interp(dRel,[0.0,1.0,3.0,5.0,6.0,7.0,8.0], [10.0,5.0,1.8,0.8,0.6,0.4,0.2])
       if not standstill or output_gb > -BRAKE_STOPPING_TARGET:
         output_gb -= STOPPING_BRAKE_RATE / RATE * factor
       output_gb = clip(output_gb, -brake_max, gas_max)
