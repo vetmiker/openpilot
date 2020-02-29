@@ -103,9 +103,9 @@ class LongitudinalMpc():
     costs = [1.0, 0.1, 0.05, 1.0]
     cost = interp(TR, TRs, costs)
     if vEgo < 5.0:
-      cost = cost * min(max(1.0 , 6.0 - vEgo),2.0)
+      cost = cost * min(max(1.0 , 6.0 - vEgo),3.0)
     if self.TR_Mod > 0:
-      cost = cost + self.TR_Mod/2
+      cost = cost + self.TR_Mod
     if self.last_cost != cost:
       self.libmpc.change_tr(MPC_COST_LONG.TTC, cost, MPC_COST_LONG.ACCELERATION, MPC_COST_LONG.JERK)
       self.last_cost = cost
@@ -179,8 +179,8 @@ class LongitudinalMpc():
 
     TR_mod = []
     # Dynamic follow modifications (the secret sauce)
-    x = [-20.0383, -15.6978, -11.2053, -7.8781, -5.0407, -3.2167, -1.6122, 0.0, 0.6847, 1.3772, 1.9007, 2.7452]  # relative velocity values
-    y = [0.641, 0.506, 0.418, 0.334, 0.24, 0.115, 0.065, 0.0, -0.049, -0.068, -0.142, -0.221]  # modification values
+    x = [-20.0, -15.0, -10.0, -7.5, -5.0, -2.5, -1.25, 0.0, 0.5, 1.0, 2.0, 3.0]  # relative velocity values
+    y = [1.5, 1.0, 0.75, 0.5, 0.35, 0.25, 0.1, 0.0, -0.05, -0.1, -0.2, -0.3]  # modification values
     TR_mod.append(interp(self.lead_data['v_lead'] - self.car_data['v_ego'], x, y))
 
     x = [-4.4795, -2.8122, -1.5727, -1.1129, -0.6611, -0.2692, 0.0, 0.1466, 0.5144, 0.6903, 0.9302]  # lead acceleration values
