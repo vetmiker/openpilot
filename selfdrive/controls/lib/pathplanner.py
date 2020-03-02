@@ -122,14 +122,14 @@ class PathPlanner():
       elif sm['carState'].rightBlinker:
         lane_change_direction = LaneChangeDirection.right
 
-      if self.alca_nudge_required:
-        torque_applied = (sm['carState'].steeringPressed and \
-                         ((sm['carState'].steeringTorque > 0 and lane_change_direction == LaneChangeDirection.left and not self.arne_sm['arne182Status'].leftBlindspot) or \
-                          (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right and not self.arne_sm['arne182Status'].rightBlindspot))) or \
-                         (self.blindspotTrueCounterleft > 30 and lane_change_direction == LaneChangeDirection.left) or \
-                         (self.blindspotTrueCounterright > 30 and lane_change_direction == LaneChangeDirection.right)
-      else:
-        torque_applied = True
+      #if self.alca_nudge_required:
+      torque_applied = (sm['carState'].steeringPressed and \
+                       ((sm['carState'].steeringTorque > 0 and lane_change_direction == LaneChangeDirection.left and not self.arne_sm['arne182Status'].leftBlindspot) or \
+                        (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right and not self.arne_sm['arne182Status'].rightBlindspot))) or \
+                       (not self.alca_nudge_required and self.blindspotTrueCounterleft > 30 and lane_change_direction == LaneChangeDirection.left) or \
+                       (not self.alca_nudge_required and self.blindspotTrueCounterright > 30 and lane_change_direction == LaneChangeDirection.right)
+      #else:
+      #  torque_applied = True
 
       lane_change_prob = self.LP.l_lane_change_prob + self.LP.r_lane_change_prob
 

@@ -47,7 +47,7 @@ class opParams:
                            'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False},
                            'osm': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use OSM for drives', 'live': False},
                            'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
-                           'alca_nudge_required': {'default': True, 'allowed_types': [bool], 'description': "Require nudge to start ALC", 'live': False},
+                           'alca_nudge_required': {'default': False, 'allowed_types': [bool], 'description': "Require nudge to start ALC", 'live': False},
                            'keep_openpilot_engaged': {'default': True, 'allowed_types': [bool], 'description': 'True is stock behavior in this fork. False lets you use the brake and cruise control stalk to disengage as usual', 'live': False},
                            'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
                            'alca_min_speed': {'default': 20, 'allowed_types': [float, int], 'description': 'Speed limit to start ALC in m/s', 'live': False},

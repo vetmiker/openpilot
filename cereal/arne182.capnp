@@ -25,6 +25,15 @@ struct ALCAState {
   alcaDirection @6 :Int8;
 }
 
+struct LongitudinalPIDTuningCruise {
+  kpBP @0 :List(Float32);
+  kpV @1 :List(Float32);
+  kiBP @2 :List(Float32);
+  kiV @3 :List(Float32);
+  deadzoneBP @4 :List(Float32);
+  deadzoneV @5 :List(Float32);
+  }
+  
 struct ThermalOnlineData {
   cpu0 @0 :UInt16;
   cpu1 @1 :UInt16;
