@@ -285,7 +285,7 @@ class CarState(CarStateBase):
       self.gasbuttonstatus = 0
     msg = messaging_arne.new_message()
     msg.init('arne182Status')
-    if frame > 999 and not (CP.carFingerprint in TSS2_CAR):
+    if frame > 999 and not (self.CP.carFingerprint in TSS2_CAR):
       if cp.vl["DEBUG"]['BLINDSPOTSIDE']==65: #Left
         if cp.vl["DEBUG"]['BLINDSPOTD1'] != self.leftblindspotD1:
           self.leftblindspotD1 = cp.vl["DEBUG"]['BLINDSPOTD1']
@@ -316,7 +316,7 @@ class CarState(CarStateBase):
         self.rightblindspot = False
         self.rightblindspotD1 = 0
         self.rightblindspotD2 = 0
-    elif CP.carFingerprint in TSS2_CAR:
+    elif self.CP.carFingerprint in TSS2_CAR:
       self.leftblindspot = cp.vl["BSM"]['L_ADJACENT'] == 1
       self.leftblindspotD1 = 10.1
       self.leftblindspotD2 = 10.1
