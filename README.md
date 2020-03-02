@@ -12,13 +12,11 @@ still have trouble ?? More info about how to install this fork can be found [her
 
 ## Panda flashing
 
-To get this branch to work, it is required to flash your Panda because:
-- changing acceleration limits and
-- adapting lane departure warning where it gives you a slight push back into the middle of the lane without needing to be engaged
+This is done automatically to change the following:
+- allowing no disengage on brake and gas for Toyota
+- changing acceleration limits for Toyota and
+- adapting lane departure warning where it gives you a slight push back into the middle of the lane without needing to be engaged (not yet complete)
 - The Panda version is also changed and checked.
-- Run this command `cd /data/openpilot/panda/board; make; reboot` to manually flash the panda.
-
-More info about Panda flashing can be found [here](https://community.comma.ai/wiki/index.php/Panda_Flashing).
 
 ## Branches
 

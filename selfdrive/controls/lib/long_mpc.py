@@ -104,7 +104,7 @@ class LongitudinalMpc():
     cost = interp(TR, TRs, costs)
     if vEgo < 5.0:
       cost = cost * min(max(1.0 , 6.0 - vEgo),3.0)
-    if self.TR_Mod > 0:
+    elif self.TR_Mod > 0:
       cost = cost + self.TR_Mod
     if self.last_cost != cost:
       self.libmpc.change_tr(MPC_COST_LONG.TTC, cost, MPC_COST_LONG.ACCELERATION, MPC_COST_LONG.JERK)
