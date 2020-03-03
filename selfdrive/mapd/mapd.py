@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-
+import sys
+# sys.path.append("/root/arne-openpilot/openpilot")
 # setup logging
 import logging
 import logging.handlers
@@ -9,6 +10,7 @@ import logging.handlers
 from scipy import spatial
 
 import selfdrive.crash as crash
+
 
 #DEFAULT_SPEEDS_BY_REGION_JSON_FILE = BASEDIR + "/selfdrive/mapd/default_speeds_by_region.json"
 #from selfdrive.mapd import default_speeds_generator
@@ -28,6 +30,7 @@ import cereal.messaging_arne as messaging_arne
 import cereal.messaging as messaging
 
 from selfdrive.mapd.mapd_helpers import MAPS_LOOKAHEAD_DISTANCE, Way, circle_through_points, rate_curvature_points
+from copy import deepcopy
 
 # define LoggerThread class to implement logging functionality
 class LoggerThread(threading.Thread):
@@ -41,6 +44,7 @@ class LoggerThread(threading.Thread):
         h.setFormatter(f)
         self.logger.addHandler(h)
         self.logger.setLevel(logging.CRITICAL) # set to logging.DEBUG to enable logging
+        # self.logger.setLevel(logging.DEBUG) # set to logging.DEBUG to enable logging
     
     def run(self):
         pass # will be overridden in the child class
@@ -57,6 +61,7 @@ class QueryThread(LoggerThread):
             'User-Agent': 'NEOS (comma.ai)',
             'Accept-Encoding': 'gzip'
         }
+        self.prev_ecef = None
 
     def is_connected_to_internet(self, timeout=5):
         try:
@@ -99,7 +104,6 @@ class QueryThread(LoggerThread):
         while True:
             time.sleep(1)
             self.logger.debug("Starting after sleeping for 1 second ...")
-            self.logger.debug("sharedParams = %s" % str(self.sharedParams))
             last_gps = self.sharedParams.get('last_gps', None)
             self.logger.debug("last_gps = %s" % str(last_gps))
             if last_gps is not None:
@@ -110,14 +114,25 @@ class QueryThread(LoggerThread):
             last_query_pos = self.sharedParams.get('last_query_pos', None)
             if last_query_pos is not None:
                 cur_ecef = geodetic2ecef((last_gps.latitude, last_gps.longitude, last_gps.altitude))
-                prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
+                if self.prev_ecef is None:
+                    prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
+                else:
+                    prev_ecef = self.prev_ecef
+                # for next step cur_ecef becomes prev_ecef
+                self.prev_ecef = cur_ecef
                 dist = np.linalg.norm(cur_ecef - prev_ecef)
                 if dist < 3000: #updated when we are 1km from the edge of the downloaded circle
                     continue
-                    self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(prev_ecef), str(dist)))
+                    # self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(prev_ecef), str(dist)))
 
                 if dist > 4000:
-                    self.sharedParams['cache_valid'] = False
+                    query_lock = self.sharedParams.get('query_lock', None)
+                    if query_lock is not None:
+                        query_lock.acquire()
+                        self.sharedParams['cache_valid'] = False
+                        query_lock.release()
+                    else:
+                        self.logger.error("There is no query_lock")
 
             if last_gps is not None and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
                 q = self.build_way_query(last_gps.latitude, last_gps.longitude, radius=4000)
@@ -147,7 +162,7 @@ class QueryThread(LoggerThread):
                     for area in new_result.areas:
                         if area.tags.get('admin_level', '') == "2":
                             location_info['country'] = area.tags.get('ISO3166-1:alpha2', '')
-                        if area.tags.get('admin_level', '') == "4":
+                        elif area.tags.get('admin_level', '') == "4":
                             location_info['region'] = area.tags.get('name', '')
 
                     nodes = np.asarray(nodes)
@@ -157,12 +172,14 @@ class QueryThread(LoggerThread):
 
                     # write result
                     query_lock = self.sharedParams.get('query_lock', None)
-                    query_lock.acquire()
-                    self.sharedParams['last_query_result'] = new_result, tree, real_nodes, node_to_way, location_info
-                    self.sharedParams['last_query_pos'] = last_gps
-                    self.sharedParams['cache_valid'] = True
-
-                    query_lock.release()
+                    if query_lock is not None:
+                        query_lock.acquire()
+                        self.sharedParams['last_query_result'] = new_result, tree, real_nodes, node_to_way, location_info
+                        self.sharedParams['last_query_pos'] = last_gps
+                        self.sharedParams['cache_valid'] = True
+                        query_lock.release()
+                    else:
+                        self.logger.error("There is not query_lock")
 
                 except Exception as e:
                     self.logger.error("ERROR :" + str(e))
@@ -184,7 +201,7 @@ class MapsdThread(LoggerThread):
         # invoke parent constructor 
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
-        self.sm = messaging.SubMaster(['gpsLocationExternal', 'liveMapData'])
+        self.sm = messaging.SubMaster(['gpsLocationExternal'])
         self.arne_sm = messaging_arne.SubMaster(['liveTrafficData'])
         self.pm = messaging.PubMaster(['liveMapData'])
         self.logger.debug("entered mapsd_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
@@ -207,7 +224,7 @@ class MapsdThread(LoggerThread):
         speedLimittrafficvalid = False
 
         while True:
-            #time.sleep(1)
+            # time.sleep(1)
             self.logger.debug("starting new cycle in endless loop")
             self.sm.update(0)
             self.arne_sm.update(0)
@@ -243,8 +260,8 @@ class MapsdThread(LoggerThread):
             # last_gps = self.sharedParams.get('last_gps', None)
             query_lock.acquire()
             self.sharedParams['last_gps'] = gps
-            self.logger.debug("setting last_gps to %s" % str(gps))
             query_lock.release()
+            self.logger.debug("setting last_gps to %s" % str(gps))
 
             fix_ok = gps.flags & 1
             self.logger.debug("fix_ok = %s" % str(fix_ok))
@@ -270,8 +287,12 @@ class MapsdThread(LoggerThread):
                 heading = gps.bearing
                 speed = gps.speed
 
-                query_lock.acquire()
-                cur_way = Way.closest(self.sharedParams['last_query_result'], lat, lon, heading, cur_way)
+                # query_lock.acquire()
+                # making a copy of sharedParams so I do not have to pass the original to the Way.closest method
+                last_q_result = deepcopy(self.sharedParams.get('last_query_result', None))
+                cur_way = Way.closest(last_q_result, lat, lon, heading, cur_way)
+                # query_lock.release()
+
                 if cur_way is not None:
                     self.logger.debug("cur_way is not None ...")
                     pnts, curvature_valid = cur_way.get_lookahead(lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE)
@@ -300,7 +321,7 @@ class MapsdThread(LoggerThread):
 
                             if cur_way.way.tags['highway'] == 'trunk':
                                 radii = radii*1.6 # https://media.springernature.com/lw785/springer-static/image/chp%3A10.1007%2F978-3-658-01689-0_21/MediaObjects/298553_35_De_21_Fig65_HTML.gif
-                            if cur_way.way.tags['highway'] == 'motorway' or  cur_way.way.tags['highway'] == 'motorway_link':
+                            elif cur_way.way.tags['highway'] == 'motorway' or  cur_way.way.tags['highway'] == 'motorway_link':
                                 radii = radii*2.8
 
                             curvature = 1. / radii
@@ -331,17 +352,19 @@ class MapsdThread(LoggerThread):
 
 
                             upcoming_curvature = np.amax(curvature)
-                            dist_to_turn =np.amin(dists[np.logical_and(curvature >= np.amax(curvature), curvature <= np.amax(curvature))])
+                            dist_to_turn =np.amin(dists[np.logical_and(curvature >= upcoming_curvature, curvature <= upcoming_curvature)])
 
 
                         else:
                             upcoming_curvature = 0.
                             dist_to_turn = 999
 
-                query_lock.release()
+                # query_lock.release()
 
             dat = messaging.new_message()
             dat.init('liveMapData')
+
+            last_gps = self.sharedParams.get('last_gps', None)
 
             if last_gps is not None:  # TODO: this should never be None with SubMaster now
                 dat.liveMapData.lastGps = last_gps
@@ -403,10 +426,7 @@ class MapsdThread(LoggerThread):
             self.logger.debug("Sending ... liveMapData ... %s", str(dat))
             self.pm.send('liveMapData', dat)
 
-
-
-
-if __name__ == "__main__":
+def main():
     params = Params()
     dongle_id = params.get("DongleId")
     crash.bind_user(id=dongle_id)
@@ -414,14 +434,7 @@ if __name__ == "__main__":
     crash.install()
     # initialize gps parameters
     # initialize last_gps
-    current_milli_time = lambda: int(round(time.time() * 1000))
-
-    #from collections import namedtuple
-    #MyGpsData = namedtuple('MyGpsData','latitude, longitude, altitude, speed, bearing, accuracy, flags, timestamp')
-
-    #last_gps = MyGpsData(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1, current_milli_time)
-    #
-
+    # current_milli_time = lambda: int(round(time.time() * 1000))
 
 
     # setup shared parameters
@@ -439,6 +452,11 @@ if __name__ == "__main__":
 
     qt.start()
     mt.start()
+    # print("Threads started")
     # qt.run()
     # qt.join()
-    print("threads started")
+
+
+
+if __name__ == "__main__":
+    main()
