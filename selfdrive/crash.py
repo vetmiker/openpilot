@@ -43,11 +43,11 @@ else:
     client.user_context(kwargs)
     
   def capture_warning(warning_string):
-    bind_user(id=uniqueID)
+    bind_user(id=dongle_id)
     client.captureMessage(warning_string, level='warning')
   
   def capture_info(info_string):
-    bind_user(id=uniqueID)
+    bind_user(id=dongle_id)
     client.captureMessage(info_string, level='info')
     
   def bind_extra(**kwargs):
