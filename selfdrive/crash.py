@@ -40,11 +40,11 @@ else:
     cloudlog.error("crash", exc_info=kwargs.get('exc_info', 1))
     
   def capture_warning(warning_string):
-    client.user_context('username': uniqueID)
+    client.user_context(id= uniqueID)
     client.captureMessage(warning_string, level='warning')
   
   def capture_info(info_string):
-    client.user_context('username': uniqueID)
+    client.user_context(id= uniqueID)
     client.captureMessage(info_string, level='info')
     
   def bind_user(**kwargs):
