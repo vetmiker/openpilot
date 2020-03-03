@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys
+#import sys
 # sys.path.append("/root/arne-openpilot/openpilot")
 # setup logging
 import logging
