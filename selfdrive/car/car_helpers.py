@@ -105,6 +105,10 @@ def fingerprint(logcan, sendcan, has_relay):
   Params().put("CarVin", vin)
 
   finger = gen_empty_fingerprint()
+  
+  if vin == '4T1B11HKXKU730751':
+    return "TOYOTA CAMRY 2018", finger, vin, car_fw, car.CarParams.FingerprintSource.fixed
+  
   candidate_cars = {i: all_known_cars() for i in [0, 1]}  # attempt fingerprint on both bus 0 and 1
   frame = 0
   frame_fingerprint = 10  # 0.1s
