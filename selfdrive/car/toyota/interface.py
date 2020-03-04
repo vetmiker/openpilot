@@ -9,6 +9,7 @@ from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness,
 from selfdrive.swaglog import cloudlog
 from selfdrive.car.interfaces import CarInterfaceBase
 from common.op_params import opParams
+import cereal.messaging as messaging
 
 ButtonType = car.CarState.ButtonEvent.Type
 GearShifter = car.CarState.GearShifter
