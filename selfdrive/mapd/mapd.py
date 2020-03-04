@@ -287,11 +287,11 @@ class MapsdThread(LoggerThread):
                 heading = gps.bearing
                 speed = gps.speed
 
-                # query_lock.acquire()
+                query_lock.acquire()
                 # making a copy of sharedParams so I do not have to pass the original to the Way.closest method
                 last_q_result = deepcopy(self.sharedParams.get('last_query_result', None))
                 cur_way = Way.closest(last_q_result, lat, lon, heading, cur_way)
-                # query_lock.release()
+                query_lock.release()
 
                 if cur_way is not None:
                     self.logger.debug("cur_way is not None ...")
