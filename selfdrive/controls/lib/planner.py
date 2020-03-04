@@ -125,7 +125,7 @@ class Planner():
     self.offset = 0
     self.last_time = 0
 
-  def choose_solution(self, v_cruise_setpoint, enabled, lead_1, lead_2, steeringAngle, following):
+  def choose_solution(self, v_cruise_setpoint, enabled, lead_1, lead_2, steeringAngle):
     center_x = -2.5 # Wheel base 2.5m
     lead1_check = True
     lead2_check = True
@@ -144,8 +144,7 @@ class Planner():
       if self.mpc2.prev_lead_status and lead2_check:
         solutions['mpc2'] = self.mpc2.v_mpc
       solutions['model'] = self.v_model
-      if not following:
-        solutions['cruise'] = self.v_cruise
+      solutions['cruise'] = self.v_cruise
 
       slowest = min(solutions, key=solutions.get)
 
@@ -305,11 +304,11 @@ class Planner():
         accel_limits_turns[1] = min(accel_limits_turns[1], AWARENESS_DECEL)
         accel_limits_turns[0] = min(accel_limits_turns[0], accel_limits_turns[1])
 
-      if decel_for_turn and sm['liveMapData'].distToTurn < speed_ahead_distance:
+      if decel_for_turn and sm['liveMapData'].distToTurn < speed_ahead_distance and not following:
         time_to_turn = max(1.0, sm['liveMapData'].distToTurn / max((v_ego + v_curvature_map)/2, 1.))
         required_decel = min(0, (v_curvature_map - v_ego) / time_to_turn)
         accel_limits[0] = max(accel_limits[0], required_decel)
-      if v_speedlimit_ahead < v_speedlimit and self.longitudinalPlanSource =='cruise' and v_ego > v_speedlimit_ahead and sm['liveMapData'].speedLimitAheadDistance > 0.10:
+      if v_speedlimit_ahead < v_speedlimit and v_ego > v_speedlimit_ahead and sm['liveMapData'].speedLimitAheadDistance > 0.10 and not following:
         required_decel = min(0, (v_speedlimit_ahead*v_speedlimit_ahead - v_ego*v_ego)/(sm['liveMapData'].speedLimitAheadDistance*2))
         required_decel = max(required_decel, -3.0)
         accel_limits[0] = required_decel
@@ -348,7 +347,7 @@ class Planner():
     self.mpc1.update(pm, sm['carState'], lead_1, v_cruise_setpoint)
     self.mpc2.update(pm, sm['carState'], lead_2, v_cruise_setpoint)
 
-    self.choose_solution(v_cruise_setpoint, enabled, lead_1, lead_2, sm['carState'].steeringAngle, following)
+    self.choose_solution(v_cruise_setpoint, enabled, lead_1, lead_2, sm['carState'].steeringAngle)
 
     # determine fcw
     if self.mpc1.new_lead:
