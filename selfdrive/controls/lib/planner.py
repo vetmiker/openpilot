@@ -125,7 +125,7 @@ class Planner():
     self.offset = 0
     self.last_time = 0
 
-  def choose_solution(self, v_cruise_setpoint, enabled, lead_1, lead_2, steeringAngle):
+  def choose_solution(self, v_cruise_setpoint, enabled, lead_1, lead_2, steeringAngle, following):
     center_x = -2.5 # Wheel base 2.5m
     lead1_check = True
     lead2_check = True
@@ -144,7 +144,8 @@ class Planner():
       if self.mpc2.prev_lead_status and lead2_check:
         solutions['mpc2'] = self.mpc2.v_mpc
       solutions['model'] = self.v_model
-      solutions['cruise'] = self.v_cruise
+      if not following:
+        solutions['cruise'] = self.v_cruise
 
       slowest = min(solutions, key=solutions.get)
 
@@ -347,7 +348,7 @@ class Planner():
     self.mpc1.update(pm, sm['carState'], lead_1, v_cruise_setpoint)
     self.mpc2.update(pm, sm['carState'], lead_2, v_cruise_setpoint)
 
-    self.choose_solution(v_cruise_setpoint, enabled, lead_1, lead_2, sm['carState'].steeringAngle)
+    self.choose_solution(v_cruise_setpoint, enabled, lead_1, lead_2, sm['carState'].steeringAngle, following)
 
     # determine fcw
     if self.mpc1.new_lead:
