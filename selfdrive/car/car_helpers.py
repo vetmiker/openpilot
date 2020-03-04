@@ -105,9 +105,6 @@ def fingerprint(logcan, sendcan, has_relay):
   Params().put("CarVin", vin)
 
   finger = gen_empty_fingerprint()
-  
-
-  
   candidate_cars = {i: all_known_cars() for i in [0, 1]}  # attempt fingerprint on both bus 0 and 1
   frame = 0
   frame_fingerprint = 10  # 0.1s
@@ -115,7 +112,7 @@ def fingerprint(logcan, sendcan, has_relay):
   done = False
 
  
-  if cached_fingerprint is not None and use_car_caching and vin != '4T1B11HKXKU730751':  # if we previously identified a car and fingerprint and user hasn't disabled caching
+  if cached_fingerprint is not None and use_car_caching:  # if we previously identified a car and fingerprint and user hasn't disabled caching
     cached_fingerprint = json.loads(cached_fingerprint)
     if cached_fingerprint[0] is None or len(cached_fingerprint) < 3:
       params.delete('CachedFingerprint')
@@ -174,8 +171,7 @@ def fingerprint(logcan, sendcan, has_relay):
   if len(fixed_fingerprint):
     car_fingerprint = fixed_fingerprint
     source = car.CarParams.FingerprintSource.fixed
-  if vin == '4T1B11HKXKU730751':
-    return "TOYOTA CAMRY 2019", finger, vin, car_fw, car.CarParams.FingerprintSource.fixed
+
   cloudlog.warning("fingerprinted %s", car_fingerprint)
   params.put("CachedFingerprint", json.dumps([car_fingerprint, source, {int(key): value for key, value in finger[0].items()}]))
   return car_fingerprint, finger, vin, car_fw, source
