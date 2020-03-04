@@ -30,7 +30,7 @@ import cereal.messaging_arne as messaging_arne
 import cereal.messaging as messaging
 
 from selfdrive.mapd.mapd_helpers import MAPS_LOOKAHEAD_DISTANCE, Way, circle_through_points, rate_curvature_points
-#from copy import deepcopy
+from copy import deepcopy
 
 # define LoggerThread class to implement logging functionality
 class LoggerThread(threading.Thread):
@@ -289,8 +289,8 @@ class MapsdThread(LoggerThread):
 
                 query_lock.acquire()
                 # making a copy of sharedParams so I do not have to pass the original to the Way.closest method
-                #last_q_result = deepcopy(self.sharedParams.get('last_query_result', None))
-                cur_way = Way.closest(self.sharedParams['last_query_result'], lat, lon, heading, cur_way)
+                last_q_result = deepcopy(self.sharedParams.get('last_query_result', None))
+                cur_way = Way.closest(last_q_result, lat, lon, heading, cur_way)
                 #query_lock.release()
 
                 if cur_way is not None:
