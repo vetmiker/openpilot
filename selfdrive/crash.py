@@ -3,7 +3,11 @@ import os
 import sys
 import threading
 import capnp
-from selfdrive.version import version, dirty
+from common.params import Params
+from selfdrive.version import version, dirty, origin, branch
+from common.op_params import opParams
+op_params = opParams()
+uniqueID = op_params.get('uniqueID', None)
 
 from selfdrive.swaglog import cloudlog
 
@@ -19,18 +23,33 @@ if os.getenv("NOLOG") or os.getenv("NOCRASH"):
 else:
   from raven import Client
   from raven.transport.http import HTTPTransport
-  client = Client('https://1994756b5e6f41cf939a4c65de45f4f2:cefebaf3a8aa40d182609785f7189bd7@app.getsentry.com/77924',
-                  install_sys_hook=False, transport=HTTPTransport, release=version, tags={'dirty': dirty})
+  params = Params()
+  try:
+    dongle_id = params.get("DongleId").decode('utf8')
+  except AttributeError:
+    dongle_id = "None"
+  error_tags = {'dirty': dirty, 'username': uniqueID, 'dongle_id': dongle_id, 'branch': branch, 'remote': origin}
+  
+  client = Client('https://137e8e621f114f858f4c392c52e18c6d:8aba82f49af040c8aac45e95a8484970@sentry.io/1404547',
+                  install_sys_hook=False, transport=HTTPTransport, release=version, tags=error_tags)
 
   def capture_exception(*args, **kwargs):
     exc_info = sys.exc_info()
     if not exc_info[0] is capnp.lib.capnp.KjException:
       client.captureException(*args, **kwargs)
     cloudlog.error("crash", exc_info=kwargs.get('exc_info', 1))
-
+    
   def bind_user(**kwargs):
     client.user_context(kwargs)
-
+    
+  def capture_warning(warning_string):
+    bind_user(id=dongle_id)
+    client.captureMessage(warning_string, level='warning')
+  
+  def capture_info(info_string):
+    bind_user(id=dongle_id)
+    client.captureMessage(info_string, level='info')
+    
   def bind_extra(**kwargs):
     client.extra_context(kwargs)
 

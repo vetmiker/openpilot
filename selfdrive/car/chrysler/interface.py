@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from cereal import car
+from cereal import car, arne182
 from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event
 from selfdrive.controls.lib.vehicle_model import VehicleModel
@@ -61,7 +61,7 @@ class CarInterface(CarInterfaceBase):
     ret.steerRateCost = 0.7
     ret.steerLimitTimer = 0.4
 
-    if candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
+    if candidate in (CAR.JEEP_CHEROKEE_2017, CAR.JEEP_CHEROKEE_2018, CAR.JEEP_CHEROKEE_2019):
       ret.wheelbase = 2.91  # in meters
       ret.steerRatio = 12.7
       ret.steerActuatorDelay = 0.2  # in seconds
@@ -70,7 +70,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.minSteerSpeed = 3.8  # m/s
     ret.minEnableSpeed = -1.   # enable is done by stock ACC, so ignore this
-    if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020_HYBRID, CAR.JEEP_CHEROKEE_2019):
+    if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.JEEP_CHEROKEE_2019):
       ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
       # TODO allow 2019 cars to steer down to 13 m/s if already engaged.
 
@@ -115,7 +115,11 @@ class CarInterface(CarInterfaceBase):
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
 
-    ret = self.CS.update(self.cp, self.cp_cam)
+    self.CS.update(self.cp, self.cp_cam)
+
+    # create message
+    ret = car.CarState.new_message()
+    ret_arne182 = arne182.CarStateArne182.new_message()
 
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
 
@@ -144,6 +148,7 @@ class CarInterface(CarInterfaceBase):
 
     # events
     events = []
+    eventsArne182 = []
     if not (ret.gearShifter in (GearShifter.drive, GearShifter.low)):
       events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if ret.doorOpen:
@@ -173,6 +178,7 @@ class CarInterface(CarInterfaceBase):
       events.append(create_event('belowSteerSpeed', [ET.WARNING]))
 
     ret.events = events
+    ret_arne182.events = eventsArne182
 
     self.gas_pressed_prev = ret.gasPressed
     self.brake_pressed_prev = ret.brakePressed
@@ -183,7 +189,11 @@ class CarInterface(CarInterfaceBase):
     # copy back carState packet to CS
     self.CS.out = ret.as_reader()
 
-    return self.CS.out
+
+    return ret.as_reader(), ret_arne182.as_reader()
+
+    #return self.CS.out
+
 
   # pass in a car.CarControl
   # to be called @ 100hz

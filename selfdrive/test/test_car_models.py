@@ -71,7 +71,7 @@ routes = {
     'enableCamera': True,
   },
   "8190c7275a24557b|2020-01-29--08-33-58": {
-    'carFingerprint': CHRYSLER.PACIFICA_2020_HYBRID,
+    'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
     'enableCamera': True,
   },
   # This pacifica was removed because the fingerprint seemed from a Volt
@@ -80,7 +80,7 @@ routes = {
   #  'enableCamera': True,
   #},
   "9f7a7e50a51fb9db|2019-01-17--18-34-21": {
-    'carFingerprint': CHRYSLER.JEEP_CHEROKEE,
+    'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2017,
     'enableCamera': True,
   },
   "192a598e34926b1e|2019-04-04--13-27-39": {
@@ -188,19 +188,10 @@ routes = {
     'carFingerprint': HONDA.ACCORD_15,
     'enableCamera': True,
   },
-  # TODO: This doesnt fingerprint because the fingerprint overlaps with the Insight
-  # "690c4c9f9f2354c7|2018-09-15--17-36-05": {
-  #   'carFingerprint': HONDA.ACCORDH,
-  #   'enableCamera': True,
-  # },
   "1632088eda5e6c4d|2018-06-07--08-03-18": {
     'carFingerprint': HONDA.CIVIC_BOSCH,
     'enableCamera': True,
   },
-  #"18971a99f3f2b385|2018-11-14--19-09-31": {
-  #  'carFingerprint': HONDA.INSIGHT,
-  #  'enableCamera': True,
-  #},
   "38bfd238edecbcd7|2018-08-22--09-45-44": {
     'carFingerprint': HYUNDAI.SANTA_FE,
     'enableCamera': False,
@@ -398,18 +389,18 @@ routes = {
     'enableCamera': False,
     'enableDsu': False,
   },
-  "2e07163a1ba9a780|2019-08-25--13-15-13": {
-    'carFingerprint': TOYOTA.LEXUS_IS,
-    'enableCamera': True,
-    'enableDsu': False,
-  },
+  #"2e07163a1ba9a780|2019-08-25--13-15-13": {
+  #  'carFingerprint': TOYOTA.LEXUS_IS,
+  #  'enableCamera': True,
+  #  'enableDsu': False,
+  #},
   "2e07163a1ba9a780|2019-08-29--09-35-42": {
     'carFingerprint': TOYOTA.LEXUS_IS,
     'enableCamera': False,
     'enableDsu': False,
   },
   "1dd19ceed0ee2b48|2018-12-22--17-36-49": {
-    'carFingerprint': TOYOTA.LEXUS_IS, # 300 hybrid
+    'carFingerprint': TOYOTA.LEXUS_ISH, # 300 hybrid
     'enableCamera': True,
     'enableDsu': False,
   },
@@ -480,7 +471,7 @@ non_public_routes = [
 ]
 
 # TODO: add routes for these cars
-non_tested_cars = [TOYOTA.LEXUS_CTH, CHRYSLER.PACIFICA_2018, HONDA.ACCORDH]
+non_tested_cars = [TOYOTA.LEXUS_CTH, HONDA.ACCORDH, CHRYSLER.PACIFICA_2018, CHRYSLER.PACIFICA_2017, CHRYSLER.JEEP_CHEROKEE_2018]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
 
 if __name__ == "__main__":
 
