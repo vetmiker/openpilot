@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from cereal import car, arne182
+from cereal import car, arne182, log
 from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne
 from selfdrive.controls.lib.vehicle_model import VehicleModel
@@ -13,6 +13,8 @@ from common.op_params import opParams
 ButtonType = car.CarState.ButtonEvent.Type
 GearShifter = car.CarState.GearShifter
 
+LaneChangeState = log.PathPlan.LaneChangeState
+
 class CarInterface(CarInterfaceBase):
   def __init__(self, CP, CarController):
     self.CP = CP
@@ -23,6 +25,7 @@ class CarInterface(CarInterfaceBase):
     self.brake_pressed_prev = False
     self.cruise_enabled_prev = False
     self.keep_openpilot_engaged = True
+    self.sm = messaging.SubMaster(['pathPlan'])
     # *** init the major players ***
     self.CS = CarState(CP)
     self.op_params = opParams()
@@ -362,6 +365,7 @@ class CarInterface(CarInterfaceBase):
 
   # returns a car.CarState
   def update(self, c, can_strings):
+    self.sm.update(0)
     # ******************* do can recv *******************
     self.cp_cam.update_strings(can_strings)
     if self.frame < 1000:
@@ -528,9 +532,9 @@ class CarInterface(CarInterfaceBase):
 
     if ret.gasPressed and disengage_event:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
-    if ret.rightBlinker and self.CS.rightblindspot and ret.vEgo > self.alca_min_speed:
+    if ret.rightBlinker and self.CS.rightblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
       eventsArne182.append(create_event_arne('rightALCbsm', [ET.WARNING]))
-    if ret.leftBlinker and self.CS.leftblindspot and ret.vEgo > self.alca_min_speed:
+    if ret.leftBlinker and self.CS.leftblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
       eventsArne182.append(create_event_arne('leftALCbsm', [ET.WARNING]))
     ret.events = events
     ret_arne182.events = eventsArne182
