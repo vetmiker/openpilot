@@ -115,12 +115,10 @@ class QueryThread(LoggerThread):
             if last_query_pos is not None:
                 cur_ecef = geodetic2ecef((last_gps.latitude, last_gps.longitude, last_gps.altitude))
                 if self.prev_ecef is None:
-                    prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
-                else:
-                    prev_ecef = self.prev_ecef
+                    self.prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
                 # for next step cur_ecef becomes prev_ecef
-                self.prev_ecef = cur_ecef
-                dist = np.linalg.norm(cur_ecef - prev_ecef)
+                
+                dist = np.linalg.norm(cur_ecef - self.prev_ecef)
                 if dist < 3000: #updated when we are 1km from the edge of the downloaded circle
                     continue
                     # self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(prev_ecef), str(dist)))
@@ -175,6 +173,7 @@ class QueryThread(LoggerThread):
                     if query_lock is not None:
                         query_lock.acquire()
                         self.sharedParams['last_query_result'] = new_result, tree, real_nodes, node_to_way, location_info
+                        self.prev_ecef = geodetic2ecef((last_gps.latitude, last_gps.longitude, last_gps.altitude))
                         self.sharedParams['last_query_pos'] = last_gps
                         self.sharedParams['cache_valid'] = True
                         query_lock.release()
@@ -291,7 +290,7 @@ class MapsdThread(LoggerThread):
                 # making a copy of sharedParams so I do not have to pass the original to the Way.closest method
                 #last_q_result = deepcopy(self.sharedParams.get('last_query_result', None))
                 cur_way = Way.closest(self.sharedParams['last_query_result'], lat, lon, heading, cur_way)
-                #query_lock.release()
+                query_lock.release()
 
                 if cur_way is not None:
                     self.logger.debug("cur_way is not None ...")
@@ -359,7 +358,7 @@ class MapsdThread(LoggerThread):
                             upcoming_curvature = 0.
                             dist_to_turn = 999
 
-                query_lock.release()
+                #query_lock.release()
 
             dat = messaging.new_message()
             dat.init('liveMapData')
