@@ -186,9 +186,9 @@ class LongitudinalMpc():
     y = [0.641, 0.506, 0.418, 0.334, 0.24, 0.115, 0.055, 0.0, -0.03, -0.068, -0.142, -0.221]  # modification values
     TR_mod.append(interp(self.lead_data['v_lead'] - self.car_data['v_ego'], x, y))
 
-    x = [-4.4795, -2.8122, -1.5727, -1.1129, -0.6611, -0.2692, 0.0, 0.1466, 0.5144, 0.6903, 0.9302]  # lead acceleration values
-    y = [0.265, 0.187, 0.096, 0.057, 0.033, 0.024, 0.0, -0.009, -0.042, -0.053, -0.059]  # modification values
-    TR_mod.append(interp(self.calculate_lead_accel(), x, y))
+    #x = [-4.4795, -2.8122, -1.5727, -1.1129, -0.6611, -0.2692, 0.0, 0.1466, 0.5144, 0.6903, 0.9302]  # lead acceleration values
+    #y = [0.265, 0.187, 0.096, 0.057, 0.033, 0.024, 0.0, -0.009, -0.042, -0.053, -0.059]  # modification values
+    #TR_mod.append(interp(self.calculate_lead_accel(), x, y))
 
     # x = [4.4704, 22.352]  # 10 to 50 mph  #todo: remove if uneeded/unsafe
     # y = [0.94, 1.0]
