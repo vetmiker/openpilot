@@ -12,7 +12,7 @@ still have trouble ?? More info about how to install this fork can be found [her
 
 ## Panda flashing
 
-This is done automatically to change the following:
+This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/panda/board; make; reboot) to change the following:
 - allowing no disengage on brake and gas for Toyota
 - changing acceleration limits for Toyota and
 - adapting lane departure warning where it gives you a slight push back into the middle of the lane without needing to be engaged (not yet complete)
