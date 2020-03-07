@@ -79,7 +79,7 @@ class LongitudinalMpc():
     if not self.lead_data['status'] or travis:
       TR = 1.8
     elif CS.vEgo < 5.0:
-      TRs = [4.0, 2.5, 2.0, 1.75, 1.6]
+      TRs = [2.5, 2.0, 1.8, 1.75, 1.6]
       vEgos = [1.0, 2.0, 3.0, 4.0, 5.0]
       #TRs = [1.8, 1.6]
       #vEgos =[4.0, 5.0]
