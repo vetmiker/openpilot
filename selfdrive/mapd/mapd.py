@@ -232,7 +232,7 @@ class MapsdThread(LoggerThread):
         speedLimittrafficvalid = False
 
         while True:
-            # time.sleep(1)
+            time.sleep(0.1)
             self.logger.debug("starting new cycle in endless loop")
             self.sm.update(0)
             self.arne_sm.update(0)
