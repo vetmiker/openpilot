@@ -259,10 +259,9 @@ class MapsdThread(LoggerThread):
 
             if self.sm.updated['gpsLocationExternal']:
                 gps = gps_ext
+                self.save_gps_data(gps)
             else:
                 continue
-
-            self.save_gps_data(gps)
             query_lock = self.sharedParams.get('query_lock', None)
             # last_gps = self.sharedParams.get('last_gps', None)
             query_lock.acquire()
