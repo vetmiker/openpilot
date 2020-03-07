@@ -47,7 +47,15 @@ class LoggerThread(threading.Thread):
         self.logger.addHandler(h)
         self.logger.setLevel(logging.CRITICAL) # set to logging.DEBUG to enable logging
         # self.logger.setLevel(logging.DEBUG) # set to logging.DEBUG to enable logging
-    
+        
+    def save_gps_data(self, gps):
+        try:
+            location = [gps.speed, gps.bearing, gps.latitude, gps.longitude, gps.altitude, gps.accuracy, time.time()]
+            with open("/data/openpilot/selfdrive/data_collection/gps-data", "a") as f:
+                f.write("{}\n".format(location))
+        except:
+            self.logger.error("Unable to write gps data to external file")
+            
     def run(self):
         pass # will be overridden in the child class
 
@@ -206,13 +214,6 @@ class MapsdThread(LoggerThread):
         self.arne_sm = messaging_arne.SubMaster(['liveTrafficData'])
         self.pm = messaging.PubMaster(['liveMapData'])
         self.logger.debug("entered mapsd_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
-    def save_gps_data(gps):
-      try:
-        location = [gps.speed, gps.bearing, gps.latitude, gps.longitude, gps.altitude, gps.accuracy, time.time()]
-        with open("/data/openpilot/selfdrive/data_collection/gps-data", "a") as f:
-          f.write("{}\n".format(location))
-      except:
-        pass
     def run(self):
         self.logger.debug("Entered run method for thread :" + str(self.name))
         cur_way = None
