@@ -32,6 +32,8 @@ import cereal.messaging as messaging
 from selfdrive.mapd.mapd_helpers import MAPS_LOOKAHEAD_DISTANCE, Way, circle_through_points, rate_curvature_points
 #from copy import deepcopy
 
+
+
 # define LoggerThread class to implement logging functionality
 class LoggerThread(threading.Thread):
     def __init__(self, threadID, name):
@@ -204,7 +206,13 @@ class MapsdThread(LoggerThread):
         self.arne_sm = messaging_arne.SubMaster(['liveTrafficData'])
         self.pm = messaging.PubMaster(['liveMapData'])
         self.logger.debug("entered mapsd_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
-
+    def save_gps_data(gps):
+      try:
+        location = [gps.speed, gps.bearing, gps.latitude, gps.longitude, gps.altitude, gps.accuracy, time.time()]
+        with open("/data/openpilot/selfdrive/data_collection/gps-data", "a") as f:
+          f.write("{}\n".format(location))
+      except:
+        pass
     def run(self):
         self.logger.debug("Entered run method for thread :" + str(self.name))
         cur_way = None
@@ -254,7 +262,7 @@ class MapsdThread(LoggerThread):
             else:
                 continue
 
-            # save_gps_data(gps)
+            self.save_gps_data(gps)
             query_lock = self.sharedParams.get('query_lock', None)
             # last_gps = self.sharedParams.get('last_gps', None)
             query_lock.acquire()
