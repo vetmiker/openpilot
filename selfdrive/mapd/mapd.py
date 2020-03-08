@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import time
+import math
 import overpy
 import requests
 import threading
@@ -79,8 +80,13 @@ class QueryThread(LoggerThread):
             self.logger.error("No internet connection available.")
             return False 
 
-    def build_way_query(self, lat, lon, radius=50):
+    def build_way_query(self, lat, lon, heading, radius=50):
         """Builds a query to find all highways within a given radius around a point"""
+        a = 111132.954*math.cos(float(lat)/180*3.141592)
+        b = 111132.954 - 559.822 * math.cos( 2 * float(lat)/180*3.141592) + 1.175 * math.cos( 4 * float(lat)/180*3.141592)
+        heading = math.radians(-heading + 90)
+        lat = lat+math.sin(heading)*radius/2/b
+        lon = lon+math.cos(heading)*radius/2/a
         pos = "  (around:%f,%f,%f)" % (radius, lat, lon)
         lat_lon = "(%f,%f)" % (lat, lon)
         q = """(
@@ -92,7 +98,7 @@ class QueryThread(LoggerThread):
         name = t['name'], "ISO3166-1:alpha2" = t['ISO3166-1:alpha2'];out;
         """
         self.logger.debug("build_way_query : %s" % str(q))
-        return q
+        return q, lat, lon
 
     def run(self):
         self.logger.debug("run method started for thread %s" % self.name)
@@ -129,7 +135,7 @@ class QueryThread(LoggerThread):
                         self.logger.error("There is no query_lock")
 
             if last_gps is not None and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
-                q = self.build_way_query(last_gps.latitude, last_gps.longitude, radius=4000)
+                q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.heading, radius=4000)
                 try:
                     try:
                         new_result = api.query(q)
@@ -138,7 +144,11 @@ class QueryThread(LoggerThread):
                         api2 = overpy.Overpass(url=self.OVERPASS_API_URL2)
                         self.logger.error("Using backup Server")
                         new_result = api2.query(q)
-
+                    query_lock.acquire()
+                    last_gps.latitude = lat
+                    last_gps.longitude = lon
+                    self.sharedParams['last_gps'] = last_gps
+                    query_lock.release()
                     # Build kd-tree
                     nodes = []
                     real_nodes = []
