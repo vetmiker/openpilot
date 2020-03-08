@@ -144,11 +144,6 @@ class QueryThread(LoggerThread):
                         api2 = overpy.Overpass(url=self.OVERPASS_API_URL2)
                         self.logger.error("Using backup Server")
                         new_result = api2.query(q)
-                    query_lock.acquire()
-                    last_gps.latitude = lat
-                    last_gps.longitude = lon
-                    self.sharedParams['last_gps'] = last_gps
-                    query_lock.release()
                     # Build kd-tree
                     nodes = []
                     real_nodes = []
@@ -178,6 +173,8 @@ class QueryThread(LoggerThread):
                     query_lock = self.sharedParams.get('query_lock', None)
                     if query_lock is not None:
                         query_lock.acquire()
+                        last_gps.latitude = lat
+                        last_gps.longitude = lon
                         self.sharedParams['last_query_result'] = new_result, tree, real_nodes, node_to_way, location_info
                         self.prev_ecef = geodetic2ecef((last_gps.latitude, last_gps.longitude, last_gps.altitude))
                         self.sharedParams['last_query_pos'] = last_gps
