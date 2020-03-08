@@ -117,7 +117,7 @@ class QueryThread(LoggerThread):
                 dist = np.linalg.norm(cur_ecef - self.prev_ecef)
                 if dist < 3000: #updated when we are 1km from the edge of the downloaded circle
                     continue
-                    self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(prev_ecef), str(dist)))
+                    self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(self.prev_ecef), str(dist)))
 
                 if dist > 4000:
                     query_lock = self.sharedParams.get('query_lock', None)
