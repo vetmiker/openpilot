@@ -220,7 +220,7 @@ class Planner():
       # TODO: compute max speed without using a list of points and without numpy
       y_p = 3 * path[0] * self.path_x**2 + 2 * path[1] * self.path_x + path[2]
       y_pp = 6 * path[0] * self.path_x + 2 * path[1]
-      curv = y_pp / (1. + y_p**2)**1.5
+      curv = y_pp / (1. + y_p**2)**1.5 * np.sqrt(curvature_factor)
 
       a_y_max = 2.975 - v_ego * 0.0375  # ~1.85 @ 75mph, ~2.6 @ 25mph
       v_curvature = np.sqrt(a_y_max / np.clip(np.abs(curv), 1e-4, None))
