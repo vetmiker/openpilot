@@ -105,8 +105,8 @@ class LongitudinalMpc():
     costs = [1.0, 0.1, 0.05, 1.0]
     cost = interp(TR, TRs, costs)
     if vEgo < 5.0:
-      #cost = cost * min(max(1.0 , 6.0 - vEgo),3.0)
       cost = 0.1
+      cost = cost * min(max(1.0 , (6.0 - vEgo)),5.0) 
     #elif self.TR_Mod > 0:
     #  cost = cost + self.TR_Mod
     if self.last_cost != cost:
