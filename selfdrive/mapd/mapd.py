@@ -32,6 +32,8 @@ import cereal.messaging as messaging
 from selfdrive.mapd.mapd_helpers import MAPS_LOOKAHEAD_DISTANCE, Way, circle_through_points, rate_curvature_points
 #from copy import deepcopy
 
+
+
 # define LoggerThread class to implement logging functionality
 class LoggerThread(threading.Thread):
     def __init__(self, threadID, name):
@@ -45,7 +47,15 @@ class LoggerThread(threading.Thread):
         self.logger.addHandler(h)
         self.logger.setLevel(logging.CRITICAL) # set to logging.DEBUG to enable logging
         # self.logger.setLevel(logging.DEBUG) # set to logging.DEBUG to enable logging
-    
+        
+    def save_gps_data(self, gps):
+        try:
+            location = [gps.speed, gps.bearing, gps.latitude, gps.longitude, gps.altitude, gps.accuracy, time.time()]
+            with open("/data/openpilot/selfdrive/data_collection/gps-data", "a") as f:
+                f.write("{}\n".format(location))
+        except:
+            self.logger.error("Unable to write gps data to external file")
+            
     def run(self):
         pass # will be overridden in the child class
 
@@ -204,7 +214,6 @@ class MapsdThread(LoggerThread):
         self.arne_sm = messaging_arne.SubMaster(['liveTrafficData'])
         self.pm = messaging.PubMaster(['liveMapData'])
         self.logger.debug("entered mapsd_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
-
     def run(self):
         self.logger.debug("Entered run method for thread :" + str(self.name))
         cur_way = None
@@ -223,7 +232,7 @@ class MapsdThread(LoggerThread):
         speedLimittrafficvalid = False
 
         while True:
-            # time.sleep(1)
+            time.sleep(0.1)
             self.logger.debug("starting new cycle in endless loop")
             self.sm.update(0)
             self.arne_sm.update(0)
@@ -251,10 +260,9 @@ class MapsdThread(LoggerThread):
 
             if self.sm.updated['gpsLocationExternal']:
                 gps = gps_ext
+                self.save_gps_data(gps)
             else:
                 continue
-
-            # save_gps_data(gps)
             query_lock = self.sharedParams.get('query_lock', None)
             # last_gps = self.sharedParams.get('last_gps', None)
             query_lock.acquire()

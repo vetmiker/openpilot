@@ -79,8 +79,10 @@ class LongitudinalMpc():
     if not self.lead_data['status'] or travis:
       TR = 1.8
     elif CS.vEgo < 5.0:
-      TRs = [4.0, 2.5, 2.0, 1.75, 1.6]
+      TRs = [2.5, 2.0, 1.8, 1.75, 1.6]
       vEgos = [1.0, 2.0, 3.0, 4.0, 5.0]
+      #TRs = [1.8, 1.6]
+      #vEgos =[4.0, 5.0]
       TR = interp(CS.vEgo, vEgos, TRs)
     else:
       self.store_df_data()
@@ -103,9 +105,10 @@ class LongitudinalMpc():
     costs = [1.0, 0.1, 0.05, 1.0]
     cost = interp(TR, TRs, costs)
     if vEgo < 5.0:
-      cost = cost * min(max(1.0 , 6.0 - vEgo),3.0)
-    elif self.TR_Mod > 0:
-      cost = cost + self.TR_Mod
+      #cost = cost * min(max(1.0 , 6.0 - vEgo),3.0)
+      cost = 0.1
+    #elif self.TR_Mod > 0:
+    #  cost = cost + self.TR_Mod
     if self.last_cost != cost:
       self.libmpc.change_tr(MPC_COST_LONG.TTC, cost, MPC_COST_LONG.ACCELERATION, MPC_COST_LONG.JERK)
       self.last_cost = cost
