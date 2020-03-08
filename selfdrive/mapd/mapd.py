@@ -1,38 +1,26 @@
 #!/usr/bin/env python3
-#import sys
-# sys.path.append("/root/arne-openpilot/openpilot")
+
+import time
+import overpy
+import requests
+import threading
+import numpy as np
 # setup logging
 import logging
 import logging.handlers
-
-
-# Add phonelibs openblas to LD_LIBRARY_PATH if import fails
 from scipy import spatial
-
 import selfdrive.crash as crash
-
+from common.params import Params
+from collections import defaultdict
+import cereal.messaging as messaging
+import cereal.messaging_arne as messaging_arne
+from selfdrive.version import version, dirty
+from common.transformations.coordinates import geodetic2ecef
+from selfdrive.mapd.mapd_helpers import MAPS_LOOKAHEAD_DISTANCE, Way, circle_through_points, rate_curvature_points
 
 #DEFAULT_SPEEDS_BY_REGION_JSON_FILE = BASEDIR + "/selfdrive/mapd/default_speeds_by_region.json"
 #from selfdrive.mapd import default_speeds_generator
 #default_speeds_generator.main(DEFAULT_SPEEDS_BY_REGION_JSON_FILE)
-
-import time
-import requests
-import threading
-import numpy as np
-import overpy
-from common.params import Params
-from collections import defaultdict
-from selfdrive.version import version, dirty
-
-from common.transformations.coordinates import geodetic2ecef
-import cereal.messaging_arne as messaging_arne
-import cereal.messaging as messaging
-
-from selfdrive.mapd.mapd_helpers import MAPS_LOOKAHEAD_DISTANCE, Way, circle_through_points, rate_curvature_points
-#from copy import deepcopy
-
-
 
 # define LoggerThread class to implement logging functionality
 class LoggerThread(threading.Thread):
@@ -46,7 +34,7 @@ class LoggerThread(threading.Thread):
         h.setFormatter(f)
         self.logger.addHandler(h)
         self.logger.setLevel(logging.CRITICAL) # set to logging.DEBUG to enable logging
-        # self.logger.setLevel(logging.DEBUG) # set to logging.DEBUG to enable logging
+        # self.logger.setLevel(logging.DEBUG) # set to logging.CRITICAL to disable logging
         
     def save_gps_data(self, gps):
         try:
@@ -106,7 +94,6 @@ class QueryThread(LoggerThread):
         self.logger.debug("build_way_query : %s" % str(q))
         return q
 
-
     def run(self):
         self.logger.debug("run method started for thread %s" % self.name)
         api = overpy.Overpass(url=self.OVERPASS_API_URL)
@@ -126,12 +113,11 @@ class QueryThread(LoggerThread):
                 cur_ecef = geodetic2ecef((last_gps.latitude, last_gps.longitude, last_gps.altitude))
                 if self.prev_ecef is None:
                     self.prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
-                # for next step cur_ecef becomes prev_ecef
                 
                 dist = np.linalg.norm(cur_ecef - self.prev_ecef)
                 if dist < 3000: #updated when we are 1km from the edge of the downloaded circle
                     continue
-                    # self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(prev_ecef), str(dist)))
+                    self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(prev_ecef), str(dist)))
 
                 if dist > 4000:
                     query_lock = self.sharedParams.get('query_lock', None)
@@ -238,8 +224,6 @@ class MapsdThread(LoggerThread):
             self.arne_sm.update(0)
             gps_ext = self.sm['gpsLocationExternal']
             traffic = self.arne_sm['liveTrafficData']
-            # if True:  # todo: should this be `if sm.updated['liveTrafficData']:`?
-            # commented out the previous line because it does not make sense
 
             self.logger.debug("got gps_ext = %s" % str(gps_ext))
             if traffic.speedLimitValid:
@@ -254,9 +238,6 @@ class MapsdThread(LoggerThread):
                 speedLimittrafficAdvisoryvalid = True
             else:
                 speedLimittrafficAdvisoryvalid = False
-            # commented out because it is never going to happen
-            # else:
-                # speedLimittrafficAdvisoryvalid = False
 
             if self.sm.updated['gpsLocationExternal']:
                 gps = gps_ext
@@ -264,7 +245,7 @@ class MapsdThread(LoggerThread):
             else:
                 continue
             query_lock = self.sharedParams.get('query_lock', None)
-            # last_gps = self.sharedParams.get('last_gps', None)
+            
             query_lock.acquire()
             self.sharedParams['last_gps'] = gps
             query_lock.release()
@@ -295,8 +276,6 @@ class MapsdThread(LoggerThread):
                 speed = gps.speed
 
                 query_lock.acquire()
-                # making a copy of sharedParams so I do not have to pass the original to the Way.closest method
-                #last_q_result = deepcopy(self.sharedParams.get('last_query_result', None))
                 cur_way = Way.closest(self.sharedParams['last_query_result'], lat, lon, heading, cur_way)
                 query_lock.release()
 
@@ -366,14 +345,12 @@ class MapsdThread(LoggerThread):
                             upcoming_curvature = 0.
                             dist_to_turn = 999
 
-                #query_lock.release()
-
             dat = messaging.new_message()
             dat.init('liveMapData')
 
             last_gps = self.sharedParams.get('last_gps', None)
 
-            if last_gps is not None:  # TODO: this should never be None with SubMaster now
+            if last_gps is not None:
                 dat.liveMapData.lastGps = last_gps
 
             if cur_way is not None:
@@ -429,7 +406,6 @@ class MapsdThread(LoggerThread):
                     dat.liveMapData.speedLimit = max_speed
 
             dat.liveMapData.mapValid = map_valid
-            #
             self.logger.debug("Sending ... liveMapData ... %s", str(dat))
             self.pm.send('liveMapData', dat)
 
@@ -439,11 +415,7 @@ def main():
     crash.bind_user(id=dongle_id)
     crash.bind_extra(version=version, dirty=dirty, is_eon=True)
     crash.install()
-    # initialize gps parameters
-    # initialize last_gps
-    # current_milli_time = lambda: int(round(time.time() * 1000))
-
-
+    
     # setup shared parameters
     last_gps = None
     query_lock = threading.Lock()
@@ -459,11 +431,6 @@ def main():
 
     qt.start()
     mt.start()
-    # print("Threads started")
-    # qt.run()
-    # qt.join()
-
-
-
+    
 if __name__ == "__main__":
     main()
