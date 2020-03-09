@@ -209,7 +209,7 @@ class Planner():
     lead_2 = sm['radarState'].leadTwo
 
     enabled = (long_control_state == LongCtrlState.pid) or (long_control_state == LongCtrlState.stopping)
-    following = (lead_1.status and lead_1.dRel < 45.0) or (lead_2.status and lead_2.dRel < 45.0)
+    following = self.mpc1.prev_lead_status
 
     if len(sm['model'].path.poly):
       path = list(sm['model'].path.poly)
