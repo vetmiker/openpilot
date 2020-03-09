@@ -102,7 +102,7 @@ class LongitudinalMpc():
 
   def change_cost(self, TR, vEgo):
     TRs = [0.9, 1.8, 2.7, 5.0]
-    costs = [1.0, 0.1, 0.05, 1.0]
+    costs = [0.5, 0.1, 0.05, 1.0]
     cost = interp(TR, TRs, costs)
     if vEgo < 5.0:
       cost = 0.1
