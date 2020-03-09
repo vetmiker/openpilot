@@ -209,7 +209,7 @@ class Planner():
     lead_2 = sm['radarState'].leadTwo
 
     enabled = (long_control_state == LongCtrlState.pid) or (long_control_state == LongCtrlState.stopping)
-    following = (lead_1.status and lead_1.dRel < 45.0) or (lead_2.status and lead_2.dRel < 45.0)
+    following = self.mpc1.prev_lead_status
 
     if len(sm['model'].path.poly):
       path = list(sm['model'].path.poly)
@@ -220,7 +220,7 @@ class Planner():
       # TODO: compute max speed without using a list of points and without numpy
       y_p = 3 * path[0] * self.path_x**2 + 2 * path[1] * self.path_x + path[2]
       y_pp = 6 * path[0] * self.path_x + 2 * path[1]
-      curv = y_pp / (1. + y_p**2)**1.5
+      curv = y_pp / (1. + y_p**2)**1.5 / np.sqrt(curvature_factor)
 
       a_y_max = 2.975 - v_ego * 0.0375  # ~1.85 @ 75mph, ~2.6 @ 25mph
       v_curvature = np.sqrt(a_y_max / np.clip(np.abs(curv), 1e-4, None))
