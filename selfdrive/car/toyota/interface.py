@@ -68,11 +68,15 @@ class CarInterface(CarInterfaceBase):
     if candidate in [CAR.PRIUS, CAR.LEXUS_CTH]:
     # if candidate == CAR.PRIUS:
       stop_and_go = True
-      ret.safetyParam = 66  # see conversion factor for STEER_TORQUE_EPS in dbc file
-      ret.wheelbase = 2.70
-      ret.steerRatio = 15.74   # unknown end-to-end spec
-      tire_stiffness_factor = 0.6371   # hand-tune
-      ret.mass = 3045. * CV.LB_TO_KG + STD_CARGO_KG
+      # ret.safetyParam = 66  # see conversion factor for STEER_TORQUE_EPS in dbc file
+      ret.safetyParam = 100  # see conversion factor for STEER_TORQUE_EPS in dbc file
+      ret.wheelbase = 2.60
+      # ret.steerRatio = 15.74   # unknown end-to-end spec
+      ret.steerRatio = 13.33   # unknown end-to-end spec
+      # tire_stiffness_factor = 0.6371   # hand-tune
+      tire_stiffness_factor = 0.444   # hand-tune
+      # ret.mass = 3045. * CV.LB_TO_KG + STD_CARGO_KG
+      ret.mass = 3108. * CV.LB_TO_KG + STD_CARGO_KG  # mean between min and max
 
       ret.lateralTuning.init('indi')
       ret.lateralTuning.indi.innerLoopGain = 4.0
