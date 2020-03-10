@@ -11,6 +11,8 @@ from selfdrive.car.interfaces import CarInterfaceBase
 from common.op_params import opParams
 import cereal.messaging as messaging
 
+op_params = opParams()
+
 ButtonType = car.CarState.ButtonEvent.Type
 GearShifter = car.CarState.GearShifter
 
@@ -63,7 +65,8 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.init('pid')
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
 
-    if candidate == CAR.PRIUS:
+    if candidate in [CAR.PRIUS, CAR.LEXUS_CTH]:
+    # if candidate == CAR.PRIUS:
       stop_and_go = True
       ret.safetyParam = 66  # see conversion factor for STEER_TORQUE_EPS in dbc file
       ret.wheelbase = 2.70
@@ -270,14 +273,19 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.05]]
       ret.lateralTuning.pid.kf = 0.00006
 
+
     elif candidate == CAR.LEXUS_CTH:
+      KPV = op_params.get('camera_offset', 0.3)
+      KIV = op_params.get('camera_offset', 0.1)
+
       stop_and_go = True
       ret.safetyParam = 100
       ret.wheelbase = 2.60
       ret.steerRatio = 13.3
       tire_stiffness_factor = 0.444
       ret.mass = 3108 * CV.LB_TO_KG + STD_CARGO_KG  # mean between min and max
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.1]]
+      # ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.1]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[KPV], [KIV]]
       ret.lateralTuning.pid.kf = 0.00006
 
     elif candidate == CAR.LEXUS_NXH:
