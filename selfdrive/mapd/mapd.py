@@ -134,7 +134,7 @@ class QueryThread(LoggerThread):
                     else:
                         self.logger.error("There is no query_lock")
 
-            if last_gps is not None and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
+            if last_gps is not None and last_gps.accuracy < 5.0 and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
                 q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=4000)
                 try:
                     try:
