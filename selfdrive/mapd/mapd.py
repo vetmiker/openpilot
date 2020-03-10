@@ -173,8 +173,10 @@ class QueryThread(LoggerThread):
                     query_lock = self.sharedParams.get('query_lock', None)
                     if query_lock is not None:
                         query_lock.acquire()
-                        last_gps.latitude = lat
-                        last_gps.longitude = lon
+                        last_gps_mod = last_gps.as_builder()
+                        last_gps_mod.latitude = lat
+                        last_gps_mod.longitude = lon
+                        last_gps = last_gps_mod.as_reader()
                         self.sharedParams['last_query_result'] = new_result, tree, real_nodes, node_to_way, location_info
                         self.prev_ecef = geodetic2ecef((last_gps.latitude, last_gps.longitude, last_gps.altitude))
                         self.sharedParams['last_query_pos'] = last_gps
