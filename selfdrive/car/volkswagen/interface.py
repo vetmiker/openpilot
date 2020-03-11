@@ -121,7 +121,7 @@ class CarInterface(CarInterfaceBase):
     eventsArne182 = []
     buttonEvents = []
     params = Params()
-    ret = car.CarState.new_message()
+    ret = self.CS.update(self.cp)
     ret_arne182 = arne182.CarStateArne182.new_message()
 
     # Process the most recent CAN message traffic, and check for validity
@@ -129,7 +129,7 @@ class CarInterface(CarInterfaceBase):
     # anyway so we can test connectivity with can_valid
     self.pt_cp.update_strings(can_strings)
     self.cam_cp.update_strings(can_strings)
-    self.CS.update(self.pt_cp)
+    
     ret.canValid = self.pt_cp.can_valid and self.cam_cp.can_valid
 
     # Wheel and vehicle speed, yaw rate
