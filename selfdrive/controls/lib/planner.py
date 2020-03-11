@@ -210,7 +210,7 @@ class Planner():
 
     enabled = (long_control_state == LongCtrlState.pid) or (long_control_state == LongCtrlState.stopping)
     
-    following = False if self.longitudinalPlanSource=='cruise' else self.mpc1.prev_lead_status
+    following = False if self.longitudinalPlanSource=='cruise' else (lead_1.status and lead_1.dRel < 40.0)
 
     if len(sm['model'].path.poly):
       path = list(sm['model'].path.poly)
