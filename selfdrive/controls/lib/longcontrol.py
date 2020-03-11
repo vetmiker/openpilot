@@ -158,7 +158,7 @@ class LongControl():
     elif self.long_control_state == LongCtrlState.starting:
       factor = 1
       if hasLead:
-        factor = interp(dRel,[0.0,2.0,4.0,6.0], [0.0,0.25,0.5,1.0])
+        factor = interp(dRel,[0.0,2.0,4.0,6.0], [0.0,0.5,1.0,2.0])
       if output_gb < -0.2:
         output_gb += STARTING_BRAKE_RATE / RATE * factor
       self.v_pid = v_ego
