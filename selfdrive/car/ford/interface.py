@@ -144,8 +144,9 @@ class CarInterface(CarInterfaceBase):
     self.gas_pressed_prev = ret.gasPressed
     self.brake_pressed_prev = ret.brakePressed
     self.cruise_enabled_prev = ret.cruiseState.enabled
-
-    return ret.as_reader(), ret_arne182.as_reader()
+    self.CS.out = ret.as_reader()
+    
+    return self.CS.out, ret_arne182.as_reader()
 
   # pass in a car.CarControl
   # to be called @ 100hz
