@@ -97,9 +97,10 @@ class CarInterface(CarInterfaceBase):
   def update(self, c, can_strings):
     self.pt_cp.update_strings(can_strings)
     self.cam_cp.update_strings(can_strings)
+    self.CS.update(self.pt_cp, self.cam_cp)
 
     # create message
-    ret = self.CS.update(self.cp, self.cp_cam)
+    ret = car.CarState.new_message()
     ret_arne182 = arne182.CarStateArne182.new_message()
     
     ret.canValid = self.pt_cp.can_valid and self.cam_cp.can_valid
