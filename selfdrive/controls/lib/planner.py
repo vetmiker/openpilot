@@ -211,13 +211,7 @@ class Planner():
     enabled = (long_control_state == LongCtrlState.pid) or (long_control_state == LongCtrlState.stopping)
     
     following = False if self.longitudinalPlanSource=='cruise' else (lead_1.status and lead_1.dRel < 40.0)
-    if following:
-      print("dRel")
-      print(lead_1.dRel)
-      print("vRel")
-      print(lead_1.vRel)
-      print("yRel")
-      print(lead_1.yRel)
+     
 
     if len(sm['model'].path.poly):
       path = list(sm['model'].path.poly)
@@ -319,6 +313,12 @@ class Planner():
       if v_speedlimit_ahead < v_speedlimit and v_ego > v_speedlimit_ahead and sm['liveMapData'].speedLimitAheadDistance > 0.10 and not following:
         required_decel = min(0, (v_speedlimit_ahead*v_speedlimit_ahead - v_ego*v_ego)/(sm['liveMapData'].speedLimitAheadDistance*2))
         required_decel = max(required_decel, -3.0)
+        print("v_speedlimit_ahead")
+        print(v_speedlimit_ahead)
+        print("v_speedlimit")
+        print(v_speedlimit)
+        print("speedLimitAheadDistance")
+        print(sm['liveMapData'].speedLimitAheadDistance)
         accel_limits[0] = required_decel
         accel_limits[1] = required_decel
         self.a_acc_start = required_decel
