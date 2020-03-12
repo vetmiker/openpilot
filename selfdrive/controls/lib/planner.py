@@ -314,14 +314,6 @@ class Planner():
         required_decel = min(0, (v_speedlimit_ahead*v_speedlimit_ahead - v_ego*v_ego)/(sm['liveMapData'].speedLimitAheadDistance*2))
         required_decel = max(required_decel, -3.0)
         decel_for_turn = True
-        print("v_speedlimit_ahead")
-        print(v_speedlimit_ahead)
-        print("v_speedlimit")
-        print(v_speedlimit)
-        print("speedLimitAheadDistance")
-        print(sm['liveMapData'].speedLimitAheadDistance)
-        print("required_decel")
-        print(required_decel)
         accel_limits[0] = required_decel
         accel_limits[1] = required_decel
         self.a_acc_start = required_decel
