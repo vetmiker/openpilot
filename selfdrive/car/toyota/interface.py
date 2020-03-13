@@ -132,8 +132,8 @@ class CarInterface(CarInterfaceBase):
 
       ret.lateralTuning.lqr.scale = 1500.0
       ret.lateralTuning.lqr.ki = 0.06
-      ret.longitudinalTuning.kpV = [0.5, 0.4, 0.3]  # braking tune
-      ret.longitudinalTuning.kiV = [0.135, 0.1]
+      ret.longitudinalTuning.kpV = [0.1, 0.3, 0.3]  # braking tune
+      ret.longitudinalTuning.kiV = [0.1, 0.1]
       ret.lateralTuning.lqr.a = [0., 1., -0.22619643, 1.21822268]
       ret.lateralTuning.lqr.b = [-1.92006585e-04, 3.95603032e-05]
       ret.lateralTuning.lqr.c = [1., 0.]

@@ -103,10 +103,11 @@ class CarInterface(CarInterfaceBase):
     ret.longitudinalTuning.deadzoneBP = [0., 9.]
     ret.longitudinalTuning.deadzoneV = [0., .15]
     ret.longitudinalTuning.kpBP = [0., 5., 35.]
-    ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
+    #ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
     ret.longitudinalTuning.kiBP = [0., 35.]
-    ret.longitudinalTuning.kiV = [0.54, 0.36]
-
+    #ret.longitudinalTuning.kiV = [0.54, 0.36]
+    ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
+    ret.longitudinalTuning.kiV = [0.15, 0.10]
     return ret
 
   # returns a car.CarState
