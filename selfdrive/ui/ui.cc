@@ -7,13 +7,10 @@
 #include <sys/mman.h>
 #include <sys/resource.h>
 
-<<<<<<< HEAD
 #include <capnp/serialize.h>
 #include "cereal/gen/cpp/arne182.capnp.h"
 
-#include <json.h>
-=======
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+#include <json.h> // Might not be needed
 #include <czmq.h>
 
 #include "common/util.h"
@@ -160,36 +157,31 @@ static void ui_init(UIState *s) {
   s->uilayout_sock = SubSocket::create(s->ctx, "uiLayoutState");
   s->livecalibration_sock = SubSocket::create(s->ctx, "liveCalibration");
   s->radarstate_sock = SubSocket::create(s->ctx, "radarState");
-<<<<<<< HEAD
   s->carstate_sock = SubSocket::create(s->ctx, "carState");
   s->livempc_sock = SubSocket::create(s->ctx, "liveMpc");
   s->gps_sock = SubSocket::create(s->ctx, "gpsLocationExternal");
-  s->thermal_sock = SubSocket::create(s->ctxarne182, "thermalonline");
+  s->thermalonline_sock = SubSocket::create(s->ctxarne182, "thermalonline");
   s->arne182_sock = SubSocket::create(s->ctxarne182, "arne182Status");
   s->dynamicfollowbutton_sock = PubSocket::create(s->ctxarne182, "dynamicFollowButton");
-=======
   s->thermal_sock = SubSocket::create(s->ctx, "thermal");
   s->health_sock = SubSocket::create(s->ctx, "health");
   s->ubloxgnss_sock = SubSocket::create(s->ctx, "ubloxGnss");
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
   assert(s->model_sock != NULL);
   assert(s->controlsstate_sock != NULL);
   assert(s->uilayout_sock != NULL);
   assert(s->livecalibration_sock != NULL);
   assert(s->radarstate_sock != NULL);
-<<<<<<< HEAD
   assert(s->carstate_sock != NULL);
   assert(s->livempc_sock != NULL);
   assert(s->gps_sock != NULL);
   assert(s->thermal_sock != NULL);
+  assert(s->thermalonline_sock != NULL);
   assert(s->arne182_sock != NULL);
   assert(s->dynamicfollowbutton_sock != NULL);
-=======
-  assert(s->thermal_sock != NULL);
   assert(s->health_sock != NULL);
   assert(s->ubloxgnss_sock != NULL);
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+
 
   s->poller = Poller::create({
                               s->model_sock,
@@ -197,19 +189,16 @@ static void ui_init(UIState *s) {
                               s->uilayout_sock,
                               s->livecalibration_sock,
                               s->radarstate_sock,
-<<<<<<< HEAD
+                              s->thermal_sock,
+                              s->health_sock,
+                              s->ubloxgnss_sock
                               s->carstate_sock,
                               s->livempc_sock,
                               s->gps_sock
                              });
   s->pollerarne182 = Poller::create({
-                              s->thermal_sock,
+                              s->thermalonline_sock,
                               s->arne182_sock
-=======
-                              s->thermal_sock,
-                              s->health_sock,
-                              s->ubloxgnss_sock
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
                              });
 
 #ifdef SHOW_SPEEDLIMIT
@@ -481,23 +470,15 @@ void handle_message(UIState *s, Message * msg) {
     struct cereal_RadarState_LeadData leaddatad;
     struct cereal_RadarState_LeadData leaddatae;
     cereal_read_RadarState_LeadData(&leaddatad, datad.leadOne);
-    cereal_read_RadarState_LeadData(&leaddatae, datad.leadTwo);
     s->scene.lead_status = leaddatad.status;
     s->scene.lead_d_rel = leaddatad.dRel;
     s->scene.lead_y_rel = leaddatad.yRel;
     s->scene.lead_v_rel = leaddatad.vRel;
-<<<<<<< HEAD
-    s->scene.lead_status2 = leaddatae.status;
-    s->scene.lead_d_rel2 = leaddatae.dRel;
-    s->scene.lead_y_rel2 = leaddatae.yRel;
-    s->scene.lead_v_rel2 = leaddatae.vRel;
-=======
     cereal_read_RadarState_LeadData(&leaddatad, datad.leadTwo);
     s->scene.lead_status2 = leaddatad.status;
     s->scene.lead_d_rel2 = leaddatad.dRel;
     s->scene.lead_y_rel2 = leaddatad.yRel;
     s->scene.lead_v_rel2 = leaddatad.vRel;
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     s->livempc_or_radarstate_changed = true;
   } else if (eventd.which == cereal_Event_liveCalibration) {
     s->scene.world_objects_visible = true;
@@ -540,7 +521,6 @@ void handle_message(UIState *s, Message * msg) {
     struct cereal_LiveMapData datad;
     cereal_read_LiveMapData(&datad, eventd.liveMapData);
     s->scene.map_valid = datad.mapValid;
-<<<<<<< HEAD
     s->scene.speedlimit = datad.speedLimit;
     s->scene.speedlimitahead_valid = datad.speedLimitAheadValid;
     s->scene.speedlimitaheaddistance = datad.speedLimitAheadDistance;
@@ -565,7 +545,6 @@ void handle_message(UIState *s, Message * msg) {
     {
       s->scene.gpsAccuracy = 99.8;
     }
-=======
   } else if (eventd.which == cereal_Event_thermal) {
     struct cereal_ThermalData datad;
     cereal_read_ThermalData(&datad, eventd.thermal);
@@ -591,12 +570,10 @@ void handle_message(UIState *s, Message * msg) {
 
     s->scene.hwType = datad.hwType;
     s->hardware_timeout = 5*30; // 5 seconds at 30 fps
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
   }
   capn_free(&ctx);
 }
 
-<<<<<<< HEAD
 void handle_message_arne182(UIState *s, Message * msg) {
   struct capn ctxarne182;
   capn_init_mem(&ctxarne182, (uint8_t*)msg->getData(), msg->getSize(), 0);
@@ -623,7 +600,7 @@ void handle_message_arne182(UIState *s, Message * msg) {
     s->scene.rightblindspotD2 = datad.rightBlindspotD2;
   }
   capn_free(&ctxarne182);
-=======
+
 static void check_messages(UIState *s) {
   while(true) {
     auto polls = s->poller->poll(0);
@@ -635,12 +612,30 @@ static void check_messages(UIState *s) {
       Message * msg = sock->receive();
       if (msg == NULL) continue;
 
+      set_awake(s, true);
+
       handle_message(s, msg);
 
       delete msg;
     }
   }
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+  while(true) {
+    auto pollsarne182 = s->pollerarne182->poll(0);
+
+    if (pollsarne182.size() == 0)
+      return;
+
+    for (auto sock : pollsarne182){
+      Message * msgarne182 = sock->receive();
+      if (msgarne182 == NULL) continue;
+
+      set_awake(s, true);
+
+      handle_message_arne182(s, msgarne182);
+
+      delete msgarne182;
+    }
+  }
 }
 
 static void ui_update(UIState *s) {
@@ -793,44 +788,7 @@ static void ui_update(UIState *s) {
     break;
   }
   // peek and consume all events in the zmq queue, then return.
-<<<<<<< HEAD
-  while(true) {
-    auto polls = s->poller->poll(0);
-
-    if (polls.size() == 0)
-      break;
-
-    for (auto sock : polls){
-      Message * msg = sock->receive();
-      if (msg == NULL) continue;
-
-      set_awake(s, true);
-
-      handle_message(s, msg);
-
-      delete msg;
-    }
-  }
-  while(true) {
-    auto pollsarne182 = s->pollerarne182->poll(0);
-
-    if (pollsarne182.size() == 0)
-      return;
-
-    for (auto sock : pollsarne182){
-      Message * msgarne182 = sock->receive();
-      if (msgarne182 == NULL) continue;
-
-      set_awake(s, true);
-
-      handle_message_arne182(s, msgarne182);
-
-      delete msgarne182;
-    }
-  }
-=======
   check_messages(s);
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 }
 
 static int vision_subscribe(int fd, VisionPacket *rp, VisionStreamType type) {
@@ -1150,7 +1108,6 @@ int main(int argc, char* argv[]) {
       set_awake(s, false);
     }
 
-<<<<<<< HEAD
     //dfButton manager  // code below thanks to kumar: https://github.com/arne182/openpilot/commit/71d5aac9f8a3f5942e89634b20cbabf3e19e3e78
     if (s->awake && s->vision_connected && s->active_app == cereal_UiLayoutState_App_home && s->status != STATUS_STOPPED) {
       if (df_button_clicked(touch_x, touch_y)) {
@@ -1161,21 +1118,16 @@ int main(int argc, char* argv[]) {
         send_df(s, s->scene.dfButtonStatus);
       }
     }
-
-    // Don't waste resources on drawing in case screen is off or car is not started.
-    if (s->awake && s->vision_connected) {
-      dashcam(s, touch_x, touch_y);
-=======
     // manage hardware disconnect
     if (s->hardware_timeout > 0) {
       s->hardware_timeout--;
     } else {
       s->scene.hwType = cereal_HealthData_HwType_unknown;
     }
-
-    // Don't waste resources on drawing in case screen is off
-    if (s->awake) {
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+    
+    // Don't waste resources on drawing in case screen is off or car is not started.
+    if (s->awake && s->vision_connected) {
+      dashcam(s, touch_x, touch_y);
       ui_draw(s);
       glFinish();
       should_swap = true;
