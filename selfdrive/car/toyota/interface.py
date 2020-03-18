@@ -1,52 +1,24 @@
 #!/usr/bin/env python3
 from cereal import car, arne182, log
 from selfdrive.config import Conversions as CV
-<<<<<<< HEAD
 from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne
-from selfdrive.controls.lib.vehicle_model import VehicleModel
 from selfdrive.car.toyota.carstate import CarState, get_can_parser, get_cam_can_parser, get_can_parser_init
-from selfdrive.car.toyota.values import Ecu, ECU_FINGERPRINT, CAR, NO_STOP_TIMER_CAR, TSS2_CAR, FINGERPRINTS
-=======
-from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event
 from selfdrive.car.toyota.values import Ecu, ECU_FINGERPRINT, CAR, TSS2_CAR, FINGERPRINTS
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, is_ecu_disconnected, gen_empty_fingerprint
 from selfdrive.swaglog import cloudlog
 from selfdrive.car.interfaces import CarInterfaceBase
 from common.op_params import opParams
 import cereal.messaging as messaging
 
-<<<<<<< HEAD
-ButtonType = car.CarState.ButtonEvent.Type
-GearShifter = car.CarState.GearShifter
-
 LaneChangeState = log.PathPlan.LaneChangeState
 
 class CarInterface(CarInterfaceBase):
-  def __init__(self, CP, CarController):
-    self.CP = CP
-    self.VM = VehicleModel(CP)
+  def __init__(self):
     self.waiting = False
-    self.frame = 0
-    self.gas_pressed_prev = False
-    self.brake_pressed_prev = False
-    self.cruise_enabled_prev = False
     self.keep_openpilot_engaged = True
     self.sm = messaging.SubMaster(['pathPlan'])
-    # *** init the major players ***
-    self.CS = CarState(CP)
     self.op_params = opParams()
     self.alca_min_speed = self.op_params.get('alca_min_speed', default=20.0)
-    self.cp = get_can_parser(CP)
-    self.cp_init = get_can_parser_init(CP)
-    self.cp_cam = get_cam_can_parser(CP)
-
-    self.CC = None
-    if CarController is not None:
-      self.CC = CarController(self.cp.dbc_name, CP.carFingerprint, CP.enableCamera, CP.enableDsu, CP.enableApgs)
-=======
-class CarInterface(CarInterfaceBase):
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
   @staticmethod
   def compute_gb(accel, speed):
@@ -333,19 +305,6 @@ class CarInterface(CarInterfaceBase):
     ret.tireStiffnessFront, ret.tireStiffnessRear = scale_tire_stiffness(ret.mass, ret.wheelbase, ret.centerToFront,
                                                                          tire_stiffness_factor=tire_stiffness_factor)
 
-<<<<<<< HEAD
-    # no rear steering, at least on the listed cars above
-    ret.steerRatioRear = 0.
-    ret.steerControlType = car.CarParams.SteerControlType.torque
-
-    # steer, gas, brake limitations VS speed
-    ret.steerMaxBP = [16. * CV.KPH_TO_MS, 45. * CV.KPH_TO_MS]  # breakpoints at 1 and 40 kph
-    ret.steerMaxV = [1., 1.]  # 2/3rd torque allowed above 45 kph
-    ret.brakeMaxBP = [0., 35., 55.]
-    ret.brakeMaxV = [1.0, 0.8, 0.7]
-
-=======
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS, ECU_FINGERPRINT, candidate, Ecu.fwdCamera) or has_relay
     # Detect smartDSU, which intercepts ACC_CMD from the DSU allowing openpilot to send it
     smartDsu = 0x2FF in fingerprint[0]
@@ -368,15 +327,9 @@ class CarInterface(CarInterfaceBase):
 
     ret.longitudinalTuning.deadzoneBP = [0., 9.]
     ret.longitudinalTuning.deadzoneV = [0., .15]
-<<<<<<< HEAD
+
     ret.longitudinalTuning.kpBP = [0., 5., 55.]
     ret.longitudinalTuning.kiBP = [0., 55.]
-    ret.stoppingControl = False
-    ret.startAccel = 0.0
-=======
-    ret.longitudinalTuning.kpBP = [0., 5., 35.]
-    ret.longitudinalTuning.kiBP = [0., 35.]
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     return ret
 
@@ -385,26 +338,20 @@ class CarInterface(CarInterfaceBase):
     self.sm.update(0)
     # ******************* do can recv *******************
     self.cp_cam.update_strings(can_strings)
-<<<<<<< HEAD
     if self.frame < 1000:
       self.cp_init.update_strings(can_strings)
-      self.CS.update(self.cp_init, self.cp_cam, self.frame)
+      ret = self.CS.update(self.cp_init, self.cp_cam, self.frame)
     else:
       self.cp.update_strings(can_strings)
-      self.CS.update(self.cp, self.cp_cam, self.frame)
+      ret = self.CS.update(self.cp, self.cp_cam, self.frame)
 
     # create message
-    ret = car.CarState.new_message()
     ret_arne182 = arne182.CarStateArne182.new_message()
-=======
 
-    ret = self.CS.update(self.cp, self.cp_cam)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
-<<<<<<< HEAD
     eventsArne182 = []
 
     # cruise state
@@ -420,43 +367,10 @@ class CarInterface(CarInterfaceBase):
         self.waiting = False
     if self.CS.v_ego < 1 or not self.keep_openpilot_engaged:
       ret.cruiseState.enabled = self.CS.pcm_acc_active
-    ret.cruiseState.speed = self.CS.v_cruise_pcm * CV.KPH_TO_MS
     ret.cruiseState.available = bool(self.CS.main_on)
     ret.cruiseState.speedOffset = 0.
 
-    if self.CP.carFingerprint in NO_STOP_TIMER_CAR or self.CP.enableGasInterceptor:
-      # ignore standstill in hybrid vehicles, since pcm allows to restart without
-      # receiving any special command
-      # also if interceptor is detected
-      ret.cruiseState.standstill = False
-    else:
-      ret.cruiseState.standstill = self.CS.pcm_acc_status == 7
-
-    buttonEvents = []
-    if self.CS.left_blinker_on != self.CS.prev_left_blinker_on:
-      be = car.CarState.ButtonEvent.new_message()
-      be.type = ButtonType.leftBlinker
-      be.pressed = self.CS.left_blinker_on != 0
-      buttonEvents.append(be)
-
-    if self.CS.right_blinker_on != self.CS.prev_right_blinker_on:
-      be = car.CarState.ButtonEvent.new_message()
-      be.type = ButtonType.rightBlinker
-      be.pressed = self.CS.right_blinker_on != 0
-      buttonEvents.append(be)
-
-    ret.buttonEvents = buttonEvents
-    ret.leftBlinker = bool(self.CS.left_blinker_on)
-    ret.rightBlinker = bool(self.CS.right_blinker_on)
-
-    ret.doorOpen = not self.CS.door_all_closed
-    ret.seatbeltUnlatched = not self.CS.seatbelt
-
-    ret.genericToggle = self.CS.generic_toggle
-    ret.stockAeb = self.CS.stock_aeb
-=======
     ret.buttonEvents = []
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     if ret.cruiseState.enabled and not self.cruise_enabled_prev:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
       disengage_event = True
@@ -469,29 +383,46 @@ class CarInterface(CarInterfaceBase):
 
     if self.cp_cam.can_invalid_cnt >= 200 and self.CP.enableCamera:
       events.append(create_event('invalidGiraffeToyota', [ET.PERMANENT]))
-<<<<<<< HEAD
-    if not ret.gearShifter == GearShifter.drive and self.CP.openpilotLongitudinalControl:
-      if ret.vEgo < 5:
-        eventsArne182.append(create_event_arne('wrongGearArne', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+    # needs to move to selfdrive/car/interfaces.py 
+    #if not ret.gearShifter == GearShifter.drive and self.CP.openpilotLongitudinalControl:
+    #  if ret.vEgo < 5:
+    #    eventsArne182.append(create_event_arne('wrongGearArne', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+    #  else:
+    #    events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+    #if ret.doorOpen and disengage_event:
+    #  events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+    #if ret.seatbeltUnlatched and disengage_event:
+    #  events.append(create_event('seatbeltNotLatched', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+    #if ret.gearShifter == GearShifter.reverse and self.CP.openpilotLongitudinalControl:
+    #  if ret.vEgo < 5:
+    #    eventsArne182.append(create_event_arne('reverseGearArne', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+    #  else:
+    #    events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+    #  try:
+    #    if eventsArne182[0].name == 'longControlDisabled':
+    #      del eventsArne182[0]
+    #  except IndexError:
+    #    pass
+    ## disable on pedals rising edge or when brake is pressed and speed isn't zero
+    #if (((ret.gasPressed and not self.gas_pressed_prev) or \
+    #   (ret.brakePressed and (not self.brake_pressed_prev or ret.vEgo > 0.001))) and disengage_event) or (ret.brakePressed and not self.brake_pressed_prev and ret.vEgo < 0.1):
+    #  events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
+
+    #if ret.gasPressed and disengage_event:
+    #  events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
+    
+    if not self.waiting and ret.vEgo < 0.3 and not ret.gasPressed and self.CP.carFingerprint == CAR.RAV4H:
+      self.waiting = True
+    if self.waiting:
+      if ret.gasPressed:
+        self.waiting = False
       else:
-        events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if ret.doorOpen and disengage_event:
-      events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if ret.seatbeltUnlatched and disengage_event:
-      events.append(create_event('seatbeltNotLatched', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if self.CS.esp_disabled and self.CP.openpilotLongitudinalControl:
-      events.append(create_event('espDisabled', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if not self.CS.main_on and self.CP.openpilotLongitudinalControl:
-      events.append(create_event('wrongCarMode', [ET.NO_ENTRY, ET.USER_DISABLE]))
-    if ret.gearShifter == GearShifter.reverse and self.CP.openpilotLongitudinalControl:
-      if ret.vEgo < 5:
-        eventsArne182.append(create_event_arne('reverseGearArne', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-      else:
-        events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-    if self.CS.steer_error:
-      events.append(create_event('steerTempUnavailable', [ET.NO_ENTRY, ET.WARNING]))
-=======
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+        eventsArne182.append(create_event_arne('waitingMode', [ET.WARNING]))
+
+    if ret.rightBlinker and self.CS.rightblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
+      eventsArne182.append(create_event_arne('rightALCbsm', [ET.WARNING]))
+    if ret.leftBlinker and self.CS.leftblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
+      eventsArne182.append(create_event_arne('leftALCbsm', [ET.WARNING]))
     if self.CS.low_speed_lockout and self.CP.openpilotLongitudinalControl:
       events.append(create_event('lowSpeedLockout', [ET.NO_ENTRY, ET.PERMANENT]))
     if ret.vEgo < self.CP.minEnableSpeed and self.CP.openpilotLongitudinalControl:
@@ -508,33 +439,7 @@ class CarInterface(CarInterfaceBase):
       events.append(create_event('pcmEnable', [ET.ENABLE]))
     elif not ret.cruiseState.enabled:
       events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
-<<<<<<< HEAD
-      try:
-        if eventsArne182[0].name == 'longControlDisabled':
-          del eventsArne182[0]
-      except IndexError:
-        pass
-    if not self.waiting and ret.vEgo < 0.3 and not ret.gasPressed and self.CP.carFingerprint == CAR.RAV4H:
-      self.waiting = True
-    if self.waiting:
-      if ret.gasPressed:
-        self.waiting = False
-      else:
-        eventsArne182.append(create_event_arne('waitingMode', [ET.WARNING]))
-    # disable on pedals rising edge or when brake is pressed and speed isn't zero
-    if (((ret.gasPressed and not self.gas_pressed_prev) or \
-       (ret.brakePressed and (not self.brake_pressed_prev or ret.vEgo > 0.001))) and disengage_event) or (ret.brakePressed and not self.brake_pressed_prev and ret.vEgo < 0.1):
-      events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
-    if ret.gasPressed and disengage_event:
-      events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
-    if ret.rightBlinker and self.CS.rightblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
-      eventsArne182.append(create_event_arne('rightALCbsm', [ET.WARNING]))
-    if ret.leftBlinker and self.CS.leftblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
-      eventsArne182.append(create_event_arne('leftALCbsm', [ET.WARNING]))
-=======
-
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     ret.events = events
     ret_arne182.events = eventsArne182
 
@@ -542,12 +447,8 @@ class CarInterface(CarInterfaceBase):
     self.brake_pressed_prev = ret.brakePressed
     self.cruise_enabled_prev = ret.cruiseState.enabled
 
-<<<<<<< HEAD
-    return ret.as_reader(), ret_arne182.as_reader()
-=======
     self.CS.out = ret.as_reader()
-    return self.CS.out
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+    return self.CS.out, ret_arne182.as_reader()
 
   # pass in a car.CarControl
   # to be called @ 100hz
