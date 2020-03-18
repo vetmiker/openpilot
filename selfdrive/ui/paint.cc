@@ -1523,14 +1523,12 @@ void ui_nvg_init(UIState *s) {
   assert(s->img_map >= 0);
   s->img_map = nvgCreateImage(s->vg, "../assets/img_map.png", 1);
 
-<<<<<<< HEAD
   assert(s->img_brake >= 0);
   s->img_brake = nvgCreateImage(s->vg, "../assets/img_brake_disc.png", 1);
 
   assert(s->img_speed >= 0);
   s->img_speed = nvgCreateImage(s->vg, "../assets/img_trafficSign_speedahead.png", 1);
 	
-=======
   assert(s->img_button_settings >= 0);
   s->img_button_settings = nvgCreateImage(s->vg, "../assets/images/button_settings.png", 1);
 
@@ -1550,7 +1548,6 @@ void ui_nvg_init(UIState *s) {
     s->img_network[i] = nvgCreateImage(s->vg, network_asset, 1);
   }
 
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
   // init gl
   s->frame_program = load_program(frame_vertex_shader, frame_fragment_shader);
   assert(s->frame_program);
