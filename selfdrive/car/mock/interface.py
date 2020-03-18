@@ -35,13 +35,7 @@ class CarInterface(CarInterfaceBase):
 
   @staticmethod
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), has_relay=False, car_fw=[]):
-<<<<<<< HEAD
-
-    ret = car.CarParams.new_message()
-    
-=======
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint, has_relay)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     ret.carName = "mock"
     ret.safetyModel = car.CarParams.SafetyModel.noOutput
     ret.mass = 1700.
