@@ -39,6 +39,12 @@
 #define ALERTSIZE_MID 2
 #define ALERTSIZE_FULL 3
 
+#define COLOR_BLACK_ALPHA nvgRGBA(0, 0, 0, 85)
+#define COLOR_WHITE nvgRGBA(255, 255, 255, 255)
+#define COLOR_WHITE_ALPHA nvgRGBA(255, 255, 255, 85)
+#define COLOR_YELLOW nvgRGBA(218, 202, 37, 255)
+#define COLOR_RED nvgRGBA(201, 34, 49, 255)
+
 #ifndef QCOM
   #define UI_60FPS
 #endif
@@ -61,6 +67,14 @@ const int viz_w = vwp_w-(bdr_s*2);
 const int header_h = 420;
 const int footer_h = 280;
 const int footer_y = vwp_h-bdr_s-footer_h;
+const int settings_btn_h = 117;
+const int settings_btn_w = 200;
+const int settings_btn_x = 50;
+const int settings_btn_y = 35;
+const int home_btn_h = 180;
+const int home_btn_w = 180;
+const int home_btn_x = 60;
+const int home_btn_y = vwp_h - home_btn_h - 40;
 
 const int UI_FREQ = 30;   // Hz
 
@@ -127,8 +141,15 @@ typedef struct UIScene {
   int lead_status;
   int lead_status2;
   float lead_d_rel, lead_y_rel, lead_v_rel;
+<<<<<<< HEAD
   float lead_d_rel2, lead_y_rel2, lead_v_rel2;
   
+=======
+
+  int lead_status2;
+  float lead_d_rel2, lead_y_rel2, lead_v_rel2;
+
+>>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
   int front_box_x, front_box_y, front_box_width, front_box_height;
   
    
@@ -151,6 +172,7 @@ typedef struct UIScene {
   // Used to show gps planner status
   bool gps_planner_active;
 
+<<<<<<< HEAD
   // Brake Lights
   bool brakeLights;
 
@@ -164,6 +186,17 @@ typedef struct UIScene {
   float pa0;
   float freeSpace;
 
+=======
+  uint8_t networkType;
+  uint8_t networkStrength;
+  int batteryPercent;
+  char batteryStatus[64];
+  float freeSpace;
+  uint8_t thermalStatus;
+  int paTemp;
+  int hwType;
+  int satelliteCount;
+>>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 } UIScene;
 
 typedef struct {
@@ -202,7 +235,15 @@ typedef struct UIState {
   int img_turn;
   int img_face;
   int img_map;
+<<<<<<< HEAD
   int img_brake;
+=======
+  int img_button_settings;
+  int img_button_home;
+  int img_battery;
+  int img_battery_charging;
+  int img_network[6];
+>>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
   // sockets
   Context *ctx;
@@ -215,11 +256,19 @@ typedef struct UIState {
   SubSocket *livempc_sock;
   SubSocket *map_data_sock;
   SubSocket *uilayout_sock;
+<<<<<<< HEAD
   SubSocket *gps_sock;
   SubSocket *arne182_sock;
   PubSocket *dynamicfollowbutton_sock;
   Poller * poller;
   Poller * pollerarne182;
+=======
+  SubSocket *thermal_sock;
+  SubSocket *health_sock;
+  SubSocket *ubloxgnss_sock;
+  Poller * poller;
+  Poller * ublox_poller;
+>>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
   int active_app;
 
@@ -263,6 +312,7 @@ typedef struct UIState {
   int is_metric_timeout;
   int longitudinal_control_timeout;
   int limit_set_speed_timeout;
+  int hardware_timeout;
 
   bool controls_seen;
 
@@ -301,6 +351,7 @@ typedef struct UIState {
 void ui_draw_vision_alert(UIState *s, int va_size, int va_color,
                           const char* va_text1, const char* va_text2);
 void ui_draw(UIState *s);
+void ui_draw_sidebar(UIState *s);
 void ui_nvg_init(UIState *s);
 
 #endif

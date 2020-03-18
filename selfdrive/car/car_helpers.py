@@ -38,10 +38,12 @@ def load_interfaces(brand_names):
     CarInterface = __import__(path + '.interface', fromlist=['CarInterface']).CarInterface
     if os.path.exists(BASEDIR + '/' + path.replace('.', '/') + '/carcontroller.py'):
       CarController = __import__(path + '.carcontroller', fromlist=['CarController']).CarController
+      CarState = __import__(path + '.carstate', fromlist=['CarState']).CarState
     else:
       CarController = None
+      CarState = None
     for model_name in brand_names[brand_name]:
-      ret[model_name] = (CarInterface, CarController)
+      ret[model_name] = (CarInterface, CarController, CarState)
   return ret
 
 
@@ -63,7 +65,8 @@ def _get_interface_names():
 
 
 # imports from directory selfdrive/car/<name>/
-interfaces = load_interfaces(_get_interface_names())
+interface_names = _get_interface_names()
+interfaces = load_interfaces(interface_names)
 
 
 def only_toyota_left(candidate_cars):
@@ -88,11 +91,16 @@ def fingerprint(logcan, sendcan, has_relay):
 
     cached_params = Params().get("CarParamsCache")
     if cached_params is not None:
+      cached_params = car.CarParams.from_bytes(cached_params)
+      if cached_params.carName == "mock":
+        cached_params = None
+
+    if cached_params is not None and len(cached_params.carFw) > 0 and cached_params.carVin is not VIN_UNKNOWN:
       cloudlog.warning("Using cached CarParams")
-      CP = car.CarParams.from_bytes(cached_params)
-      vin = CP.carVin
-      car_fw = list(CP.carFw)
+      vin = cached_params.carVin
+      car_fw = list(cached_params.carFw)
     else:
+      cloudlog.warning("Getting VIN & FW versions")
       _, vin = get_vin(logcan, sendcan, bus)
       car_fw = get_fw_versions(logcan, sendcan, bus)
 
@@ -206,14 +214,18 @@ def get_car(logcan, sendcan, has_relay=False):
     cloudlog.warning("car doesn't match any fingerprints: %r", fingerprints)
     candidate = "mock"
 
+<<<<<<< HEAD
   if not travis:
     x = threading.Thread(target=crash_log, args=(candidate,))
     x.start()
 
   CarInterface, CarController = interfaces[candidate]
+=======
+  CarInterface, CarController, CarState = interfaces[candidate]
+>>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
   car_params = CarInterface.get_params(candidate, fingerprints, has_relay, car_fw)
   car_params.carVin = vin
   car_params.carFw = car_fw
   car_params.fingerprintSource = source
 
-  return CarInterface(car_params, CarController), car_params
+  return CarInterface(car_params, CarController, CarState), car_params
