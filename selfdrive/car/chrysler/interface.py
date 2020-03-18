@@ -37,13 +37,7 @@ class CarInterface(CarInterfaceBase):
     ret.centerToFront = ret.wheelbase * 0.44
 
     ret.minSteerSpeed = 3.8  # m/s
-<<<<<<< HEAD
-    ret.minEnableSpeed = -1.   # enable is done by stock ACC, so ignore this
     if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.JEEP_CHEROKEE_2019):
-      ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
-=======
-    if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.JEEP_CHEROKEE_2019):
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
       # TODO allow 2019 cars to steer down to 13 m/s if already engaged.
       ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
 
@@ -56,23 +50,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS, ECU_FINGERPRINT, candidate, Ecu.fwdCamera) or has_relay
     print("ECU Camera Simulated: {0}".format(ret.enableCamera))
-<<<<<<< HEAD
-    ret.openpilotLongitudinalControl = False
 
-    ret.stoppingControl = False
-    ret.startAccel = 0.0
-
-    ret.longitudinalTuning.deadzoneBP = [0., 9.]
-    ret.longitudinalTuning.deadzoneV = [0., .15]
-    ret.longitudinalTuning.kpBP = [0., 5., 35.]
-    #ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
-    ret.longitudinalTuning.kiBP = [0., 35.]
-    #ret.longitudinalTuning.kiV = [0.54, 0.36]
-    ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
-    ret.longitudinalTuning.kiV = [0.15, 0.10]
-=======
-
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     return ret
 
   # returns a car.CarState
@@ -90,29 +68,8 @@ class CarInterface(CarInterfaceBase):
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
-<<<<<<< HEAD
-    # TODO: button presses
-    buttonEvents = []
     eventsArne182 = []
-
-    if ret.leftBlinker != self.left_blinker_prev:
-      be = car.CarState.ButtonEvent.new_message()
-      be.type = ButtonType.leftBlinker
-      be.pressed = ret.leftBlinker != 0
-      buttonEvents.append(be)
-
-    if ret.rightBlinker != self.right_blinker_prev:
-      be = car.CarState.ButtonEvent.new_message()
-      be.type = ButtonType.rightBlinker
-      be.pressed = ret.rightBlinker != 0
-      buttonEvents.append(be)
-
-    ret.buttonEvents = buttonEvents
-
-    self.low_speed_alert = (ret.vEgo < self.CP.minSteerSpeed)
-=======
     ret.buttonEvents = []
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     # events
     events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low], gas_resume_speed = 2.)
