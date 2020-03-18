@@ -41,13 +41,9 @@ int toyota_desired_torque_last = 0;       // last desired steer torque
 int toyota_rt_torque_last = 0;            // last desired torque for real time check
 uint32_t toyota_ts_last = 0;
 int toyota_cruise_engaged_last = 0;       // cruise state
-<<<<<<< HEAD
 int ego_speed_toyota = 0;                 // speed
 int toyota_gas_pressed = 0;
-int toyota_gas_prev = 0;
-=======
 bool toyota_moving = false;
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 struct sample_t toyota_torque_meas;       // last 3 motor torques produced by the eps
 
 
@@ -124,7 +120,7 @@ static int toyota_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       int byte = (addr == 0x224) ? 0 : 4;
       bool brake_pressed = ((GET_BYTE(to_push, byte) >> 5) & 1) != 0;
       if (brake_pressed && (!brake_pressed_prev || toyota_moving)) {
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
       brake_pressed_prev = brake_pressed;
     }
@@ -133,30 +129,18 @@ static int toyota_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if (addr == 0x201) {
       gas_interceptor_detected = 1;
       int gas_interceptor = GET_INTERCEPTOR(to_push);
-<<<<<<< HEAD
-      if ((gas_interceptor > TOYOTA_GAS_INTERCEPTOR_THRESHOLD) &&
-          (gas_interceptor_prev <= TOYOTA_GAS_INTERCEPTOR_THRESHOLD)) {
-        toyota_gas_pressed = 1;
-=======
       if ((gas_interceptor > TOYOTA_GAS_INTERCEPTOR_THRSLD) &&
           (gas_interceptor_prev <= TOYOTA_GAS_INTERCEPTOR_THRSLD)) {
-        controls_allowed = 0;
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+        controls_allowed = 1;
       }
       gas_interceptor_prev = gas_interceptor;
     }
 
     // exit controls on rising edge of gas press
     if (addr == 0x2C1) {
-<<<<<<< HEAD
-      int gas = GET_BYTE(to_push, 6) & 0xFF;
-      if ((gas > 0) && (toyota_gas_prev == 0) && !gas_interceptor_detected) {
-        toyota_gas_pressed = 1;
-=======
       bool gas_pressed = GET_BYTE(to_push, 6) != 0;
       if (gas_pressed && !gas_pressed_prev && !gas_interceptor_detected) {
-        controls_allowed = 0;
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+        controls_allowed = 1;
       }
       gas_pressed_prev = gas_pressed;
     }
