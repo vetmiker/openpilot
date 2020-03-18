@@ -66,16 +66,10 @@ routes = {
     'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
     'enableCamera': True,
   },
-<<<<<<< HEAD
   "8190c7275a24557b|2020-01-29--08-33-58": {
     'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
     'enableCamera': True,
   },
-  # This pacifica was removed because the fingerprint seemed from a Volt
-  #"9f7a7e50a51fb9db|2019-01-03--14-05-01": {
-  #  'carFingerprint': CHRYSLER.PACIFICA_2018,
-  #  'enableCamera': True,
-  #},
   "9f7a7e50a51fb9db|2019-01-17--18-34-21": {
     'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2017,
     'enableCamera': True,
@@ -84,9 +78,6 @@ routes = {
     'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2019,
     'enableCamera': True,
   },
-=======
-  # This pacifica was removed because the fingerprint seemed from a Volt
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
   "f1b4c567731f4a1b|2018-04-18--11-29-37": {
     'carFingerprint': FORD.FUSION,
     'enableCamera': False,
@@ -171,9 +162,6 @@ routes = {
     'enableCamera': True,
     'fingerprintSource': 'fixed',
   },
-<<<<<<< HEAD
-  "1632088eda5e6c4d|2018-06-07--08-03-18": {
-=======
   "07d37d27996096b6|2020-03-04--21-57-27": {
     'carFingerprint': HONDA.PILOT,
     'enableCamera': True,
@@ -183,7 +171,6 @@ routes = {
     'enableCamera': True,
   },
   "0a78dfbacc8504ef|2020-03-04--13-29-55": {
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     'carFingerprint': HONDA.CIVIC_BOSCH,
     'enableCamera': True,
   },
@@ -332,7 +319,6 @@ routes = {
     'enableCamera': True,
     'enableDsu': False,
   },
-<<<<<<< HEAD
   "362d23d4d5bea2fa|2018-08-10--13-31-40": {
     'carFingerprint': TOYOTA.HIGHLANDERH,
     'enableCamera': False,
@@ -343,13 +329,6 @@ routes = {
   #  'enableCamera': True,
   #  'enableDsu': False,
   #},
-=======
-  "2e07163a1ba9a780|2019-08-25--13-15-13": {
-    'carFingerprint': TOYOTA.LEXUS_IS,
-    'enableCamera': True,
-    'enableDsu': False,
-  },
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
   "2e07163a1ba9a780|2019-08-29--09-35-42": {
     'carFingerprint': TOYOTA.LEXUS_IS,
     'enableCamera': False,
@@ -387,14 +366,11 @@ forced_dashcam_routes = [
 ]
 
 # TODO: add routes for these cars
-<<<<<<< HEAD
-non_tested_cars = [TOYOTA.LEXUS_CTH, HONDA.ACCORDH, CHRYSLER.PACIFICA_2018, CHRYSLER.PACIFICA_2017, CHRYSLER.JEEP_CHEROKEE_2018]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
-=======
+
 non_tested_cars = [
-  CHRYSLER.JEEP_CHEROKEE,
-  CHRYSLER.JEEP_CHEROKEE_2019,
-  CHRYSLER.PACIFICA_2018,
-  CHRYSLER.PACIFICA_2018_HYBRID,
+  CHRYSLER.JEEP_CHEROKEE_2018
+  CHRYSLER.PACIFICA_2018, 
+  CHRYSLER.PACIFICA_2017, 
   GM.CADILLAC_ATS,
   GM.HOLDEN_ASTRA,
   GM.MALIBU,
@@ -408,9 +384,9 @@ non_tested_cars = [
   TOYOTA.CAMRYH,
   TOYOTA.CHR,
   TOYOTA.CHRH,
-  TOYOTA.HIGHLANDERH,
-]
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+  TOYOTA.LEXUS_CTH, 
+  ]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
+
 
 if __name__ == "__main__":
 
