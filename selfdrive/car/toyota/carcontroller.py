@@ -2,14 +2,8 @@ from cereal import car
 from common.numpy_fast import clip
 from selfdrive.car import apply_toyota_steer_torque_limits, create_gas_command, make_can_msg
 from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_command, \
-<<<<<<< HEAD
-                                           create_ipas_steer_command, create_accel_command, \
-                                           create_acc_cancel_command, create_fcw_command
-from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams, TSS2_CAR
-=======
                                            create_accel_command, create_acc_cancel_command, create_fcw_command
 from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 from opendbc.can.packer import CANPacker
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
@@ -19,20 +13,6 @@ ACCEL_HYST_GAP = 0.02  # don't change accel command for small oscilalitons withi
 ACCEL_MAX = 3.5  # 1.5 m/s2
 ACCEL_MIN = -3.5 # 3   m/s2
 ACCEL_SCALE = max(ACCEL_MAX, -ACCEL_MIN)
-
-<<<<<<< HEAD
-
-# Steer angle limits (tested at the Crows Landing track and considered ok)
-ANGLE_MAX_BP = [0., 5.]
-ANGLE_MAX_V = [510., 300.]
-ANGLE_DELTA_BP = [0., 5., 15.]
-ANGLE_DELTA_V = [5., .8, .15]     # windup limit
-ANGLE_DELTA_VU = [5., 3.5, 0.4]   # unwind limit
-
-TARGET_IDS = [0x340, 0x341, 0x342, 0x343, 0x344, 0x345,
-              0x363, 0x364, 0x365, 0x370, 0x371, 0x372,
-              0x373, 0x374, 0x375, 0x380, 0x381, 0x382,
-              0x383]
 
 # Blindspot codes
 LEFT_BLINDSPOT = b'\x41'
@@ -50,10 +30,6 @@ def set_blindspot_debug_mode(lr,enable):
 def poll_blindspot_status(lr):
   m = lr + b'\x02\x21\x69\x00\x00\x00\x00'
   return make_can_msg(0x750, m, 0)
-=======
-def accel_hysteresis(accel, accel_steady, enabled):
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
-
 
 def accel_hysteresis(accel, accel_steady, enabled):
   # for small accel oscillations within ACCEL_HYST_GAP, don't change the accel command
@@ -91,14 +67,10 @@ class CarController():
     self.alert_active = False
     self.last_standstill = False
     self.standstill_req = False
-<<<<<<< HEAD
-    self.angle_control = False
     self.blindspot_blink_counter_left = 0
     self.blindspot_blink_counter_right = 0
     self.blindspot_debug_enabled_left = False
     self.blindspot_debug_enabled_right = False
-=======
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     self.last_fault_frame = -200
     self.steer_rate_limited = False
@@ -142,11 +114,6 @@ class CarController():
 
     # steer torque
     new_steer = int(round(actuators.steer * SteerLimitParams.STEER_MAX))
-<<<<<<< HEAD
-=======
-    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.last_steer, CS.out.steeringTorqueEps, SteerLimitParams)
-    self.steer_rate_limited = new_steer != apply_steer
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     # only cut torque when steer state is a known fault
     if CS.steer_state in [9, 25]:
@@ -159,36 +126,13 @@ class CarController():
     else:
       apply_steer_req = 1
 
-<<<<<<< HEAD
-    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.last_steer, CS.steer_torque_motor, SteerLimitParams)
+    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.last_steer, CS.out.steeringTorqueEps, SteerLimitParams)
     self.steer_rate_limited = new_steer != apply_steer
 
     if not enabled:
       apply_steer = 0
       apply_steer_req = 0
 
-    self.steer_angle_enabled, self.ipas_reset_counter = \
-      ipas_state_transition(self.steer_angle_enabled, enabled, CS.ipas_active, self.ipas_reset_counter)
-    #print("{0} {1} {2}".format(self.steer_angle_enabled, self.ipas_reset_counter, CS.ipas_active))
-
-    # steer angle
-    if self.steer_angle_enabled and CS.ipas_active:
-      apply_angle = actuators.steerAngle
-      angle_lim = interp(CS.v_ego, ANGLE_MAX_BP, ANGLE_MAX_V)
-      apply_angle = clip(apply_angle, -angle_lim, angle_lim)
-
-      # windup slower
-      if self.last_angle * apply_angle > 0. and abs(apply_angle) > abs(self.last_angle):
-        angle_rate_lim = interp(CS.v_ego, ANGLE_DELTA_BP, ANGLE_DELTA_V)
-      else:
-        angle_rate_lim = interp(CS.v_ego, ANGLE_DELTA_BP, ANGLE_DELTA_VU)
-
-      apply_angle = clip(apply_angle, self.last_angle - angle_rate_lim, self.last_angle + angle_rate_lim)
-    else:
-      apply_angle = CS.angle_steers
-
-=======
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     if not enabled and CS.pcm_acc_status:
       # send pcm acc cancel cmd if drive is disabled but pcm is still on, or if the system can't be activated
       pcm_cancel_cmd = 1
