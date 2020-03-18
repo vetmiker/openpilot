@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 import numpy as np
 from common.numpy_fast import interp
 import math
-=======
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 from cereal import car
 from common.numpy_fast import mean
 import cereal.messaging_arne as messaging_arne
@@ -12,189 +9,8 @@ from opendbc.can.can_define import CANDefine
 from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from selfdrive.config import Conversions as CV
-<<<<<<< HEAD
-from selfdrive.car.toyota.values import CAR, DBC, STEER_THRESHOLD, TSS2_CAR, NO_DSU_CAR
 from common.travis_checker import travis
-
-GearShifter = car.CarState.GearShifter
-
-def parse_gear_shifter(gear):
-  return {'P': GearShifter.park, 'R': GearShifter.reverse, 'N': GearShifter.neutral,
-              'D': GearShifter.drive, 'B': GearShifter.brake}.get(gear, GearShifter.unknown)
-
-def get_can_parser_init(CP):
-
-  signals = [
-    # sig_name, sig_address, default
-    ("STEER_ANGLE", "STEER_ANGLE_SENSOR", 0),
-    ("GEAR", "GEAR_PACKET", 0),
-    ("SPORT_ON", "GEAR_PACKET", 0),
-    ("ECON_ON", "GEAR_PACKET", 0),
-    ("BRAKE_PRESSED", "BRAKE_MODULE", 0),
-    ("GAS_PEDAL", "GAS_PEDAL", 0),
-    ("WHEEL_SPEED_FL", "WHEEL_SPEEDS", 0),
-    ("WHEEL_SPEED_FR", "WHEEL_SPEEDS", 0),
-    ("WHEEL_SPEED_RL", "WHEEL_SPEEDS", 0),
-    ("WHEEL_SPEED_RR", "WHEEL_SPEEDS", 0),
-    ("DOOR_OPEN_FL", "SEATS_DOORS", 1),
-    ("DOOR_OPEN_FR", "SEATS_DOORS", 1),
-    ("DOOR_OPEN_RL", "SEATS_DOORS", 1),
-    ("DOOR_OPEN_RR", "SEATS_DOORS", 1),
-    ("SEATBELT_DRIVER_UNLATCHED", "SEATS_DOORS", 1),
-    ("TC_DISABLED", "ESP_CONTROL", 1),
-    ("STEER_FRACTION", "STEER_ANGLE_SENSOR", 0),
-    ("STEER_RATE", "STEER_ANGLE_SENSOR", 0),
-    ("CRUISE_ACTIVE", "PCM_CRUISE", 0),
-    ("CRUISE_STATE", "PCM_CRUISE", 0),
-    ("STEER_TORQUE_DRIVER", "STEER_TORQUE_SENSOR", 0),
-    ("STEER_TORQUE_EPS", "STEER_TORQUE_SENSOR", 0),
-    ("TURN_SIGNALS", "STEERING_LEVERS", 3),   # 3 is no blinkers
-    ("LKA_STATE", "EPS_STATUS", 0),
-    ("IPAS_STATE", "EPS_STATUS", 1),
-    ("BRAKE_LIGHTS_ACC", "ESP_CONTROL", 0),
-    ("AUTO_HIGH_BEAM", "LIGHT_STALK", 0),
-  ]
-
-  checks = [
-    ("BRAKE_MODULE", 40),
-    ("GAS_PEDAL", 33),
-    ("WHEEL_SPEEDS", 80),
-    ("STEER_ANGLE_SENSOR", 80),
-    ("PCM_CRUISE", 33),
-    ("STEER_TORQUE_SENSOR", 50),
-    ("EPS_STATUS", 25),
-  ]
-
-  if CP.carFingerprint == CAR.LEXUS_IS:
-    signals.append(("MAIN_ON", "DSU_CRUISE", 0))
-    signals.append(("SET_SPEED", "DSU_CRUISE", 0))
-    checks.append(("DSU_CRUISE", 5))
-  else:
-    signals.append(("MAIN_ON", "PCM_CRUISE_2", 0))
-    signals.append(("SET_SPEED", "PCM_CRUISE_2", 0))
-    signals.append(("LOW_SPEED_LOCKOUT", "PCM_CRUISE_2", 0))
-    checks.append(("PCM_CRUISE_2", 33))
-
-  if CP.carFingerprint in NO_DSU_CAR:
-    signals += [("STEER_ANGLE", "STEER_TORQUE_SENSOR", 0)]
-
-  if CP.carFingerprint == CAR.PRIUS:
-    signals += [("STATE", "AUTOPARK_STATUS", 0)]
-
-  # add gas interceptor reading if we are using it
-  if CP.enableGasInterceptor:
-    signals.append(("INTERCEPTOR_GAS", "GAS_SENSOR", 0))
-    signals.append(("INTERCEPTOR_GAS2", "GAS_SENSOR", 0))
-    checks.append(("GAS_SENSOR", 50))
-
-  return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
-
-def get_can_parser(CP):
-
-  signals = [
-    # sig_name, sig_address, default
-    ("STEER_ANGLE", "STEER_ANGLE_SENSOR", 0),
-    ("GEAR", "GEAR_PACKET", 0),
-    ("SPORT_ON", "GEAR_PACKET", 0),
-    ("ECON_ON", "GEAR_PACKET", 0),
-    ("BRAKE_PRESSED", "BRAKE_MODULE", 0),
-    ("GAS_PEDAL", "GAS_PEDAL", 0),
-    ("WHEEL_SPEED_FL", "WHEEL_SPEEDS", 0),
-    ("WHEEL_SPEED_FR", "WHEEL_SPEEDS", 0),
-    ("WHEEL_SPEED_RL", "WHEEL_SPEEDS", 0),
-    ("WHEEL_SPEED_RR", "WHEEL_SPEEDS", 0),
-    ("DOOR_OPEN_FL", "SEATS_DOORS", 1),
-    ("DOOR_OPEN_FR", "SEATS_DOORS", 1),
-    ("DOOR_OPEN_RL", "SEATS_DOORS", 1),
-    ("DOOR_OPEN_RR", "SEATS_DOORS", 1),
-    ("SEATBELT_DRIVER_UNLATCHED", "SEATS_DOORS", 1),
-    ("TC_DISABLED", "ESP_CONTROL", 1),
-    ("STEER_FRACTION", "STEER_ANGLE_SENSOR", 0),
-    ("STEER_RATE", "STEER_ANGLE_SENSOR", 0),
-    ("CRUISE_ACTIVE", "PCM_CRUISE", 0),
-    ("CRUISE_STATE", "PCM_CRUISE", 0),
-    ("STEER_TORQUE_DRIVER", "STEER_TORQUE_SENSOR", 0),
-    ("STEER_TORQUE_EPS", "STEER_TORQUE_SENSOR", 0),
-    ("TURN_SIGNALS", "STEERING_LEVERS", 3),   # 3 is no blinkers
-    ("LKA_STATE", "EPS_STATUS", 0),
-    ("IPAS_STATE", "EPS_STATUS", 1),
-    ("BRAKE_LIGHTS_ACC", "ESP_CONTROL", 0),
-    ("AUTO_HIGH_BEAM", "LIGHT_STALK", 0),
-    ("BLINDSPOT","DEBUG", 0),
-    ("BLINDSPOTSIDE","DEBUG",65),
-    ("BLINDSPOTD1","DEBUG", 0),
-    ("BLINDSPOTD2","DEBUG", 0),
-    ("ACC_DISTANCE", "JOEL_ID", 2),
-    ("LANE_WARNING", "JOEL_ID", 1),
-    ("ACC_SLOW", "JOEL_ID", 0),
-    ("DISTANCE_LINES", "PCM_CRUISE_SM", 0),
-  ]
-
-  checks = [
-    ("BRAKE_MODULE", 40),
-    ("GAS_PEDAL", 33),
-    ("WHEEL_SPEEDS", 80),
-    ("STEER_ANGLE_SENSOR", 80),
-    ("PCM_CRUISE", 33),
-    ("STEER_TORQUE_SENSOR", 50),
-    ("EPS_STATUS", 25),
-  ]
-
-  if CP.carFingerprint == CAR.LEXUS_IS:
-    signals.append(("MAIN_ON", "DSU_CRUISE", 0))
-    signals.append(("SET_SPEED", "DSU_CRUISE", 0))
-    checks.append(("DSU_CRUISE", 5))
-  else:
-    signals.append(("MAIN_ON", "PCM_CRUISE_2", 0))
-    signals.append(("SET_SPEED", "PCM_CRUISE_2", 0))
-    signals.append(("LOW_SPEED_LOCKOUT", "PCM_CRUISE_2", 0))
-    checks.append(("PCM_CRUISE_2", 33))
-
-  if CP.carFingerprint in NO_DSU_CAR:
-    signals += [("STEER_ANGLE", "STEER_TORQUE_SENSOR", 0)]
-
-  if CP.carFingerprint == CAR.PRIUS:
-    signals += [("STATE", "AUTOPARK_STATUS", 0)]
-
-  # add gas interceptor reading if we are using it
-  if CP.enableGasInterceptor:
-    signals.append(("INTERCEPTOR_GAS", "GAS_SENSOR", 0))
-    signals.append(("INTERCEPTOR_GAS2", "GAS_SENSOR", 0))
-    checks.append(("GAS_SENSOR", 50))
-  if CP.carFingerprint in TSS2_CAR:
-    signals += [("L_ADJACENT", "BSM", 0)]
-    signals += [("R_ADJACENT", "BSM", 0)]
-    
-  return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
-
-
-def get_cam_can_parser(CP):
-
-  signals = [
-    ("FORCE", "PRE_COLLISION", 0),
-    ("PRECOLLISION_ACTIVE", "PRE_COLLISION", 0),
-    ("TSGN1", "RSA1", 0),
-    ("SPDVAL1", "RSA1", 0),
-    ("SPLSGN1", "RSA1", 0),
-    ("TSGN2", "RSA1", 0),
-    ("SPDVAL2", "RSA1", 0),
-    ("SPLSGN2", "RSA1", 0),
-    ("TSGN3", "RSA2", 0),
-    ("SPLSGN3", "RSA2", 0),
-    ("TSGN4", "RSA2", 0),
-    ("SPLSGN4", "RSA2", 0),
-    ("BARRIERS", "LKAS_HUD", 0),
-    ("RIGHT_LINE", "LKAS_HUD", 0),
-    ("LEFT_LINE", "LKAS_HUD", 0),]
-
-  # use steering message to check if panda is connected to frc
-  checks = [("STEERING_LKA", 42)]
-
-  return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)
-=======
 from selfdrive.car.toyota.values import CAR, DBC, STEER_THRESHOLD, TSS2_CAR, NO_STOP_TIMER_CAR
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
-
 
 class CarState(CarStateBase):
   def __init__(self, CP):
@@ -210,9 +26,7 @@ class CarState(CarStateBase):
     # Need to apply an offset as soon as the steering angle measurements are both received
     self.needs_angle_offset = CP.carFingerprint not in TSS2_CAR
     self.angle_offset = 0.
-<<<<<<< HEAD
     self.pcm_acc_active = False
-    self.init_angle_offset = False
     self.v_cruise_pcmlast = 41.0
     self.setspeedoffset = 34.0
     self.setspeedcounter = 0
@@ -232,28 +46,10 @@ class CarState(CarStateBase):
     if not travis:
       self.arne_pm = messaging_arne.PubMaster(['liveTrafficData', 'arne182Status'])
 
-    # initialize can parser
-    self.car_fingerprint = CP.carFingerprint
-
-    # vEgo kalman filter
-    dt = 0.01
-    # Q = np.matrix([[10.0, 0.0], [0.0, 100.0]])
-    # R = 1e3
-    self.v_ego_kf = KF1D(x0=[[0.0], [0.0]],
-                         A=[[1.0, dt], [0.0, 1.0]],
-                         C=[1.0, 0.0],
-                         K=[[0.12287673], [0.29666309]])
     self.v_ego = 0.0
 
   def update(self, cp, cp_cam, frame):
-    # update prevs, update must run once per loop
-    self.prev_left_blinker_on = self.left_blinker_on
-    self.prev_right_blinker_on = self.right_blinker_on
-=======
-
-  def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     ret.doorOpen = any([cp.vl["SEATS_DOORS"]['DOOR_OPEN_FL'], cp.vl["SEATS_DOORS"]['DOOR_OPEN_FR'],
                         cp.vl["SEATS_DOORS"]['DOOR_OPEN_RL'], cp.vl["SEATS_DOORS"]['DOOR_OPEN_RR']])
@@ -274,7 +70,7 @@ class CarState(CarStateBase):
     ret.wheelSpeeds.rr = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_RR'] * CV.KPH_TO_MS
     ret.vEgoRaw = mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr])
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
-
+    self.v_ego = ret.vEgo
     ret.standstill = ret.vEgoRaw < 0.001
 
     # Some newer models have a more accurate angle measurement in the TORQUE_SENSOR message. Use if non-zero
@@ -294,8 +90,8 @@ class CarState(CarStateBase):
 
     ret.steeringRate = cp.vl["STEER_ANGLE_SENSOR"]['STEER_RATE']
     can_gear = int(cp.vl["GEAR_PACKET"]['GEAR'])
-<<<<<<< HEAD
-    self.gear_shifter = parse_gear_shifter(self.shifter_values.get(can_gear, None))
+
+    ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
     try:
       self.econ_on = cp.vl["GEAR_PACKET"]['ECON_ON']
     except:
@@ -366,11 +162,9 @@ class CarState(CarStateBase):
       self.main_on = cp.vl["PCM_CRUISE_2"]['MAIN_ON']
     self.left_blinker_on = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 1
     self.right_blinker_on = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 2
-=======
-    ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
+
     ret.leftBlinker = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 1
     ret.rightBlinker = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 2
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     ret.steeringTorque = cp.vl["STEER_TORQUE_SENSOR"]['STEER_TORQUE_DRIVER']
     ret.steeringTorqueEps = cp.vl["STEER_TORQUE_SENSOR"]['STEER_TORQUE_EPS']
@@ -460,14 +254,16 @@ class CarState(CarStateBase):
     self.steer_warning = cp.vl["EPS_STATUS"]['LKA_STATE'] not in [1, 5]
 
     return ret
-
+  
   @staticmethod
-  def get_can_parser(CP):
+  def get_can_parser_init(CP):
 
     signals = [
       # sig_name, sig_address, default
       ("STEER_ANGLE", "STEER_ANGLE_SENSOR", 0),
       ("GEAR", "GEAR_PACKET", 0),
+      ("SPORT_ON", "GEAR_PACKET", 0),
+      ("ECON_ON", "GEAR_PACKET", 0),
       ("BRAKE_PRESSED", "BRAKE_MODULE", 0),
       ("GAS_PEDAL", "GAS_PEDAL", 0),
       ("WHEEL_SPEED_FL", "WHEEL_SPEEDS", 0),
@@ -526,15 +322,100 @@ class CarState(CarStateBase):
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
 
   @staticmethod
+  def get_can_parser(CP):
+
+    signals = [
+      # sig_name, sig_address, default
+      ("STEER_ANGLE", "STEER_ANGLE_SENSOR", 0),
+      ("GEAR", "GEAR_PACKET", 0),
+      ("BRAKE_PRESSED", "BRAKE_MODULE", 0),
+      ("GAS_PEDAL", "GAS_PEDAL", 0),
+      ("WHEEL_SPEED_FL", "WHEEL_SPEEDS", 0),
+      ("WHEEL_SPEED_FR", "WHEEL_SPEEDS", 0),
+      ("WHEEL_SPEED_RL", "WHEEL_SPEEDS", 0),
+      ("WHEEL_SPEED_RR", "WHEEL_SPEEDS", 0),
+      ("DOOR_OPEN_FL", "SEATS_DOORS", 1),
+      ("DOOR_OPEN_FR", "SEATS_DOORS", 1),
+      ("DOOR_OPEN_RL", "SEATS_DOORS", 1),
+      ("DOOR_OPEN_RR", "SEATS_DOORS", 1),
+      ("SEATBELT_DRIVER_UNLATCHED", "SEATS_DOORS", 1),
+      ("TC_DISABLED", "ESP_CONTROL", 1),
+      ("STEER_FRACTION", "STEER_ANGLE_SENSOR", 0),
+      ("STEER_RATE", "STEER_ANGLE_SENSOR", 0),
+      ("CRUISE_ACTIVE", "PCM_CRUISE", 0),
+      ("CRUISE_STATE", "PCM_CRUISE", 0),
+      ("STEER_TORQUE_DRIVER", "STEER_TORQUE_SENSOR", 0),
+      ("STEER_TORQUE_EPS", "STEER_TORQUE_SENSOR", 0),
+      ("STEER_ANGLE", "STEER_TORQUE_SENSOR", 0),
+      ("TURN_SIGNALS", "STEERING_LEVERS", 3),   # 3 is no blinkers
+      ("LKA_STATE", "EPS_STATUS", 0),
+      ("BRAKE_LIGHTS_ACC", "ESP_CONTROL", 0),
+      ("AUTO_HIGH_BEAM", "LIGHT_STALK", 0),
+      ("SPORT_ON", "GEAR_PACKET", 0),
+      ("ECON_ON", "GEAR_PACKET", 0),
+      ("BLINDSPOT","DEBUG", 0),
+      ("BLINDSPOTSIDE","DEBUG",65),
+      ("BLINDSPOTD1","DEBUG", 0),
+      ("BLINDSPOTD2","DEBUG", 0),
+      ("ACC_DISTANCE", "JOEL_ID", 2),
+      ("LANE_WARNING", "JOEL_ID", 1),
+      ("ACC_SLOW", "JOEL_ID", 0),
+      ("DISTANCE_LINES", "PCM_CRUISE_SM", 0),
+    ]
+
+    checks = [
+      ("BRAKE_MODULE", 40),
+      ("GAS_PEDAL", 33),
+      ("WHEEL_SPEEDS", 80),
+      ("STEER_ANGLE_SENSOR", 80),
+      ("PCM_CRUISE", 33),
+      ("STEER_TORQUE_SENSOR", 50),
+      ("EPS_STATUS", 25),
+    ]
+
+    if CP.carFingerprint == CAR.LEXUS_IS:
+      signals.append(("MAIN_ON", "DSU_CRUISE", 0))
+      signals.append(("SET_SPEED", "DSU_CRUISE", 0))
+      checks.append(("DSU_CRUISE", 5))
+    else:
+      signals.append(("MAIN_ON", "PCM_CRUISE_2", 0))
+      signals.append(("SET_SPEED", "PCM_CRUISE_2", 0))
+      signals.append(("LOW_SPEED_LOCKOUT", "PCM_CRUISE_2", 0))
+      checks.append(("PCM_CRUISE_2", 33))
+
+
+    if CP.carFingerprint == CAR.PRIUS:
+      signals += [("STATE", "AUTOPARK_STATUS", 0)]
+
+    # add gas interceptor reading if we are using it
+    if CP.enableGasInterceptor:
+      signals.append(("INTERCEPTOR_GAS", "GAS_SENSOR", 0))
+      signals.append(("INTERCEPTOR_GAS2", "GAS_SENSOR", 0))
+      checks.append(("GAS_SENSOR", 50))
+
+    return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
+
+  @staticmethod
   def get_cam_can_parser(CP):
 
-    signals = [("FORCE", "PRE_COLLISION", 0), ("PRECOLLISION_ACTIVE", "PRE_COLLISION", 0)]
+    signals = [("FORCE", "PRE_COLLISION", 0),
+               ("PRECOLLISION_ACTIVE", "PRE_COLLISION", 0),
+               ("TSGN1", "RSA1", 0),
+               ("SPDVAL1", "RSA1", 0),
+               ("SPLSGN1", "RSA1", 0),
+               ("TSGN2", "RSA1", 0),
+               ("SPDVAL2", "RSA1", 0),
+               ("SPLSGN2", "RSA1", 0),
+               ("TSGN3", "RSA2", 0),
+               ("SPLSGN3", "RSA2", 0),
+               ("TSGN4", "RSA2", 0),
+               ("SPLSGN4", "RSA2", 0),
+               ("BARRIERS", "LKAS_HUD", 0),
+               ("RIGHT_LINE", "LKAS_HUD", 0),
+               ("LEFT_LINE", "LKAS_HUD", 0),]
 
     # use steering message to check if panda is connected to frc
     checks = [("STEERING_LKA", 42)]
-
-<<<<<<< HEAD
-    self.stock_aeb = bool(cp_cam.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_cam.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
 
     self.barriers = cp_cam.vl["LKAS_HUD"]['BARRIERS']
     self.rightline = cp_cam.vl["LKAS_HUD"]['RIGHT_LINE']
@@ -573,6 +454,5 @@ class CarState(CarStateBase):
         dat.liveTrafficData.speedAdvisoryValid = False
       if not travis:
         self.arne_pm.send('liveTrafficData', dat)
-=======
+        
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
