@@ -16,12 +16,8 @@ from selfdrive.version import terms_version, training_version
 from selfdrive.swaglog import cloudlog
 import cereal.messaging as messaging
 from selfdrive.loggerd.config import get_available_percent
-<<<<<<< HEAD:selfdrive/thermald.py
 from selfdrive.pandad import get_expected_version
-=======
-from selfdrive.pandad import get_expected_signature
 from selfdrive.thermald.power_monitoring import PowerMonitoring, get_battery_capacity, get_battery_status, get_battery_current, get_battery_voltage, get_usb_present
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e:selfdrive/thermald/thermald.py
 
 FW_SIGNATURE = get_expected_version()
 
