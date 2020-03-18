@@ -410,16 +410,9 @@ class CarInterface(CarInterfaceBase):
     # ******************* do can recv *******************
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
-<<<<<<< HEAD
-    self.CS.update(self.cp, self.cp_cam)
 
-    # create message
-    ret = car.CarState.new_message()
     ret_arne182 = arne182.CarStateArne182.new_message()
-=======
-
     ret = self.CS.update(self.cp, self.cp_cam)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
@@ -465,16 +458,9 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = buttonEvents
 
     # events
-<<<<<<< HEAD
-    events = []
     eventsArne182 = []
-    if self.CS.steer_error:
-      events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
-    elif self.CS.steer_warning:
-      events.append(create_event('steerTempUnavailable', [ET.WARNING]))
-=======
     events = self.create_common_events(ret)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+
     if self.CS.brake_error:
       events.append(create_event('brakeUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
     if self.CS.brake_hold and self.CS.CP.carFingerprint not in HONDA_BOSCH:
@@ -530,13 +516,8 @@ class CarInterface(CarInterfaceBase):
     self.gas_pressed_prev = ret.gasPressed
     self.brake_pressed_prev = ret.brakePressed
 
-<<<<<<< HEAD
-    # cast to reader so it can't be modified
-    return ret.as_reader(), ret_arne182.as_reader()
-=======
     self.CS.out = ret.as_reader()
-    return self.CS.out
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+    return self.CS.out, ret_arne182.as_reader()
 
   # pass in a car.CarControl
   # to be called @ 100hz
