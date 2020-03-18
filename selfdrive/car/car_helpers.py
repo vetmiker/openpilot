@@ -125,7 +125,7 @@ def fingerprint(logcan, sendcan, has_relay):
     if cached_fingerprint[0] is None or len(cached_fingerprint) < 3:
       params.delete('CachedFingerprint')
     else:
-      finger[0] = {key: value for key, value in cached_fingerprint[2].items()}
+      finger[0] = {int(key): value for key, value in cached_fingerprint[2].items()}
       source = car.CarParams.FingerprintSource.can
       return (str(cached_fingerprint[0]), finger, vin, car_fw, cached_fingerprint[1])
   
@@ -214,15 +214,12 @@ def get_car(logcan, sendcan, has_relay=False):
     cloudlog.warning("car doesn't match any fingerprints: %r", fingerprints)
     candidate = "mock"
 
-<<<<<<< HEAD
   if not travis:
     x = threading.Thread(target=crash_log, args=(candidate,))
     x.start()
 
-  CarInterface, CarController = interfaces[candidate]
-=======
   CarInterface, CarController, CarState = interfaces[candidate]
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+
   car_params = CarInterface.get_params(candidate, fingerprints, has_relay, car_fw)
   car_params.carVin = vin
   car_params.carFw = car_fw
