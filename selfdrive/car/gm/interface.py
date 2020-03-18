@@ -116,14 +116,8 @@ class CarInterface(CarInterfaceBase):
     #ret.longitudinalTuning.kpV = [2.4, 1.5]
     ret.longitudinalTuning.kpV = [0.3, 0.3]
     ret.longitudinalTuning.kiBP = [0.]
-<<<<<<< HEAD
     #ret.longitudinalTuning.kiV = [0.36]
     ret.longitudinalTuning.kiV = [0.1]
-    ret.longitudinalTuning.deadzoneBP = [0.]
-    ret.longitudinalTuning.deadzoneV = [0.]
-=======
-    ret.longitudinalTuning.kiV = [0.36]
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     ret.stoppingControl = True
     ret.startAccel = 0.8
@@ -135,30 +129,8 @@ class CarInterface(CarInterfaceBase):
 
   # returns a car.CarState
   def update(self, c, can_strings):
-<<<<<<< HEAD
-    self.pt_cp.update_strings(can_strings)
-
-    self.CS.update(self.pt_cp)
-
-    # create message
-    ret = car.CarState.new_message()
     ret_arne182 = arne182.CarStateArne182.new_message()
-
-    ret.canValid = self.pt_cp.can_valid
-
-    # speeds
-    ret.vEgo = self.CS.v_ego
-    ret.aEgo = self.CS.a_ego
-    ret.vEgoRaw = self.CS.v_ego_raw
-    ret.yawRate = self.VM.yaw_rate(self.CS.angle_steers * CV.DEG_TO_RAD, self.CS.v_ego)
-    ret.standstill = self.CS.standstill
-    ret.wheelSpeeds.fl = self.CS.v_wheel_fl
-    ret.wheelSpeeds.fr = self.CS.v_wheel_fr
-    ret.wheelSpeeds.rl = self.CS.v_wheel_rl
-    ret.wheelSpeeds.rr = self.CS.v_wheel_rr
-=======
     self.cp.update_strings(can_strings)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     ret = self.CS.update(self.cp)
 
@@ -190,20 +162,8 @@ class CarInterface(CarInterfaceBase):
 
     ret.buttonEvents = buttonEvents
 
-<<<<<<< HEAD
-    events = []
     eventsArne182 = []
-    if self.CS.steer_error:
-      events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
-    if self.CS.steer_not_allowed:
-      events.append(create_event('steerTempUnavailable', [ET.NO_ENTRY, ET.WARNING]))
-    if ret.doorOpen:
-      events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if ret.seatbeltUnlatched:
-      events.append(create_event('seatbeltNotLatched', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-=======
     events = self.create_common_events(ret)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     if self.CS.car_fingerprint in SUPERCRUISE_CARS:
       if ret.cruiseState.enabled and not self.cruise_enabled_prev:
@@ -239,15 +199,10 @@ class CarInterface(CarInterfaceBase):
     self.gas_pressed_prev = ret.gasPressed
     self.brake_pressed_prev = ret.brakePressed
 
-<<<<<<< HEAD
-    # cast to reader so it can't be modified
-    return ret.as_reader(), ret_arne182.as_reader()
-=======
     # copy back carState packet to CS
     self.CS.out = ret.as_reader()
 
-    return self.CS.out
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+    return self.CS.out, ret_arne182.as_reader()
 
   def apply(self, c):
     hud_v_cruise = c.hudControl.setSpeed
