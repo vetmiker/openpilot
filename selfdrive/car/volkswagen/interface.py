@@ -75,18 +75,12 @@ class CarInterface(CarInterfaceBase):
   # returns a car.CarState
   def update(self, c, can_strings):
     canMonoTimes = []
-<<<<<<< HEAD
-    events = []
     eventsArne182 = []
-    buttonEvents = []
-    params = Params()
-    
-    ret = car.CarState.new_message()
+
     ret_arne182 = arne182.CarStateArne182.new_message()
-=======
     buttonEvents = []
     params = Params()
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+
 
     # Process the most recent CAN message traffic, and check for validity
     # The camera CAN has no signals we use at this time, but we process it
@@ -139,13 +133,9 @@ class CarInterface(CarInterfaceBase):
     self.displayMetricUnitsPrev = self.CS.displayMetricUnits
     self.buttonStatesPrev = self.CS.buttonStates.copy()
 
-<<<<<<< HEAD
-    # cast to reader so it can't be modified
-    return ret.as_reader(), ret_arne182.as_reader()
-=======
     self.CS.out = ret.as_reader()
-    return self.CS.out
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+    return self.CS.out, ret_arne182.as_reader()
+
 
   def apply(self, c):
     can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,
