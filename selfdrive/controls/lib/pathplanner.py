@@ -153,22 +153,17 @@ class PathPlanner():
           self.lane_change_state = LaneChangeState.laneChangeStarting
 
       # starting
-<<<<<<< HEAD
-      elif self.lane_change_state == LaneChangeState.laneChangeStarting: 
-        if lane_change_prob > 0.5:
-          self.lane_change_state = LaneChangeState.laneChangeFinishing
-        if (self.arne_sm['arne182Status'].rightBlindspot and lane_change_direction == LaneChangeDirection.right) or (self.arne_sm['arne182Status'].leftBlindspot and lane_change_direction == LaneChangeDirection.left):
-          self.lane_change_state = LaneChangeState.preLaneChange
-          self.blindspotTrueCounterleft = 0
-          self.blindspotTrueCounterright = 0
-=======
       elif self.lane_change_state == LaneChangeState.laneChangeStarting:
         # fade out lanelines over 1s
         self.lane_change_ll_prob = max(self.lane_change_ll_prob - DT_MDL, 0.0)
         # 98% certainty
         if lane_change_prob < 0.02 and self.lane_change_ll_prob < 0.01:
           self.lane_change_state = LaneChangeState.laneChangeFinishing
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+        if (self.arne_sm['arne182Status'].rightBlindspot and lane_change_direction == LaneChangeDirection.right) or (self.arne_sm['arne182Status'].leftBlindspot and lane_change_direction == LaneChangeDirection.left):
+          self.lane_change_state = LaneChangeState.preLaneChange
+          self.blindspotTrueCounterleft = 0
+          self.blindspotTrueCounterright = 0
+
 
       # finishing
       elif self.lane_change_state == LaneChangeState.laneChangeFinishing:
@@ -176,13 +171,9 @@ class PathPlanner():
         self.lane_change_ll_prob = min(self.lane_change_ll_prob + DT_MDL, 1.0)
         if one_blinker and self.lane_change_ll_prob > 0.99:
           self.lane_change_state = LaneChangeState.preLaneChange
-<<<<<<< HEAD
           self.blindspotTrueCounterleft = 0
           self.blindspotTrueCounterright = 0
-        else:
-=======
         elif self.lane_change_ll_prob > 0.99:
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
           self.lane_change_state = LaneChangeState.off
           self.blindspotTrueCounterright = 0
           self.blindspotTrueCounterleft = 0
@@ -266,22 +257,10 @@ class PathPlanner():
 
     pm.send('pathPlan', plan_send)
 
-<<<<<<< HEAD
-    dat = messaging.new_message()
-    dat.init('liveMpc')
+    dat = messaging.new_message('liveMpc')
     dat.liveMpc.x = list(self.mpc_solution[0].x)
     dat.liveMpc.y = list(self.mpc_solution[0].y)
     dat.liveMpc.psi = list(self.mpc_solution[0].psi)
     dat.liveMpc.delta = list(self.mpc_solution[0].delta)
     dat.liveMpc.cost = self.mpc_solution[0].cost
     pm.send('liveMpc', dat)
-=======
-    if LOG_MPC:
-      dat = messaging.new_message('liveMpc')
-      dat.liveMpc.x = list(self.mpc_solution[0].x)
-      dat.liveMpc.y = list(self.mpc_solution[0].y)
-      dat.liveMpc.psi = list(self.mpc_solution[0].psi)
-      dat.liveMpc.delta = list(self.mpc_solution[0].delta)
-      dat.liveMpc.cost = self.mpc_solution[0].cost
-      pm.send('liveMpc', dat)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
