@@ -49,43 +49,10 @@ class CarInterface(CarInterfaceBase):
 
   # returns a car.CarState
   def update(self, c, can_strings):
-<<<<<<< HEAD
-    self.pt_cp.update_strings(can_strings)
-    self.cam_cp.update_strings(can_strings)
-    self.CS.update(self.pt_cp, self.cam_cp)
-
-    # create message
-    ret = car.CarState.new_message()
     ret_arne182 = arne182.CarStateArne182.new_message()
-    
-    ret.canValid = self.pt_cp.can_valid and self.cam_cp.can_valid
-
-    # speeds
-    ret.vEgo = self.CS.v_ego
-    ret.aEgo = self.CS.a_ego
-    ret.vEgoRaw = self.CS.v_ego_raw
-    ret.yawRate = self.VM.yaw_rate(self.CS.angle_steers * CV.DEG_TO_RAD, self.CS.v_ego)
-    ret.standstill = self.CS.standstill
-    ret.wheelSpeeds.fl = self.CS.v_wheel_fl
-    ret.wheelSpeeds.fr = self.CS.v_wheel_fr
-    ret.wheelSpeeds.rl = self.CS.v_wheel_rl
-    ret.wheelSpeeds.rr = self.CS.v_wheel_rr
-
-    # steering wheel
-    ret.steeringAngle = self.CS.angle_steers
-
-    # torque and user override. Driver awareness
-    # timer resets when the user uses the steering wheel.
-    ret.steeringPressed = self.CS.steer_override
-    ret.steeringTorque = self.CS.steer_torque_driver
-    ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
-
-    ret.gas = self.CS.pedal_gas / 255.
-    ret.gasPressed = self.CS.user_gas_pressed
-=======
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+
 
     ret = self.CS.update(self.cp, self.cp_cam)
 
@@ -99,42 +66,21 @@ class CarInterface(CarInterfaceBase):
     buttonEvents.append(be)
 
     events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.unknown])
-
-<<<<<<< HEAD
-    events = []
     eventsArne182 = []
-    if ret.seatbeltUnlatched:
-      events.append(create_event('seatbeltNotLatched', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-
-    if ret.doorOpen:
-      events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-
-    if self.CS.acc_active and not self.acc_active_prev:
-=======
     if ret.cruiseState.enabled and not self.cruise_enabled_prev:
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
       events.append(create_event('pcmEnable', [ET.ENABLE]))
     if not ret.cruiseState.enabled:
       events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
 
     ret.events = events
-<<<<<<< HEAD
     ret_arne182.events = eventsArne182
-    # update previous brake/gas pressed
-=======
 
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     self.gas_pressed_prev = ret.gasPressed
     self.brake_pressed_prev = ret.brakePressed
     self.cruise_enabled_prev = ret.cruiseState.enabled
 
-<<<<<<< HEAD
-    # cast to reader so it can't be modified
-    return ret.as_reader(), ret_arne182.as_reader()
-=======
     self.CS.out = ret.as_reader()
-    return self.CS.out
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+    return self.CS.out, ret_arne182.as_reader()
 
   def apply(self, c):
     can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,
