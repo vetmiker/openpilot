@@ -183,11 +183,7 @@ ALERTS = [
       "Be ready to take over at any time",
       "Always keep hands on wheel and eyes on road",
       AlertStatus.normal, AlertSize.mid,
-<<<<<<< HEAD
-      Priority.LOW_LOWEST, VisualAlert.none, AudibleAlert.none, 0., 0., 5.),
-=======
-      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 15.),
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 5.),
 
   Alert(
       "startupMaster",
@@ -304,7 +300,7 @@ ALERTS = [
         "Using profile: ",
         "",
         AlertStatus.normal, AlertSize.mid,
-        Priority.LOW_LOWEST, VisualAlert.none, AudibleAlert.chimeWarning1, 0.2, 0., 2.),
+        Priority.LOWER, VisualAlert.none, AudibleAlert.chimeWarning1, 0.2, 0., 2.),
   
   # Non-entry only alerts
   Alert(
