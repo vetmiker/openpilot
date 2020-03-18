@@ -47,21 +47,6 @@ class CarInterface(CarInterfaceBase):
     ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS, ECU_FINGERPRINT, candidate, Ecu.fwdCamera) or has_relay
     cloudlog.warning("ECU Camera Simulated: %r", ret.enableCamera)
 
-<<<<<<< HEAD
-    ret.stoppingControl = False
-    ret.startAccel = 0.0
-
-    ret.longitudinalTuning.deadzoneBP = [0., 9.]
-    ret.longitudinalTuning.deadzoneV = [0., .15]
-    ret.longitudinalTuning.kpBP = [0., 5., 35.]
-    #ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
-    ret.longitudinalTuning.kiBP = [0., 35.]
-    #ret.longitudinalTuning.kiV = [0.54, 0.36]
-    ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
-    ret.longitudinalTuning.kiV = [0.15, 0.10]
-
-=======
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
     return ret
 
   # returns a car.CarState
@@ -78,15 +63,8 @@ class CarInterface(CarInterfaceBase):
     ret.canValid = self.cp.can_valid
 
     # events
-<<<<<<< HEAD
-    events = []
     eventsArne182 = []
-
-    if self.CS.steer_error:
-      events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
-=======
     events = self.create_common_events(ret)
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
 
     # enable request in prius is simple, as we activate when Toyota is active (rising edge)
     if ret.cruiseState.enabled and not self.cruise_enabled_prev:
