@@ -139,10 +139,8 @@ if __name__ == "__main__":
     sys.exit(1)
 
   print("***** testing against commit %s *****" % ref_commit)
-<<<<<<< HEAD
   print("***** skip test *****")
   sys.exit(int(False))
-=======
 
   # check to make sure all car brands are tested
   if FULL_TEST:
@@ -150,7 +148,6 @@ if __name__ == "__main__":
     untested = (set(interface_names) - set(excluded_interfaces)) - tested_cars
     assert len(untested) == 0, "Cars missing routes: %s" % (str(untested))
 
->>>>>>> a5c3340c8dae1d4e3bf0d438661d2dc048b7767e
   results = {}
   for car_brand, segment in segments:
     if (cars_whitelisted and car_brand.upper() not in args.whitelist_cars) or \
