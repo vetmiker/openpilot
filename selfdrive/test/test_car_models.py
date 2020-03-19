@@ -66,10 +66,6 @@ routes = {
     'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
     'enableCamera': True,
   },
-  "8190c7275a24557b|2020-01-29--08-33-58": {
-    'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
-    'enableCamera': True,
-  },
   "9f7a7e50a51fb9db|2019-01-17--18-34-21": {
     'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2017,
     'enableCamera': True,
@@ -81,10 +77,6 @@ routes = {
   "f1b4c567731f4a1b|2018-04-18--11-29-37": {
     'carFingerprint': FORD.FUSION,
     'enableCamera': False,
-  },
-  "f1b4c567731f4a1b|2018-04-30--10-15-35": {
-    'carFingerprint': FORD.FUSION,
-    'enableCamera': True,
   },
   "7ed9cdf8d0c5f43e|2018-05-17--09-31-36": {
     'carFingerprint': GM.CADILLAC_CT6,
@@ -279,16 +271,16 @@ routes = {
     'enableCamera': True,
     'enableDsu': False,
   },
-    "886fcd8408d570e9|2020-01-29--05-11-22": {
-      'carFingerprint': TOYOTA.LEXUS_RX,
-      'enableCamera': True,
-      'enableDsu': True,
-    },
-    "886fcd8408d570e9|2020-01-29--02-18-55": {
-      'carFingerprint': TOYOTA.LEXUS_RX,
-      'enableCamera': True,
-      'enableDsu': False,
-    },
+  "886fcd8408d570e9|2020-01-29--05-11-22": {
+    'carFingerprint': TOYOTA.LEXUS_RX,
+    'enableCamera': True,
+    'enableDsu': True,
+  },
+  "886fcd8408d570e9|2020-01-29--02-18-55": {
+    'carFingerprint': TOYOTA.LEXUS_RX,
+    'enableCamera': True,
+    'enableDsu': False,
+  },
   "b0f5a01cf604185c|2018-02-01--21-12-28": {
     'carFingerprint': TOYOTA.LEXUS_RXH,
     'enableCamera': True,
