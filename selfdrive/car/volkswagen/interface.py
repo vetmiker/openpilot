@@ -75,7 +75,6 @@ class CarInterface(CarInterfaceBase):
   # returns a car.CarState
   def update(self, c, can_strings):
     canMonoTimes = []
-    eventsArne182 = []
 
     ret_arne182 = arne182.CarStateArne182.new_message()
     buttonEvents = []
@@ -106,7 +105,7 @@ class CarInterface(CarInterfaceBase):
         be.pressed = self.CS.buttonStates[button]
         buttonEvents.append(be)
 
-    events = self.create_common_events(ret, extra_gears=[GEAR.eco, GEAR.sport])
+    events, eventsArne182 = self.create_common_events(ret, extra_gears=[GEAR.eco, GEAR.sport])
 
     # Vehicle health and operation safety checks
     if self.CS.parkingBrakeSet:
