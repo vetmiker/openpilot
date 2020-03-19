@@ -162,8 +162,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.buttonEvents = buttonEvents
 
-    eventsArne182 = []
-    events = self.create_common_events(ret)
+    events, eventsArne182 = self.create_common_events(ret)
 
     if self.CS.car_fingerprint in SUPERCRUISE_CARS:
       if ret.cruiseState.enabled and not self.cruise_enabled_prev:
