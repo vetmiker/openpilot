@@ -4,7 +4,6 @@ import math
 from cereal import car
 from common.numpy_fast import mean
 import cereal.messaging_arne as messaging_arne
-from common.kalman.simple_kalman import KF1D
 from opendbc.can.can_define import CANDefine
 from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
