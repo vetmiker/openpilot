@@ -68,11 +68,10 @@ class CarInterface(CarInterfaceBase):
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
-    eventsArne182 = []
     ret.buttonEvents = []
 
     # events
-    events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low], gas_resume_speed = 2.)
+    events, eventsArne182 = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low], gas_resume_speed = 2.)
 
     if ret.cruiseState.enabled and not self.cruise_enabled_prev:
       events.append(create_event('pcmEnable', [ET.ENABLE]))
