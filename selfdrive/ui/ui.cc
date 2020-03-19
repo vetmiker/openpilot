@@ -600,6 +600,7 @@ void handle_message_arne182(UIState *s, Message * msg) {
     s->scene.rightblindspotD2 = datad.rightBlindspotD2;
   }
   capn_free(&ctxarne182);
+}
 
 static void check_messages(UIState *s) {
   while(true) {
