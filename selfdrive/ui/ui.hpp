@@ -142,10 +142,10 @@ typedef struct UIScene {
   int lead_status2;
   float lead_d_rel, lead_y_rel, lead_v_rel;
   float lead_d_rel2, lead_y_rel2, lead_v_rel2;
-  
+
   int front_box_x, front_box_y, front_box_width, front_box_height;
-  
-   
+
+
   uint64_t alert_ts;
   char alert_text1[1024];
   char alert_text2[1024];
@@ -182,7 +182,6 @@ typedef struct UIScene {
   uint8_t networkStrength;
   int batteryPercent;
   char batteryStatus[64];
-  float freeSpace;
   uint8_t thermalStatus;
   int paTemp;
   int hwType;
@@ -248,11 +247,9 @@ typedef struct UIState {
   PubSocket *dynamicfollowbutton_sock;
   Poller * poller;
   Poller * pollerarne182;
-  SubSocket *thermal_sock;
   SubSocket *thermalonline_sock;
   SubSocket *health_sock;
   SubSocket *ubloxgnss_sock;
-  Poller * poller;
   Poller * ublox_poller;
 
   int active_app;

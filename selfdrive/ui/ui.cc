@@ -191,7 +191,7 @@ static void ui_init(UIState *s) {
                               s->radarstate_sock,
                               s->thermal_sock,
                               s->health_sock,
-                              s->ubloxgnss_sock
+                              s->ubloxgnss_sock,
                               s->carstate_sock,
                               s->livempc_sock,
                               s->gps_sock
@@ -363,13 +363,13 @@ void handle_message(UIState *s, Message * msg) {
 
     struct cereal_ControlsState_LateralPIDState pdata;
     cereal_read_ControlsState_LateralPIDState(&pdata, datad.lateralControlState.pidState);
-    
+
     struct cereal_ControlsState_LateralLQRState qdata;
     cereal_read_ControlsState_LateralLQRState(&qdata, datad.lateralControlState.lqrState);
 
     struct cereal_ControlsState_LateralINDIState rdata;
     cereal_read_ControlsState_LateralINDIState(&rdata, datad.lateralControlState.indiState);
-    
+
     s->controls_timeout = 1 * UI_FREQ;
     s->controls_seen = true;
 
@@ -1092,7 +1092,7 @@ int main(int argc, char* argv[]) {
         should_swap = true;
       }
     }
-    
+
     //awake on any touch
     int touch_x = -1, touch_y = -1;
     int touched = touch_poll(&touch, &touch_x, &touch_y, s->awake ? 0 : 100);
@@ -1100,7 +1100,7 @@ int main(int argc, char* argv[]) {
       set_awake(s, true);
     }
 
-    
+
     // manage wakefulness
     if (s->awake_timeout > 0) {
       s->awake_timeout--;
@@ -1124,7 +1124,7 @@ int main(int argc, char* argv[]) {
     } else {
       s->scene.hwType = cereal_HealthData_HwType_unknown;
     }
-    
+
     // Don't waste resources on drawing in case screen is off or car is not started.
     if (s->awake && s->vision_connected) {
       dashcam(s, touch_x, touch_y);
