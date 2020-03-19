@@ -251,7 +251,45 @@ class CarState(CarStateBase):
     # 2 is standby, 10 is active. TODO: check that everything else is really a faulty state
     self.steer_state = cp.vl["EPS_STATUS"]['LKA_STATE']
     self.steer_warning = cp.vl["EPS_STATUS"]['LKA_STATE'] not in [1, 5]
+    
+    self.barriers = cp_cam.vl["LKAS_HUD"]['BARRIERS']
+    self.rightline = cp_cam.vl["LKAS_HUD"]['RIGHT_LINE']
+    self.leftline = cp_cam.vl["LKAS_HUD"]['LEFT_LINE']
 
+    self.tsgn1 = cp_cam.vl["RSA1"]['TSGN1']
+    self.spdval1 = cp_cam.vl["RSA1"]['SPDVAL1']
+
+    self.splsgn1 = cp_cam.vl["RSA1"]['SPLSGN1']
+    self.tsgn2 = cp_cam.vl["RSA1"]['TSGN2']
+    self.spdval2 = cp_cam.vl["RSA1"]['SPDVAL2']
+
+    self.splsgn2 = cp_cam.vl["RSA1"]['SPLSGN2']
+    self.tsgn3 = cp_cam.vl["RSA2"]['TSGN3']
+    self.splsgn3 = cp_cam.vl["RSA2"]['SPLSGN3']
+    self.tsgn4 = cp_cam.vl["RSA2"]['TSGN4']
+    self.splsgn4 = cp_cam.vl["RSA2"]['SPLSGN4']
+    self.noovertake = self.tsgn1 == 65 or self.tsgn2 == 65 or self.tsgn3 == 65 or self.tsgn4 == 65 or self.tsgn1 == 66 or self.tsgn2 == 66 or self.tsgn3 == 66 or self.tsgn4 == 66
+    if self.spdval1 > 0 or self.spdval2 > 0:
+      dat = messaging_arne.new_message()
+      dat.init('liveTrafficData')
+      if self.spdval1 > 0:
+        dat.liveTrafficData.speedLimitValid = True
+        if self.tsgn1 == 36:
+          dat.liveTrafficData.speedLimit = self.spdval1 * 1.60934
+        elif self.tsgn1 == 1:
+          dat.liveTrafficData.speedLimit = self.spdval1
+        else:
+          dat.liveTrafficData.speedLimit = 0
+      else:
+        dat.liveTrafficData.speedLimitValid = False
+      if self.spdval2 > 0:
+        dat.liveTrafficData.speedAdvisoryValid = True
+        dat.liveTrafficData.speedAdvisory = self.spdval2
+      else:
+        dat.liveTrafficData.speedAdvisoryValid = False
+      if not travis:
+        self.arne_pm.send('liveTrafficData', dat)
+        
     return ret
   
   @staticmethod
@@ -416,42 +454,5 @@ class CarState(CarStateBase):
     # use steering message to check if panda is connected to frc
     checks = [("STEERING_LKA", 42)]
 
-    self.barriers = cp_cam.vl["LKAS_HUD"]['BARRIERS']
-    self.rightline = cp_cam.vl["LKAS_HUD"]['RIGHT_LINE']
-    self.leftline = cp_cam.vl["LKAS_HUD"]['LEFT_LINE']
-
-    self.tsgn1 = cp_cam.vl["RSA1"]['TSGN1']
-    self.spdval1 = cp_cam.vl["RSA1"]['SPDVAL1']
-
-    self.splsgn1 = cp_cam.vl["RSA1"]['SPLSGN1']
-    self.tsgn2 = cp_cam.vl["RSA1"]['TSGN2']
-    self.spdval2 = cp_cam.vl["RSA1"]['SPDVAL2']
-
-    self.splsgn2 = cp_cam.vl["RSA1"]['SPLSGN2']
-    self.tsgn3 = cp_cam.vl["RSA2"]['TSGN3']
-    self.splsgn3 = cp_cam.vl["RSA2"]['SPLSGN3']
-    self.tsgn4 = cp_cam.vl["RSA2"]['TSGN4']
-    self.splsgn4 = cp_cam.vl["RSA2"]['SPLSGN4']
-    self.noovertake = self.tsgn1 == 65 or self.tsgn2 == 65 or self.tsgn3 == 65 or self.tsgn4 == 65 or self.tsgn1 == 66 or self.tsgn2 == 66 or self.tsgn3 == 66 or self.tsgn4 == 66
-    if self.spdval1 > 0 or self.spdval2 > 0:
-      dat = messaging_arne.new_message()
-      dat.init('liveTrafficData')
-      if self.spdval1 > 0:
-        dat.liveTrafficData.speedLimitValid = True
-        if self.tsgn1 == 36:
-          dat.liveTrafficData.speedLimit = self.spdval1 * 1.60934
-        elif self.tsgn1 == 1:
-          dat.liveTrafficData.speedLimit = self.spdval1
-        else:
-          dat.liveTrafficData.speedLimit = 0
-      else:
-        dat.liveTrafficData.speedLimitValid = False
-      if self.spdval2 > 0:
-        dat.liveTrafficData.speedAdvisoryValid = True
-        dat.liveTrafficData.speedAdvisory = self.spdval2
-      else:
-        dat.liveTrafficData.speedAdvisoryValid = False
-      if not travis:
-        self.arne_pm.send('liveTrafficData', dat)
-        
+       
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)
