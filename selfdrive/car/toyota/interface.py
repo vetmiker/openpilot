@@ -7,18 +7,10 @@ from selfdrive.car.toyota.values import Ecu, ECU_FINGERPRINT, CAR, TSS2_CAR, FIN
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, is_ecu_disconnected, gen_empty_fingerprint
 from selfdrive.swaglog import cloudlog
 from selfdrive.car.interfaces import CarInterfaceBase
-from common.op_params import opParams
-import cereal.messaging as messaging
 
 LaneChangeState = log.PathPlan.LaneChangeState
 
 class CarInterface(CarInterfaceBase):
-  def __init__(self):
-    self.waiting = False
-    self.keep_openpilot_engaged = True
-    self.sm = messaging.SubMaster(['pathPlan'])
-    self.op_params = opParams()
-    self.alca_min_speed = self.op_params.get('alca_min_speed', default=20.0)
 
   @staticmethod
   def compute_gb(accel, speed):
