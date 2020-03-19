@@ -6,6 +6,8 @@ from common.realtime import DT_CTRL
 from selfdrive.car import gen_empty_fingerprint
 from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event
 from selfdrive.controls.lib.vehicle_model import VehicleModel
+import cereal.messaging as messaging
+from common.op_params import opParams
 
 GearShifter = car.CarState.GearShifter
 
@@ -13,6 +15,11 @@ GearShifter = car.CarState.GearShifter
 
 class CarInterfaceBase():
   def __init__(self, CP, CarController, CarState):
+    self.waiting = False
+    self.keep_openpilot_engaged = True
+    self.sm = messaging.SubMaster(['pathPlan'])
+    self.op_params = opParams()
+    self.alca_min_speed = self.op_params.get('alca_min_speed', default=20.0)
     self.CP = CP
     self.VM = VehicleModel(CP)
 
@@ -24,6 +31,7 @@ class CarInterfaceBase():
 
     self.CS = CarState(CP)
     self.cp = self.CS.get_can_parser(CP)
+    self.cp_init = self.CS.get_can_parser_init(CP)
     self.cp_cam = self.CS.get_cam_can_parser(CP)
 
     self.CC = None
