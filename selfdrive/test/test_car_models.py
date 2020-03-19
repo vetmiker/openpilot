@@ -368,7 +368,7 @@ forced_dashcam_routes = [
 # TODO: add routes for these cars
 
 non_tested_cars = [
-  CHRYSLER.JEEP_CHEROKEE_2018
+  CHRYSLER.JEEP_CHEROKEE_2018,
   CHRYSLER.PACIFICA_2018, 
   CHRYSLER.PACIFICA_2017, 
   GM.CADILLAC_ATS,
