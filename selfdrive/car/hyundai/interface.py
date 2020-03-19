@@ -104,7 +104,7 @@ class CarInterface(CarInterfaceBase):
     # TODO: button presses
     ret.buttonEvents = []
 
-    events = self.create_common_events(ret)
+    events, eventsArne182 = self.create_common_events(ret)
 
     if ret.cruiseState.enabled and not self.cruise_enabled_prev:
       events.append(create_event('pcmEnable', [ET.ENABLE]))
@@ -117,7 +117,6 @@ class CarInterface(CarInterfaceBase):
     if ret.vEgo > (self.CP.minSteerSpeed + 4.):
       self.low_speed_alert = False
 
-    eventsArne182 = []
     if self.low_speed_alert:
       events.append(create_event('belowSteerSpeed', [ET.WARNING]))
 
