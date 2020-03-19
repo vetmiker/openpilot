@@ -458,8 +458,7 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = buttonEvents
 
     # events
-    eventsArne182 = []
-    events = self.create_common_events(ret)
+    events, eventsArne182 = self.create_common_events(ret)
 
     if self.CS.brake_error:
       events.append(create_event('brakeUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
