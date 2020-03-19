@@ -90,16 +90,37 @@ class CarInterfaceBase():
     raise NotImplementedError
 
   def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1):
+    if ret.cruiseState.enabled and not self.cruise_enabled_prev:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
+      disengage_event = True
+    else:
+      disengage_event = False
+    
     events = []
+    eventsArne182 = []
+    
+    if ret.gearShifter == GearShifter.reverse and self.CP.openpilotLongitudinalControl:
 
-    if cs_out.doorOpen:
+    # disable on pedals rising edge or when brake is pressed and speed isn't zero
+    if (((ret.gasPressed and not self.gas_pressed_prev) or \
+       (ret.brakePressed and (not self.brake_pressed_prev or ret.vEgo > 0.001))) and disengage_event) or (ret.brakePressed and not self.brake_pressed_prev and ret.vEgo < 0.1):
+      events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
+    if ret.gasPressed and disengage_event:
+      events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
+      
+    if cs_out.doorOpen and disengage_event:
       events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if cs_out.seatbeltUnlatched:
+    if cs_out.seatbeltUnlatched and disengage_event:
       events.append(create_event('seatbeltNotLatched', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.gearShifter != GearShifter.drive and cs_out.gearShifter not in extra_gears:
-      events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+      if ret.vEgo < 5:
+        eventsArne182.append(create_event_arne('wrongGearArne', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+      else:
+        events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.gearShifter == GearShifter.reverse:
-      events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+      if ret.vEgo < 5:
+        eventsArne182.append(create_event_arne('reverseGearArne', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+      else:
+        events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
     if not cs_out.cruiseState.available:
       events.append(create_event('wrongCarMode', [ET.NO_ENTRY, ET.USER_DISABLE]))
     if cs_out.espDisabled:
@@ -120,7 +141,7 @@ class CarInterfaceBase():
        (cs_out.brakePressed and (not self.brake_pressed_prev or not cs_out.standstill)):
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
-    return events
+    return events, eventsArne182
 
 class RadarInterfaceBase():
   def __init__(self, CP):
