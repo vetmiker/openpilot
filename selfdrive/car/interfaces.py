@@ -100,13 +100,7 @@ class CarInterfaceBase():
     
     if ret.gearShifter == GearShifter.reverse and self.CP.openpilotLongitudinalControl:
 
-    # disable on pedals rising edge or when brake is pressed and speed isn't zero
-    if (((ret.gasPressed and not self.gas_pressed_prev) or \
-       (ret.brakePressed and (not self.brake_pressed_prev or ret.vEgo > 0.001))) and disengage_event) or (ret.brakePressed and not self.brake_pressed_prev and ret.vEgo < 0.1):
-      events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
-    if ret.gasPressed and disengage_event:
-      events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
-      
+     
     if cs_out.doorOpen and disengage_event:
       events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.seatbeltUnlatched and disengage_event:
@@ -125,7 +119,7 @@ class CarInterfaceBase():
       events.append(create_event('wrongCarMode', [ET.NO_ENTRY, ET.USER_DISABLE]))
     if cs_out.espDisabled:
       events.append(create_event('espDisabled', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if cs_out.gasPressed:
+    if cs_out.gasPressed and disengage_event:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
 
     # TODO: move this stuff to the capnp strut
@@ -137,8 +131,8 @@ class CarInterfaceBase():
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0.
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
-    if (cs_out.gasPressed and (not self.gas_pressed_prev) and cs_out.vEgo > gas_resume_speed) or \
-       (cs_out.brakePressed and (not self.brake_pressed_prev or not cs_out.standstill)):
+    if disengage_event and ((cs_out.gasPressed and (not self.gas_pressed_prev) and cs_out.vEgo > gas_resume_speed) or \
+       (cs_out.brakePressed and (not self.brake_pressed_prev or not cs_out.standstill))):
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     return events, eventsArne182
