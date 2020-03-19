@@ -2,7 +2,6 @@
 from cereal import car, arne182, log
 from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne
-from selfdrive.car.toyota.carstate import CarState, get_can_parser, get_cam_can_parser, get_can_parser_init
 from selfdrive.car.toyota.values import Ecu, ECU_FINGERPRINT, CAR, TSS2_CAR, FINGERPRINTS
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, is_ecu_disconnected, gen_empty_fingerprint
 from selfdrive.swaglog import cloudlog
