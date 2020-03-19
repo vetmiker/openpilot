@@ -97,10 +97,7 @@ class CarInterfaceBase():
     
     events = []
     eventsArne182 = []
-    
-    if ret.gearShifter == GearShifter.reverse and self.CP.openpilotLongitudinalControl:
 
-     
     if cs_out.doorOpen and disengage_event:
       events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.seatbeltUnlatched and disengage_event:
