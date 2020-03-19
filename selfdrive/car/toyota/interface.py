@@ -343,7 +343,9 @@ class CarInterface(CarInterfaceBase):
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
-    eventsArne182 = []
+    
+    # events
+    events, eventsArne182 = self.create_common_events(ret)
 
     # cruise state
     if not self.cruise_enabled_prev:
@@ -363,44 +365,11 @@ class CarInterface(CarInterfaceBase):
 
     ret.buttonEvents = []
 
-    if ret.cruiseState.enabled and not self.cruise_enabled_prev:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
-      disengage_event = True
-    else:
-      disengage_event = False
-
-    # events
-    events = self.create_common_events(ret)
+    
 
 
     if self.cp_cam.can_invalid_cnt >= 200 and self.CP.enableCamera:
       events.append(create_event('invalidGiraffeToyota', [ET.PERMANENT]))
-    # needs to move to selfdrive/car/interfaces.py 
-    #if not ret.gearShifter == GearShifter.drive and self.CP.openpilotLongitudinalControl:
-    #  if ret.vEgo < 5:
-    #    eventsArne182.append(create_event_arne('wrongGearArne', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    #  else:
-    #    events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    #if ret.doorOpen and disengage_event:
-    #  events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    #if ret.seatbeltUnlatched and disengage_event:
-    #  events.append(create_event('seatbeltNotLatched', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    #if ret.gearShifter == GearShifter.reverse and self.CP.openpilotLongitudinalControl:
-    #  if ret.vEgo < 5:
-    #    eventsArne182.append(create_event_arne('reverseGearArne', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-    #  else:
-    #    events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-    #  try:
-    #    if eventsArne182[0].name == 'longControlDisabled':
-    #      del eventsArne182[0]
-    #  except IndexError:
-    #    pass
-    ## disable on pedals rising edge or when brake is pressed and speed isn't zero
-    #if (((ret.gasPressed and not self.gas_pressed_prev) or \
-    #   (ret.brakePressed and (not self.brake_pressed_prev or ret.vEgo > 0.001))) and disengage_event) or (ret.brakePressed and not self.brake_pressed_prev and ret.vEgo < 0.1):
-    #  events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
-
-    #if ret.gasPressed and disengage_event:
-    #  events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
     
     if not self.waiting and ret.vEgo < 0.3 and not ret.gasPressed and self.CP.carFingerprint == CAR.RAV4H:
       self.waiting = True
