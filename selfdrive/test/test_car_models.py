@@ -20,7 +20,7 @@ from selfdrive.car.hyundai.values import CAR as HYUNDAI
 from selfdrive.car.chrysler.values import CAR as CHRYSLER
 from selfdrive.car.subaru.values import CAR as SUBARU
 from selfdrive.car.volkswagen.values import CAR as VOLKSWAGEN
-from selfdrive.car.nissan.values import CAR as NISSAN
+#from selfdrive.car.nissan.values import CAR as NISSAN
 
 
 os.environ['NOCRASH'] = '1'
@@ -339,10 +339,10 @@ routes = {
     'carFingerprint': SUBARU.IMPREZA,
     'enableCamera': True,
   },
-  "fbbfa6af821552b9|2020-03-03--08-09-43": {
-    'carFingerprint': NISSAN.XTRAIL,
-    'enableCamera': True,
-  },
+  #"fbbfa6af821552b9|2020-03-03--08-09-43": {
+  #  'carFingerprint': NISSAN.XTRAIL,
+  #  'enableCamera': True,
+  #},
 }
 
 passive_routes = [
@@ -354,7 +354,7 @@ forced_dashcam_routes = [
   "f1b4c567731f4a1b|2018-04-30--10-15-35",
 
   # Nissan
-  "fbbfa6af821552b9|2020-03-03--08-09-43",
+  #"fbbfa6af821552b9|2020-03-03--08-09-43",
 ]
 
 # TODO: add routes for these cars
