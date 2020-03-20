@@ -312,6 +312,12 @@ class CarState(CarStateBase):
     return ret
 
   @staticmethod
+  def get_can_parser_init(CP):
+    signals, checks = get_can_signals(CP)
+    bus_pt = 1 if CP.isPandaBlack and CP.carFingerprint in HONDA_BOSCH else 0
+    return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, bus_pt)
+
+  @staticmethod
   def get_can_parser(CP):
     signals, checks = get_can_signals(CP)
     bus_pt = 1 if CP.isPandaBlack and CP.carFingerprint in HONDA_BOSCH else 0
