@@ -311,11 +311,11 @@ routes = {
     'enableCamera': True,
     'enableDsu': False,
   },
-  "362d23d4d5bea2fa|2018-08-10--13-31-40": {
-    'carFingerprint': TOYOTA.HIGHLANDERH,
-    'enableCamera': False,
-    'enableDsu': False,
-  },
+  #"362d23d4d5bea2fa|2018-08-10--13-31-40": {
+  #  'carFingerprint': TOYOTA.HIGHLANDERH,
+  #  'enableCamera': False,
+  #  'enableDsu': False,
+  #},
   #"2e07163a1ba9a780|2019-08-25--13-15-13": {
   #  'carFingerprint': TOYOTA.LEXUS_IS,
   #  'enableCamera': True,
