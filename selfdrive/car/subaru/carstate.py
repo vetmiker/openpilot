@@ -58,6 +58,41 @@ class CarState(CarStateBase):
     return ret
 
   @staticmethod
+  def get_can_parser_init(CP):
+    # this function generates lists for signal, messages and initial values
+    signals = [
+      # sig_name, sig_address, default
+      ("Steer_Torque_Sensor", "Steering_Torque", 0),
+      ("Steering_Angle", "Steering_Torque", 0),
+      ("Cruise_On", "CruiseControl", 0),
+      ("Cruise_Activated", "CruiseControl", 0),
+      ("Brake_Pedal", "Brake_Pedal", 0),
+      ("Throttle_Pedal", "Throttle", 0),
+      ("LEFT_BLINKER", "Dashlights", 0),
+      ("RIGHT_BLINKER", "Dashlights", 0),
+      ("SEATBELT_FL", "Dashlights", 0),
+      ("FL", "Wheel_Speeds", 0),
+      ("FR", "Wheel_Speeds", 0),
+      ("RL", "Wheel_Speeds", 0),
+      ("RR", "Wheel_Speeds", 0),
+      ("DOOR_OPEN_FR", "BodyInfo", 1),
+      ("DOOR_OPEN_FL", "BodyInfo", 1),
+      ("DOOR_OPEN_RR", "BodyInfo", 1),
+      ("DOOR_OPEN_RL", "BodyInfo", 1),
+      ("Units", "Dash_State", 1),
+    ]
+
+    checks = [
+      # sig_address, frequency
+      ("Dashlights", 10),
+      ("CruiseControl", 20),
+      ("Wheel_Speeds", 50),
+      ("Steering_Torque", 50),
+      ("BodyInfo", 10),
+    ]
+
+    return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
+  @staticmethod
   def get_can_parser(CP):
     # this function generates lists for signal, messages and initial values
     signals = [
