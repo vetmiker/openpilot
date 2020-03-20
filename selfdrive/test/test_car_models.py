@@ -66,10 +66,10 @@ routes = {
     'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
     'enableCamera': True,
   },
-  "9f7a7e50a51fb9db|2019-01-17--18-34-21": {
-    'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2017,
-    'enableCamera': True,
-  },
+  #"9f7a7e50a51fb9db|2019-01-17--18-34-21": {
+  #  'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2017,
+  #  'enableCamera': True,
+  #},
   "192a598e34926b1e|2019-04-04--13-27-39": {
     'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2019,
     'enableCamera': True,
@@ -360,6 +360,7 @@ forced_dashcam_routes = [
 # TODO: add routes for these cars
 
 non_tested_cars = [
+  CHRYSLER.JEEP_CHEROKEE_2017,
   CHRYSLER.JEEP_CHEROKEE_2018,
   CHRYSLER.PACIFICA_2018, 
   CHRYSLER.PACIFICA_2017,
