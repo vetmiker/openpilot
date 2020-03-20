@@ -70,10 +70,10 @@ routes = {
   #  'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2017,
   #  'enableCamera': True,
   #},
-  "192a598e34926b1e|2019-04-04--13-27-39": {
-    'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2019,
-    'enableCamera': True,
-  },
+  #"192a598e34926b1e|2019-04-04--13-27-39": {
+  #  'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2019,
+  #  'enableCamera': True,
+  #},
   "f1b4c567731f4a1b|2018-04-18--11-29-37": {
     'carFingerprint': FORD.FUSION,
     'enableCamera': False,
@@ -360,6 +360,7 @@ forced_dashcam_routes = [
 # TODO: add routes for these cars
 
 non_tested_cars = [
+  CHRYSLER.JEEP_CHEROKEE_2019,
   CHRYSLER.JEEP_CHEROKEE_2017,
   CHRYSLER.JEEP_CHEROKEE_2018,
   CHRYSLER.PACIFICA_2018, 
