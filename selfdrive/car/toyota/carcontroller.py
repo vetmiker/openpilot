@@ -101,15 +101,15 @@ class CarController():
     apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
 
     if CS.CP.enableGasInterceptor:
-      if CS.pedal_gas > 15.0:
+      if CS.out.gasPressed:
         apply_accel = max(apply_accel, 0.06)
-      if CS.brake_pressed:
+      if CS.out.brakePressed:
         apply_gas = 0.0
         apply_accel = min(apply_accel, 0.00)
     else:
-      if CS.pedal_gas > 0.0:
+      if CS.out.gasPressed:
         apply_accel = max(apply_accel, 0.0)
-      if CS.brake_pressed and CS.v_ego > 1:
+      if CS.out.brakePressed and CS.out.vEgo > 1:
         apply_accel = min(apply_accel, 0.0)
 
     # steer torque
@@ -120,7 +120,7 @@ class CarController():
       self.last_fault_frame = frame
 
     # Cut steering for 2s after fault
-    if (frame - self.last_fault_frame < 200) or abs(CS.angle_steers) > 100 or abs(CS.angle_steers_rate) > 100:
+    if (frame - self.last_fault_frame < 200) or abs(CS.out.angle_steers) > 100 or abs(CS.out.angle_steers_rate) > 100:
       new_steer = 0
       apply_steer_req = 0
     else:
