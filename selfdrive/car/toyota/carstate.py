@@ -45,7 +45,6 @@ class CarState(CarStateBase):
     if not travis:
       self.arne_pm = messaging_arne.PubMaster(['liveTrafficData', 'arne182Status'])
 
-    self.v_ego = 0.0
 
   def update(self, cp, cp_cam, frame):
     ret = car.CarState.new_message()
@@ -69,7 +68,6 @@ class CarState(CarStateBase):
     ret.wheelSpeeds.rr = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_RR'] * CV.KPH_TO_MS
     ret.vEgoRaw = mean([ret.wheelSpeeds.fl, ret.wheelSpeeds.fr, ret.wheelSpeeds.rl, ret.wheelSpeeds.rr])
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
-    self.v_ego = ret.vEgo
     ret.standstill = ret.vEgoRaw < 0.001
 
     # Some newer models have a more accurate angle measurement in the TORQUE_SENSOR message. Use if non-zero
@@ -186,8 +184,8 @@ class CarState(CarStateBase):
     else:
       minimum_set_speed = 41.0
     if bool(cp.vl["PCM_CRUISE"]['CRUISE_ACTIVE']) and not self.pcm_acc_active:
-      if self.v_ego < 12.5:
-        self.setspeedoffset = max(min(int(minimum_set_speed-self.v_ego*3.6),(minimum_set_speed-7.0)),0.0)
+      if ret.vEgo < 12.5:
+        self.setspeedoffset = max(min(int(minimum_set_speed-ret.vEgo*3.6),(minimum_set_speed-7.0)),0.0)
         self.v_cruise_pcmlast = ret.cruiseState.speed
       else:
         self.setspeedoffset = 0
