@@ -358,7 +358,7 @@ class CarInterface(CarInterfaceBase):
         eventsArne182.append(create_event_arne('longControlDisabled', [ET.WARNING]))
         ret.brakePressed = True
         self.waiting = False
-    if self.CS.v_ego < 1 or not self.keep_openpilot_engaged:
+    if ret.vEgo < 1 or not self.keep_openpilot_engaged:
       ret.cruiseState.enabled = self.CS.pcm_acc_active
     ret.cruiseState.available = bool(self.CS.main_on)
     ret.cruiseState.speedOffset = 0.
