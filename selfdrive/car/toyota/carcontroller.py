@@ -101,15 +101,15 @@ class CarController():
     apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
 
     if CS.CP.enableGasInterceptor:
-      if CS.out.gasPressed:
+      if CS.gasPressed:
         apply_accel = max(apply_accel, 0.06)
-      if CS.out.brakePressed:
+      if CS.brakePressed:
         apply_gas = 0.0
         apply_accel = min(apply_accel, 0.00)
     else:
-      if CS.out.gasPressed:
+      if CS.gasPressed:
         apply_accel = max(apply_accel, 0.0)
-      if CS.out.brakePressed and CS.out.vEgo > 1:
+      if CS.brakePressed and CS.out.vEgo > 1:
         apply_accel = min(apply_accel, 0.0)
 
     # steer torque
@@ -236,12 +236,12 @@ class CarController():
         #print("debug Left blindspot debug enabled")
         self.blindspot_debug_enabled_left = True
       if self.blindspot_blink_counter_right > 5 and not self.blindspot_debug_enabled_right: #enable blindspot debug mode
-        if CS.v_ego > 6: #polling at low speeds switches camera off
+        if CS.out.vEgo > 6: #polling at low speeds switches camera off
           #can_sends.append(make_can_msg(0x750, b'\x42\x02\x10\x60\x00\x00\x00\x00', 0))
           can_sends.append(set_blindspot_debug_mode(RIGHT_BLINDSPOT, True))
           #print("debug Right blindspot debug enabled")
           self.blindspot_debug_enabled_right = True
-      if CS.v_ego < 6 and self.blindspot_debug_enabled_right: # if enabled and speed falls below 6m/s
+      if CS.out.vEgo < 6 and self.blindspot_debug_enabled_right: # if enabled and speed falls below 6m/s
         #can_sends.append(make_can_msg(0x750, b'\x42\x02\x10\x01\x00\x00\x00\x00', 0))
         can_sends.append(set_blindspot_debug_mode(RIGHT_BLINDSPOT, False))
         self.blindspot_debug_enabled_right = False
