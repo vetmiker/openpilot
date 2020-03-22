@@ -1079,10 +1079,9 @@ int main(int argc, char* argv[]) {
     if (touched == 1) {
       set_awake(s, true);
       handle_sidebar_touch(s, touch_x, touch_y);
-      handle_vision_touch(s, touch_x, touch_y);
-//      if (!handle_df_touch(s, touch_x, touch_y)){  // disables sidebar from popping out when tapping df bu
-//        handle_vision_touch(s, touch_x, touch_y);
-//      }
+      if (!handle_df_touch(s, touch_x, touch_y)){  // disables sidebar from popping out when tapping df bu
+        handle_vision_touch(s, touch_x, touch_y);
+      }
     }
 
     if (!s->vision_connected) {
