@@ -1078,7 +1078,6 @@ int main(int argc, char* argv[]) {
     int touched = touch_poll(&touch, &touch_x, &touch_y, 0);
     if (touched == 1) {
       set_awake(s, true);
-      s->scene.uilayout_sidebarcollapsed = false;
       handle_sidebar_touch(s, touch_x, touch_y);
       if (!handle_df_touch(s, touch_x, touch_y)){  // disables sidebar from popping out when tapping df bu
         handle_vision_touch(s, touch_x, touch_y);
