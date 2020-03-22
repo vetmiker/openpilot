@@ -625,8 +625,6 @@ static void check_messages(UIState *s) {
       Message * msg = sock->receive();
       if (msg == NULL) continue;
 
-      set_awake(s, true);
-
       handle_message(s, msg);
 
       delete msg;
