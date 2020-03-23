@@ -214,7 +214,7 @@ class CarController():
       elif CS.out.leftBlinker:
         self.blindspot_blink_counter_left += 1
         #print("debug Left Blinker on")
-      elif CS.out.righttBlinker:
+      elif CS.out.rightBlinker:
         self.blindspot_blink_counter_right += 1
         #print("debug Right Blinker on")
       else:
