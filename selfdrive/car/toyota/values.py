@@ -41,6 +41,7 @@ class ECU:
   CAM = Ecu.fwdCamera # camera
   DSU = Ecu.dsu # driving support unit
   APGS = Ecu.apgs # advanced parking guidance system
+  SMART = Ecu.unknown
 
 
 
@@ -56,6 +57,9 @@ STATIC_MSGS = [
   (0x2E6, Ecu.dsu, (CAR.PRIUS, CAR.RAV4H, CAR.LEXUS_RXH), 0,   3, b'\xff\xf8\x00\x08\x7f\xe0\x00\x4e'),
   (0x2E7, Ecu.dsu, (CAR.PRIUS, CAR.RAV4H, CAR.LEXUS_RXH), 0,   3, b'\xa8\x9c\x31\x9c\x00\x00\x00\x02'),
   (0x33E, Ecu.dsu, (CAR.PRIUS, CAR.RAV4H, CAR.LEXUS_RXH), 0,  20, b'\x0f\xff\x26\x40\x00\x1f\x00'),
+  (0x2E6, Ecu.unknown, (CAR.RAV4H, CAR.LEXUS_RXH), 0,   3, b'\xff\xf8\x00\x08\x7f\xe0\x00\x4e'),
+  (0x2E7, Ecu.unknown, (CAR.RAV4H, CAR.LEXUS_RXH), 0,   3, b'\xa8\x9c\x31\x9c\x00\x00\x00\x02'),
+  (0x33E, Ecu.unknown, (CAR.RAV4H, CAR.LEXUS_RXH), 0,  20, b'\x0f\xff\x26\x40\x00\x1f\x00'),
   (0x344, Ecu.dsu, (CAR.PRIUS, CAR.RAV4H, CAR.LEXUS_RXH, CAR.LEXUS_NXH, CAR.RAV4, CAR.COROLLA, CAR.HIGHLANDER, CAR.HIGHLANDERH, CAR.AVALON, CAR.SIENNA, CAR.LEXUS_CTH, CAR.LEXUS_RX), 0,   5, b'\x00\x00\x01\x00\x00\x00\x00\x50'),
   (0x365, Ecu.dsu, (CAR.PRIUS, CAR.LEXUS_RXH, CAR.LEXUS_NXH, CAR.HIGHLANDERH), 0,  20, b'\x00\x00\x00\x80\x03\x00\x08'),
   (0x365, Ecu.dsu, (CAR.RAV4, CAR.RAV4H, CAR.COROLLA, CAR.HIGHLANDER, CAR.AVALON, CAR.SIENNA, CAR.LEXUS_CTH, CAR.LEXUS_RX), 0,  20, b'\x00\x00\x00\x80\xfc\x00\x08'),
@@ -449,6 +453,7 @@ FW_VERSIONS = {
       b'\x02896634774200\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
       b'\x02896634782000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
       b'\x02896634784000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
+      b'\x03896634759200\x00\x00\x00\x008966A4703000\x00\x00\x00\x00897CF4701004\x00\x00\x00\x00',
       b'\x03896634759200\x00\x00\x00\x008966A4703000\x00\x00\x00\x00897CF4701003\x00\x00\x00\x00',
       b'\x03896634759300\x00\x00\x00\x008966A4703000\x00\x00\x00\x00897CF4701004\x00\x00\x00\x00',
       b'\x03896634760000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00897CF4701002\x00\x00\x00\x00',

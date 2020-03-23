@@ -339,7 +339,6 @@ class CarInterface(CarInterfaceBase):
     # create message
     ret_arne182 = arne182.CarStateArne182.new_message()
 
-
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
@@ -364,9 +363,6 @@ class CarInterface(CarInterfaceBase):
     ret.cruiseState.speedOffset = 0.
 
     ret.buttonEvents = []
-
-    
-
 
     if self.cp_cam.can_invalid_cnt >= 200 and self.CP.enableCamera:
       events.append(create_event('invalidGiraffeToyota', [ET.PERMANENT]))

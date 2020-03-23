@@ -1,6 +1,8 @@
 from cereal import car
+import json
+from common.params import Params
 from common.numpy_fast import clip
-from selfdrive.car import apply_toyota_steer_torque_limits, create_gas_command, make_can_msg
+from selfdrive.car import apply_toyota_steer_torque_limits, create_gas_command, make_can_msg, gen_empty_fingerprint
 from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_command, \
                                            create_accel_command, create_acc_cancel_command, create_fcw_command
 from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams, TSS2_CAR
@@ -78,7 +80,15 @@ class CarController():
     self.fake_ecus = set()
     if CP.enableCamera: self.fake_ecus.add(Ecu.fwdCamera)
     if CP.enableDsu: self.fake_ecus.add(Ecu.dsu)
-
+    params = Params()
+    try:
+      cached_fingerprint = params.get('CachedFingerprint')
+      finger = gen_empty_fingerprint()
+      cached_fingerprint = json.loads(cached_fingerprint)
+      finger[0] = {int(key): value for key, value in cached_fingerprint[2].items()}
+      if 0x2FF in finger[0]: self.fake_ecus.add(Ecu.unknown)
+    except:
+      pass
     self.packer = CANPacker(dbc_name)
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, hud_alert,
@@ -196,7 +206,7 @@ class CarController():
     if (frame % 100 == 0 or send_ui) and Ecu.fwdCamera in self.fake_ecus:
       can_sends.append(create_ui_command(self.packer, steer, pcm_cancel_cmd, left_line, right_line, left_lane_depart, right_lane_depart))
 
-    if frame % 100 == 0 and Ecu.dsu in self.fake_ecus:
+    if frame % 100 == 0 and (Ecu.dsu in self.fake_ecus or Ecu.unknown in self.fake_ecus):
       can_sends.append(create_fcw_command(self.packer, fcw))
 
     #*** static msgs ***
@@ -211,10 +221,10 @@ class CarController():
         self.blindspot_blink_counter_left += 1
         self.blindspot_blink_counter_right += 1
         #print("debug blindspot alwayson!")
-      elif CS.left_blinker_on:
+      elif CS.out.leftBlinker:
         self.blindspot_blink_counter_left += 1
         #print("debug Left Blinker on")
-      elif CS.right_blinker_on:
+      elif CS.out.rightBlinker:
         self.blindspot_blink_counter_right += 1
         #print("debug Right Blinker on")
       else:

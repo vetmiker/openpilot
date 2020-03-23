@@ -80,6 +80,35 @@ static void navigate_to_home(UIState *s) {
 #endif
 }
 
+static void send_df(UIState *s, int status) {
+  capnp::MallocMessageBuilder msg;
+  cereal::EventArne182::Builder event = msg.initRoot<cereal::EventArne182>();
+  auto dfStatus = event.initDynamicFollowButton();
+  dfStatus.setStatus(status);
+
+  auto words = capnp::messageToFlatArray(msg);
+  auto bytes = words.asBytes();
+  s->dynamicfollowbutton_sock->send((char*)bytes.begin(), bytes.size());
+}
+
+static bool handle_df_touch(UIState *s, int touch_x, int touch_y) {
+  //dfButton manager  // code below thanks to kumar: https://github.com/arne182/openpilot/commit/71d5aac9f8a3f5942e89634b20cbabf3e19e3e78
+  if (s->awake && s->vision_connected && s->active_app == cereal_UiLayoutState_App_home && s->status != STATUS_STOPPED) {
+    int padding = 40;
+   if ((1660 - padding <= touch_x) && (855 - padding <= touch_y)) {
+      s->scene.uilayout_sidebarcollapsed = true;  // collapse sidebar when tapping df button
+      s->scene.dfButtonStatus++;
+      if (s->scene.dfButtonStatus > 2) {
+        s->scene.dfButtonStatus = 0;
+      }
+      send_df(s, s->scene.dfButtonStatus);
+      return true;
+    }
+  }
+  return false;
+}
+
+
 static void handle_sidebar_touch(UIState *s, int touch_x, int touch_y) {
   if (!s->scene.uilayout_sidebarcollapsed && touch_x <= sbr_w) {
     if (touch_x >= settings_btn_x && touch_x < (settings_btn_x + settings_btn_w)
@@ -279,23 +308,6 @@ static void ui_init_vision(UIState *s, const VisionStreamBufs back_bufs,
   s->limit_set_speed_timeout = UI_FREQ;
 }
 
-bool df_button_clicked(int touch_x, int touch_y) {
-  if (touch_x >= 1212 && touch_x <= 1310 && touch_y >= 902 && touch_y <= 1013) {
-    return true;
-  }
-  return false;
-}
-
-void send_df(UIState *s, int status){
-  capnp::MallocMessageBuilder msg;
-  cereal::EventArne182::Builder event = msg.initRoot<cereal::EventArne182>();
-  auto dfStatus = event.initDynamicFollowButton();
-  dfStatus.setStatus(status);
-
-  auto words = capnp::messageToFlatArray(msg);
-  auto bytes = words.asBytes();
-  s->dynamicfollowbutton_sock->send((char*)bytes.begin(), bytes.size());
-}
 
 static PathData read_path(cereal_ModelData_PathData_ptr pathp) {
   PathData ret = {0};
@@ -612,8 +624,6 @@ static void check_messages(UIState *s) {
     for (auto sock : polls){
       Message * msg = sock->receive();
       if (msg == NULL) continue;
-
-      set_awake(s, true);
 
       handle_message(s, msg);
 
@@ -1069,7 +1079,9 @@ int main(int argc, char* argv[]) {
     if (touched == 1) {
       set_awake(s, true);
       handle_sidebar_touch(s, touch_x, touch_y);
-      handle_vision_touch(s, touch_x, touch_y);
+      if (!handle_df_touch(s, touch_x, touch_y)){  // disables sidebar from popping out when tapping df bu
+        handle_vision_touch(s, touch_x, touch_y);
+      }
     }
 
     if (!s->vision_connected) {
@@ -1101,16 +1113,6 @@ int main(int argc, char* argv[]) {
       set_awake(s, false);
     }
 
-    //dfButton manager  // code below thanks to kumar: https://github.com/arne182/openpilot/commit/71d5aac9f8a3f5942e89634b20cbabf3e19e3e78
-    if (s->awake && s->vision_connected && s->active_app == cereal_UiLayoutState_App_home && s->status != STATUS_STOPPED) {
-      if (df_button_clicked(touch_x, touch_y)) {
-        s->scene.dfButtonStatus++;
-        if (s->scene.dfButtonStatus > 2){
-          s->scene.dfButtonStatus = 0;
-        }
-        send_df(s, s->scene.dfButtonStatus);
-      }
-    }
     // manage hardware disconnect
     if (s->hardware_timeout > 0) {
       s->hardware_timeout--;
@@ -1118,8 +1120,8 @@ int main(int argc, char* argv[]) {
       s->scene.hwType = cereal_HealthData_HwType_unknown;
     }
 
-    // Don't waste resources on drawing in case screen is off or car is not started.
-    if (s->awake && s->vision_connected) {
+    // Don't waste resources on drawing in case screen is off
+    if (s->awake) {
       dashcam(s, touch_x, touch_y);
       ui_draw(s);
       glFinish();

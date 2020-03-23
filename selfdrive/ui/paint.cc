@@ -376,7 +376,7 @@ const UIScene *scene = &s->scene;
         nvgRGBA(155, 0, 0, 255), nvgRGBA(55, 0, 0, 50));
     } else {
       track_bg = nvgLinearGradient(s->vg, vwp_w, vwp_h, vwp_w, vwp_h*.4,
-	
+
         nvgRGBA(255,0, 0, 255),
         nvgRGBA(155, 0, 0, 50));
     }
@@ -939,7 +939,7 @@ static void ui_draw_vision_brake(UIState *s) {
   nvgFill(s->vg);
 }
 
-static void ui_draw_dynamic_follow_button(UIState *s) {
+static void ui_draw_df_button(UIState *s) {
   int btn_w = 150;
   int btn_h = 150;
   int btn_x = 1920 - btn_w - 488;
@@ -1292,7 +1292,7 @@ static void ui_draw_vision_footer(UIState *s) {
 
   ui_draw_vision_face(s);
   ui_draw_vision_brake(s);
-  ui_draw_dynamic_follow_button(s);
+  ui_draw_df_button(s);
 
 #ifdef SHOW_SPEEDLIMIT
   ui_draw_vision_map(s);
@@ -1528,7 +1528,7 @@ void ui_nvg_init(UIState *s) {
 
   assert(s->img_speed >= 0);
   s->img_speed = nvgCreateImage(s->vg, "../assets/img_trafficSign_speedahead.png", 1);
-	
+
   assert(s->img_button_settings >= 0);
   s->img_button_settings = nvgCreateImage(s->vg, "../assets/images/button_settings.png", 1);
 
