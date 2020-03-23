@@ -330,7 +330,12 @@ class CarInterface(CarInterfaceBase):
     # ******************* do can recv *******************
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
-    ret = self.CS.update(self.cp, self.cp_cam)
+    if self.frame < 1000:
+      self.cp_init.update_strings(can_strings)
+      ret = self.CS.update(self.cp_init, self.cp_cam, self.frame)
+    else:
+      self.cp.update_strings(can_strings)
+      ret = self.CS.update(self.cp, self.cp_cam, self.frame)
 
     # create message
     ret_arne182 = arne182.CarStateArne182.new_message()
