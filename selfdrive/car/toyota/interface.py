@@ -328,7 +328,6 @@ class CarInterface(CarInterfaceBase):
   def update(self, c, can_strings):
     self.sm.update(0)
     # ******************* do can recv *******************
-    self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
     if self.frame < 1000:
       self.cp_init.update_strings(can_strings)
