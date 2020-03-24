@@ -10,6 +10,11 @@ from opendbc.can.parser import CANParser
 from selfdrive.config import Conversions as CV
 from common.travis_checker import travis
 from selfdrive.car.toyota.values import CAR, DBC, STEER_THRESHOLD, TSS2_CAR, NO_STOP_TIMER_CAR
+from common.op_params import opParams
+
+op_params = opParams()
+rsa_max_speed = op_params.get('rsa_max_speed', 24.5)
+limit_rsa = op_params.get('limit_rsa', False)
 
 class CarState(CarStateBase):
   def __init__(self, CP):
@@ -284,6 +289,8 @@ class CarState(CarStateBase):
         dat.liveTrafficData.speedAdvisory = self.spdval2
       else:
         dat.liveTrafficData.speedAdvisoryValid = False
+      if limit_rsa and rsa_max_speed < ret.vEgo:
+        dat.liveTrafficData.speedLimitValid = False
       if not travis:
         self.arne_pm.send('liveTrafficData', dat)
         
