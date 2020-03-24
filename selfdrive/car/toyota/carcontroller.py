@@ -83,10 +83,11 @@ class CarController():
     params = Params()
     try:
       cached_fingerprint = params.get('CachedFingerprint')
+      vin = = params.get('CarVin')
       finger = gen_empty_fingerprint()
       cached_fingerprint = json.loads(cached_fingerprint)
       finger[0] = {int(key): value for key, value in cached_fingerprint[2].items()}
-      if 0x2FF in finger[0]: self.fake_ecus.add(Ecu.unknown)
+      if 0x2FF in finger[0] and vin = "JTMWRREV10D058569": self.fake_ecus.add(Ecu.unknown)
     except:
       pass
     self.packer = CANPacker(dbc_name)
