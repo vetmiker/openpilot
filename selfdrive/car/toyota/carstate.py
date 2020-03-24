@@ -167,11 +167,11 @@ class CarState(CarStateBase):
 
     if self.CP.carFingerprint == CAR.LEXUS_IS:
       self.main_on = cp.vl["DSU_CRUISE"]['MAIN_ON'] != 0
-      ret.cruiseState.speed = cp.vl["DSU_CRUISE"]['SET_SPEED'] * CV.KPH_TO_MS
+      ret.cruiseState.speed = cp.vl["DSU_CRUISE"]['SET_SPEED'] 
       self.low_speed_lockout = False
     else:
       self.main_on = cp.vl["PCM_CRUISE_2"]['MAIN_ON'] != 0
-      ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]['SET_SPEED'] * CV.KPH_TO_MS
+      ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]['SET_SPEED']
       self.low_speed_lockout = cp.vl["PCM_CRUISE_2"]['LOW_SPEED_LOCKOUT'] == 2
     ret.cruiseState.available = self.main_on
     v_cruise_pcm_max = ret.cruiseState.speed
@@ -248,7 +248,7 @@ class CarState(CarStateBase):
     # 2 is standby, 10 is active. TODO: check that everything else is really a faulty state
     self.steer_state = cp.vl["EPS_STATUS"]['LKA_STATE']
     self.steer_warning = cp.vl["EPS_STATUS"]['LKA_STATE'] not in [1, 5]
-    
+    ret.cruiseState.speed = ret.cruiseState.speed * CV.KPH_TO_MS
     self.barriers = cp_cam.vl["LKAS_HUD"]['BARRIERS']
     self.rightline = cp_cam.vl["LKAS_HUD"]['RIGHT_LINE']
     self.leftline = cp_cam.vl["LKAS_HUD"]['LEFT_LINE']
