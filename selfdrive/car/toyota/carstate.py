@@ -433,7 +433,10 @@ class CarState(CarStateBase):
       signals.append(("INTERCEPTOR_GAS", "GAS_SENSOR", 0))
       signals.append(("INTERCEPTOR_GAS2", "GAS_SENSOR", 0))
       checks.append(("GAS_SENSOR", 50))
-
+    if CP.carFingerprint in TSS2_CAR:
+      signals += [("L_ADJACENT", "BSM", 0)]
+      signals += [("R_ADJACENT", "BSM", 0)]
+    
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
 
   @staticmethod
