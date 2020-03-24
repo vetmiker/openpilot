@@ -114,10 +114,10 @@ class LongitudinalMpc():
 
   def change_cost(self, TR, vEgo):
     TRs = [0.9, 1.8, 2.7]
-    costs = [0.5, 0.1, 0.05]
+    costs = [0.75, 0.2, 0.075]
     cost = interp(TR, TRs, costs)
     if vEgo < 5.0:
-      cost = 0.1
+      cost = 0.2
       cost = cost * min(max(1.0 , (6.0 - vEgo)),5.0) 
     if self.TR_Mod > 0:
       cost = cost + self.TR_Mod/2.0
