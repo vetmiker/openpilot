@@ -83,7 +83,7 @@ class CarController():
     params = Params()
     try:
       cached_fingerprint = params.get('CachedFingerprint')
-      vin = = params.get('CarVin')
+      vin = params.get('CarVin')
       finger = gen_empty_fingerprint()
       cached_fingerprint = json.loads(cached_fingerprint)
       finger[0] = {int(key): value for key, value in cached_fingerprint[2].items()}
