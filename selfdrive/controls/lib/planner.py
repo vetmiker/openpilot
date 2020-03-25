@@ -310,7 +310,7 @@ class Planner():
         time_to_turn = max(1.0, sm['liveMapData'].distToTurn / max((v_ego + v_curvature_map)/2, 1.))
         required_decel = min(0, (v_curvature_map - v_ego) / time_to_turn)
         accel_limits[0] = max(accel_limits[0], required_decel)
-      if v_speedlimit_ahead < v_speedlimit and v_ego > v_speedlimit_ahead and sm['liveMapData'].speedLimitAheadDistance > 0.10 and not following:
+      if v_speedlimit_ahead < v_speedlimit and v_ego > v_speedlimit_ahead and sm['liveMapData'].speedLimitAheadDistance > 1.0 and not following:
         required_decel = min(0, (v_speedlimit_ahead*v_speedlimit_ahead - v_ego*v_ego)/(sm['liveMapData'].speedLimitAheadDistance*2))
         required_decel = max(required_decel, -3.0)
         decel_for_turn = True
@@ -373,8 +373,7 @@ class Planner():
     radar_can_error = car.RadarData.Error.canError in radar_errors
 
     # **** send the plan ****
-    plan_send = messaging.new_message()
-    plan_send.init('plan')
+    plan_send = messaging.new_message('plan')
 
     plan_send.valid = sm.all_alive_and_valid(service_list=['carState', 'controlsState', 'radarState'])
 

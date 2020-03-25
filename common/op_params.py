@@ -47,22 +47,25 @@ class opParams:
       self.default_params = {'camera_offset': {'default': 0.06}}
     """
 
-    self.default_params = {'camera_offset': {'default': 0.06, 'allowed_types': [float, int], 'description': 'Your camera offset to use in lane_planner.py', 'live': True},
-                           'curvature_factor': {'default': 1.0, 'allowed_types': [float, int], 'description': 'Multiplier for the curvature slowdown. Increase for less braking.', 'live': False},
-                           'awareness_factor': {'default': 10., 'allowed_types': [float, int], 'description': 'Multiplier for the awareness times', 'live': False},
-                           'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False},
-                           'osm': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use OSM for drives', 'live': False},
-                           'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
-                           'alca_nudge_required': {'default': False, 'allowed_types': [bool], 'description': "Require nudge to start ALC", 'live': False},
-                           'keep_openpilot_engaged': {'default': True, 'allowed_types': [bool],
-                                                      'description': 'True is stock behavior in this fork. False lets you use the brake and cruise control stalk to disengage as usual', 'live': False},
-                           'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
+    self.default_params = {'awareness_factor': {'default': 10., 'allowed_types': [float, int], 'description': 'Multiplier for the awareness times', 'live': False},
                            'alca_min_speed': {'default': 20, 'allowed_types': [float, int], 'description': 'Speed limit to start ALC in m/s', 'live': False},
-                           'offset_limit': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed at which apk percent offset will work in m/s', 'live': False},
+                           'alca_nudge_required': {'default': False, 'allowed_types': [bool], 'description': "Require nudge to start ALC", 'live': False},
+                           'camera_offset': {'default': 0.06, 'allowed_types': [float, int], 'description': 'Your camera offset to use in lane_planner.py', 'live': True},
+                           'curvature_factor': {'default': 1.0, 'allowed_types': [float, int], 'description': 'Multiplier for the curvature slowdown. Increase for less braking.', 'live': False},
                            'dynamic_follow': {'default': 'relaxed', 'allowed_types': [str],
                                               'description': "Can be: ('traffic', 'relaxed', 'roadtrip'): Left to right increases in following distance.\n"
                                                              "All profiles support dynamic follow so you'll get your preferred distance while\n"
-                                                             "retaining the smoothness and safety of dynamic follow!", 'live': True}}
+                                                             "retaining the smoothness and safety of dynamic follow!", 'live': True},
+                           'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
+                           'keep_openpilot_engaged': {'default': True, 'allowed_types': [bool],
+                                                      'description': 'True is stock behavior in this fork. False lets you use the brake and cruise control stalk to disengage as usual', 'live': False},
+                           'limit_rsa': {'default': False, 'allowed_types': [bool], 'description': "Switch off RSA above rsa_max_speed", 'live': False},
+                           'offset_limit': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed at which apk percent offset will work in m/s', 'live': False},
+                           'osm': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use OSM for drives', 'live': False},
+                           'rsa_max_speed': {'default': 24.5, 'allowed_types': [float, int], 'description': 'Speed limit to ignore RSA in m/s', 'live': False},
+                           'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
+                           'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False}
+                           }
 
     self.params = {}
     self.params_file = "/data/op_params.json"
