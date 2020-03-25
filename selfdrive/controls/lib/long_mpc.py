@@ -1,6 +1,5 @@
 import os
 import math
-import time
 
 import cereal.messaging as messaging
 import cereal.messaging_arne as messaging_arne
@@ -12,7 +11,6 @@ from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 from common.op_params import opParams
 from common.numpy_fast import interp, clip
 from common.travis_checker import travis
-from selfdrive.config import Conversions as CV
 
 LOG_MPC = os.environ.get('LOG_MPC', False)
 
@@ -109,14 +107,14 @@ class LongitudinalMpc():
       y_dist = [1.8, 1.1]
     else:  # default to relaxed/stock
       y_dist = [1.8, 1.8]
-
-    TR_mod = []
+    TR = interp(CS.vEgo, x_vel, y_dist)
+    
     # Dynamic follow modifications (the secret sauce)
     x = [-5.0, 0.0, 5.0]  # relative velocity values
     y = [0.2, 0.0, -0.2]  # modification values
     
     self.TR_Mod = interp(lead.vRel, x, y)
-    TR = self.TR_Mod
+    TR += self.TR_Mod
 
     if CS.leftBlinker or CS.rightBlinker:
       x = [9.0, 55.0]  #
