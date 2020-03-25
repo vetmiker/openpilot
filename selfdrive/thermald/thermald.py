@@ -195,8 +195,8 @@ def thermald_thread():
     location = location.gpsLocation if location else None
     msg = read_thermal()
 
-    # clear car params when panda gets disconnected
-    if health is None and health_prev is not None:
+    # clear car params when panda gets connected
+    if health is not None and health_prev is None:
       params.panda_disconnect()
     health_prev = health
 
