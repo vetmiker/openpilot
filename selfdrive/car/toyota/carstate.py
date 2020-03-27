@@ -44,12 +44,13 @@ class CarState(CarStateBase):
     self.rightblindspotcounter = 0
     self.leftblindspotcounter = 0
     self.Angles = np.zeros(250)
-    #self.Angles_later = np.zeros(250)
+    self.Angles_later = np.zeros(250)
     self.Angle_counter = 0
     self.Angle = [0, 5, 10, 15,20,25,30,35,60,100,180,270,500]
     self.Angle_Speed = [255,160,100,80,70,60,55,50,40,33,27,17,12]
     if not travis:
       self.arne_pm = messaging_arne.PubMaster(['liveTrafficData', 'arne182Status'])
+      self.arne_sm = messaging_arne.SubMaster(['latControl'])
 
 
   def update(self, cp, cp_cam, frame):
@@ -158,6 +159,7 @@ class CarState(CarStateBase):
     msg.arne182Status.leftBlindspotD2 = self.leftblindspotD2
     msg.arne182Status.gasbuttonstatus = self.gasbuttonstatus
     if not travis:
+      self.arne_sm.update()
       self.arne_pm.send('arne182Status', msg)
     self.left_blinker_on = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 1
     self.right_blinker_on = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 2
@@ -216,10 +218,13 @@ class CarState(CarStateBase):
 
 
     ret.cruiseState.speed = min(max(7, int(ret.cruiseState.speed) - self.setspeedoffset),v_cruise_pcm_max)
-
+    if self.arne_sm.updated['latControl'] and self.v_ego > 11 and not travis:
+      angle_later = self.arne_sm['latControl'].anglelater
+    else:
+      angle_later = 0
     if not self.left_blinker_on and not self.right_blinker_on:
       self.Angles[self.Angle_counter] = abs(ret.steeringAngle)
-      #self.Angles_later[self.Angle_counter] = abs(angle_later)
+      self.Angles_later[self.Angle_counter] = abs(angle_later)
       if self.gasbuttonstatus ==1:
         factor = 1.6
       elif self.gasbuttonstatus == 2:
@@ -227,10 +232,10 @@ class CarState(CarStateBase):
       else:
         factor = 1.3
       ret.cruiseState.speed = int(min(ret.cruiseState.speed, factor * interp(np.max(self.Angles), self.Angle, self.Angle_Speed)))
-      #ret.cruiseState.speed = int(min(ret.cruiseState.speed, self.brakefactor * interp(np.max(self.Angles_later), self.Angle, self.Angle_Speed)))
+      ret.cruiseState.speed = int(min(ret.cruiseState.speed, factor * interp(np.max(self.Angles_later), self.Angle, self.Angle_Speed)))
     else:
       self.Angles[self.Angle_counter] = 0
-      #self.Angles_later[self.Angle_counter] = 0
+      self.Angles_later[self.Angle_counter] = 0
     self.Angle_counter = (self.Angle_counter + 1 ) % 250
 
     self.pcm_acc_status = cp.vl["PCM_CRUISE"]['CRUISE_STATE']
