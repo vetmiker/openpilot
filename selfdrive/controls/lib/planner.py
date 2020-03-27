@@ -198,7 +198,7 @@ class Planner():
       if v_ego < 11:
         angle_later = 0.
       else:
-        angle_later = self.arne_sm['latControl'].anglelater
+        angle_later = arne_sm['latControl'].anglelater
 
     long_control_state = sm['controlsState'].longControlState
     v_cruise_kph = sm['controlsState'].vCruise
