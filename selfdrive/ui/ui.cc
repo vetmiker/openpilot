@@ -247,7 +247,7 @@ static void ui_init(UIState *s) {
                              });
   s->pollerarne182 = Poller::create({
                               s->thermalonline_sock,
-                              s->arne182_sock
+                              s->arne182_sock,
                               s->ipaddress_sock
                              });
 
