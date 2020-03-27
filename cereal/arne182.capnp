@@ -147,6 +147,10 @@ struct DynamicFollowButton {
   status @0 :UInt16;
 }
 
+struct IPAddress {
+ ipAddr @0 :Text; # dragonpilot
+}
+
 struct EventArne182 {
   # in nanoseconds?
   logMonoTime @0 :UInt64;
@@ -161,5 +165,6 @@ struct EventArne182 {
     thermalonline @7:ThermalOnlineData;
     smiskolData @8 :SmiskolData;
     dynamicFollowButton @9 :DynamicFollowButton;
+    ipAddress @10 :IPAddress;
   }
 }
