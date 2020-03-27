@@ -155,11 +155,11 @@ static void read_param_float(float* param, const char* param_name) {
   }
 }
 
-static void read_param_str(char* param, const char* param_name) {
+static void read_param_str(const char* param, const char* param_name) {
   char *s;
   const int result = read_db_value(NULL, param_name, &s, NULL);
   if (result == 0) {
-    *param = s;
+    param = s;
     free(s);
   }
 }
@@ -182,7 +182,7 @@ static void read_param_float_timeout(float* param, const char* param_name, int* 
   }
 }
 
-static void read_param_str_timeout(char* param[20], const char* param_name, int* timeout) {
+static void read_param_str_timeout(cost char* param, const char* param_name, int* timeout) {
   if (*timeout > 0){
     (*timeout)--;
   } else {
