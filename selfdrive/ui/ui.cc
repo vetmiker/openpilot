@@ -319,6 +319,7 @@ static void ui_init_vision(UIState *s, const VisionStreamBufs back_bufs,
   read_param_bool(&s->is_metric, "IsMetric");
   read_param_bool(&s->longitudinal_control, "LongitudinalControl");
   read_param_bool(&s->limit_set_speed, "LimitSetSpeed");
+  read_param_str(&s->ipAddr, "IPAddress");
 
   // Set offsets so params don't get read at the same time
   s->longitudinal_control_timeout = UI_FREQ / 3;
