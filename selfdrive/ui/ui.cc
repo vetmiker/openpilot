@@ -155,14 +155,14 @@ static void read_param_float(float* param, const char* param_name) {
   }
 }
 
-static void read_param_str(const char* param, const char* param_name) {
-  char *s;
-  const int result = read_db_value(NULL, param_name, &s, NULL);
-  if (result == 0) {
-    param = s;
-    free(s);
-  }
-}
+#static void read_param_str(const char* param, const char* param_name) {
+#  char *s;
+#  const int result = read_db_value(NULL, param_name, &s, NULL);
+#  if (result == 0) {
+#    param = s;
+#    free(s);
+#  }
+#}
 
 static void read_param_bool_timeout(bool* param, const char* param_name, int* timeout) {
   if (*timeout > 0){
@@ -182,14 +182,14 @@ static void read_param_float_timeout(float* param, const char* param_name, int* 
   }
 }
 
-static void read_param_str_timeout(const char* param, const char* param_name, int* timeout) {
-  if (*timeout > 0){
-    (*timeout)--;
-  } else {
-    read_param_str(param, param_name);
-    *timeout = 2 * UI_FREQ; // 0.5Hz
-  }
-}
+#static void read_param_str_timeout(const char* param, const char* param_name, int* timeout) {
+#  if (*timeout > 0){
+#    (*timeout)--;
+#  } else {
+#    read_param_str(param, param_name);
+#    *timeout = 2 * UI_FREQ; // 0.5Hz
+#  }
+#}
 
 static void ui_init(UIState *s) {
   memset(s, 0, sizeof(UIState));
@@ -209,6 +209,7 @@ static void ui_init(UIState *s) {
   s->gps_sock = SubSocket::create(s->ctx, "gpsLocationExternal");
   s->thermalonline_sock = SubSocket::create(s->ctxarne182, "thermalonline");
   s->arne182_sock = SubSocket::create(s->ctxarne182, "arne182Status");
+  s->ipaddress_sock = SubSocket::create(s->ctxarne182, "ipAddress");
   s->dynamicfollowbutton_sock = PubSocket::create(s->ctxarne182, "dynamicFollowButton");
   s->thermal_sock = SubSocket::create(s->ctx, "thermal");
   s->health_sock = SubSocket::create(s->ctx, "health");
@@ -225,6 +226,7 @@ static void ui_init(UIState *s) {
   assert(s->thermal_sock != NULL);
   assert(s->thermalonline_sock != NULL);
   assert(s->arne182_sock != NULL);
+  assert(s->ipaddress_sock != NULL);
   assert(s->dynamicfollowbutton_sock != NULL);
   assert(s->health_sock != NULL);
   assert(s->ubloxgnss_sock != NULL);
@@ -246,6 +248,7 @@ static void ui_init(UIState *s) {
   s->pollerarne182 = Poller::create({
                               s->thermalonline_sock,
                               s->arne182_sock
+                              s->ipaddress_sock
                              });
 
 #ifdef SHOW_SPEEDLIMIT
@@ -319,13 +322,13 @@ static void ui_init_vision(UIState *s, const VisionStreamBufs back_bufs,
   read_param_bool(&s->is_metric, "IsMetric");
   read_param_bool(&s->longitudinal_control, "LongitudinalControl");
   read_param_bool(&s->limit_set_speed, "LimitSetSpeed");
-  read_param_str(s->ipAddr, "IPAddress");
+  #read_param_str(s->ipAddr, "IPAddress");
 
   // Set offsets so params don't get read at the same time
   s->longitudinal_control_timeout = UI_FREQ / 3;
   s->is_metric_timeout = UI_FREQ / 2;
   s->limit_set_speed_timeout = UI_FREQ;
-  s->ipAddr_timeout = UI_FREQ/5;
+  #s->ipAddr_timeout = UI_FREQ/5;
 }
 
 
@@ -630,7 +633,12 @@ void handle_message_arne182(UIState *s, Message * msg) {
     s->scene.rightblindspot = datad.rightBlindspot;
     s->scene.rightblindspotD1 = datad.rightBlindspotD1;
     s->scene.rightblindspotD2 = datad.rightBlindspotD2;
+  } else if (eventarne182d.which == cereal_EventArne182_ipAddress) {
+    struct cereal_IPAddress datad;
+    cereal_read_IPAddress(&datad, eventarne182d.ipAddress);
+    s->ipAddr = datad.ipAddr;
   }
+  
   capn_free(&ctxarne182);
 }
 
@@ -1190,7 +1198,7 @@ int main(int argc, char* argv[]) {
     read_param_bool_timeout(&s->longitudinal_control, "LongitudinalControl", &s->longitudinal_control_timeout);
     read_param_bool_timeout(&s->limit_set_speed, "LimitSetSpeed", &s->limit_set_speed_timeout);
     read_param_float_timeout(&s->speed_lim_off, "SpeedLimitOffset", &s->limit_set_speed_timeout);
-    read_param_str_timeout(s->ipAddr, "IPAddress", &s->ipAddr_timeout);
+    #read_param_str_timeout(s->ipAddr, "IPAddress", &s->ipAddr_timeout);
 
     pthread_mutex_unlock(&s->lock);
 
