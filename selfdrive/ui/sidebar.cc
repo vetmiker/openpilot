@@ -58,7 +58,7 @@ static void ui_draw_sidebar_ip_addr(UIState *s, bool hasSidebar) {
   const int network_ip_y = 255;
 
   char network_ip_str[20];
-  snprintf(network_ip_str, sizeof(network_ip_str), "%s", s->scene.ipAddr);
+  snprintf(network_ip_str, sizeof(network_ip_str), "%s", s->ipAddr);
   nvgFillColor(s->vg, COLOR_WHITE);
   nvgFontSize(s->vg, 32);
   nvgFontFace(s->vg, "sans-regular");
