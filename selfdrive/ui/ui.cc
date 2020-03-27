@@ -155,6 +155,15 @@ static void read_param_float(float* param, const char* param_name) {
   }
 }
 
+static void read_param_str(char* param, const char* param_name) {
+  char *s;
+  const int result = read_db_value(NULL, param_name, &s, NULL);
+  if (result == 0) {
+    *param = s;
+    free(s);
+  }
+}
+
 static void read_param_bool_timeout(bool* param, const char* param_name, int* timeout) {
   if (*timeout > 0){
     (*timeout)--;
@@ -165,6 +174,15 @@ static void read_param_bool_timeout(bool* param, const char* param_name, int* ti
 }
 
 static void read_param_float_timeout(float* param, const char* param_name, int* timeout) {
+  if (*timeout > 0){
+    (*timeout)--;
+  } else {
+    read_param_float(param, param_name);
+    *timeout = 2 * UI_FREQ; // 0.5Hz
+  }
+}
+
+static void read_param_str_timeout(char* param, const char* param_name, int* timeout) {
   if (*timeout > 0){
     (*timeout)--;
   } else {
@@ -306,6 +324,7 @@ static void ui_init_vision(UIState *s, const VisionStreamBufs back_bufs,
   s->longitudinal_control_timeout = UI_FREQ / 3;
   s->is_metric_timeout = UI_FREQ / 2;
   s->limit_set_speed_timeout = UI_FREQ;
+  s->ipAddr_timeout = UI_FREQ/5;
 }
 
 
@@ -568,7 +587,6 @@ void handle_message(UIState *s, Message * msg) {
     s->scene.freeSpace = datad.freeSpace;
     s->scene.thermalStatus = datad.thermalStatus;
     s->scene.paTemp = datad.pa0;
-    snprintf(s->scene.ipAddr, sizeof(s->scene.ipAddr), "%s", datad.ipAddr.str);
   } else if (eventd.which == cereal_Event_ubloxGnss) {
     struct cereal_UbloxGnss datad;
     cereal_read_UbloxGnss(&datad, eventd.ubloxGnss);
@@ -1171,6 +1189,7 @@ int main(int argc, char* argv[]) {
     read_param_bool_timeout(&s->longitudinal_control, "LongitudinalControl", &s->longitudinal_control_timeout);
     read_param_bool_timeout(&s->limit_set_speed, "LimitSetSpeed", &s->limit_set_speed_timeout);
     read_param_float_timeout(&s->speed_lim_off, "SpeedLimitOffset", &s->limit_set_speed_timeout);
+    read_param_str_timeout(&s->ipAddr, "IPAddress", &s->ipAddr_timeout);
 
     pthread_mutex_unlock(&s->lock);
 
