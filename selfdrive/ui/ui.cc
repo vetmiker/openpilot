@@ -1190,7 +1190,7 @@ int main(int argc, char* argv[]) {
     read_param_bool_timeout(&s->longitudinal_control, "LongitudinalControl", &s->longitudinal_control_timeout);
     read_param_bool_timeout(&s->limit_set_speed, "LimitSetSpeed", &s->limit_set_speed_timeout);
     read_param_float_timeout(&s->speed_lim_off, "SpeedLimitOffset", &s->limit_set_speed_timeout);
-    read_param_str_timeout(&s->ipAddr, "IPAddress", &s->ipAddr_timeout);
+    read_param_str_timeout(s->ipAddr, "IPAddress", &s->ipAddr_timeout);
 
     pthread_mutex_unlock(&s->lock);
 
