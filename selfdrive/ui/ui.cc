@@ -186,7 +186,7 @@ static void read_param_str_timeout(char* param, const char* param_name, int* tim
   if (*timeout > 0){
     (*timeout)--;
   } else {
-    read_param_float(param, param_name);
+    read_param_str(param, param_name);
     *timeout = 2 * UI_FREQ; // 0.5Hz
   }
 }
