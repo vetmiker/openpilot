@@ -71,6 +71,7 @@ keys = {
   "GithubSshKeys": [TxType.PERSISTENT],
   "HasAcceptedTerms": [TxType.PERSISTENT],
   "HasCompletedSetup": [TxType.PERSISTENT],
+  "IPAddress": [TxType.PERSISTENT],
   "IsLdwEnabled": [TxType.PERSISTENT],
   "IsGeofenceEnabled": [TxType.PERSISTENT],
   "IsMetric": [TxType.PERSISTENT],
