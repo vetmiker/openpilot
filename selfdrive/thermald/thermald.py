@@ -17,6 +17,7 @@ from common.filter_simple import FirstOrderFilter
 from selfdrive.version import terms_version, training_version
 from selfdrive.swaglog import cloudlog
 import cereal.messaging as messaging
+import cereal.messaging_arne as messaging_arne
 from selfdrive.loggerd.config import get_available_percent
 from selfdrive.pandad import get_expected_version
 from selfdrive.thermald.power_monitoring import PowerMonitoring, get_battery_capacity, get_battery_status, get_battery_current, get_battery_voltage, get_usb_present
@@ -193,7 +194,7 @@ def thermald_thread():
 
   params = Params()
   pm = PowerMonitoring()
-
+  arne_pm = messaging_arne.PubMaster('ipAddress')
   while 1:
     health = messaging.recv_sock(health_sock, wait=True)
     location = messaging.recv_sock(location_sock)
@@ -242,8 +243,12 @@ def thermald_thread():
       except:
         ip_addr = 'N/A'
       ts_last_ip = ts
-    params.put("IPAddress", ip_addr) 
-    
+      params.put("IPAddress", ip_addr) 
+      msg = messaging_arne.new_message()
+      msg.init('ipAddress ')
+      msg.ipAddress.ipAddr = ip_addr
+      arne_pm.send('ipAddress', msg)
+      
     current_filter.update(msg.thermal.batteryCurrent / 1e6)
 
     # TODO: add car battery voltage check
