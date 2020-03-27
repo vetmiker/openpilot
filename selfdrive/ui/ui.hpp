@@ -116,7 +116,6 @@ typedef struct UIScene {
   float gpsAccuracy;
   float speedlimit;
   float angleSteers;
-  char ipAddr[20];
   float speedlimitaheaddistance;
   bool speedlimitahead_valid;
   bool speedlimit_valid;
@@ -300,7 +299,7 @@ typedef struct UIState {
   int hardware_timeout;
 
   bool controls_seen;
-
+  char ipAddr[20];
   int status;
   bool is_metric;
   bool longitudinal_control;
