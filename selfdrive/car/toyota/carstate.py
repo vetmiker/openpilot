@@ -218,7 +218,7 @@ class CarState(CarStateBase):
 
 
     ret.cruiseState.speed = min(max(7, int(ret.cruiseState.speed) - self.setspeedoffset),v_cruise_pcm_max)
-    if self.arne_sm.updated['latControl'] and self.v_ego > 11 and not travis:
+    if self.arne_sm.updated['latControl'] and ret.vEgo > 11 and not travis:
       angle_later = self.arne_sm['latControl'].anglelater
     else:
       angle_later = 0
