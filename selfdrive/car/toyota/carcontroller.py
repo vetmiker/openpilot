@@ -8,6 +8,7 @@ from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_comma
 from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams, TSS2_CAR
 from opendbc.can.packer import CANPacker
 from common.op_params import opParams
+import cereal.messaging as messaging
 
 op_params = opParams()
 
@@ -106,10 +107,10 @@ class CarController():
       blinker = CS.out.leftBlinker or CS.out.rightBlinker
       ldw_allowed = CS.out.vEgo > 12.5 and not blinker
       CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
-      right_lane_visible = sm['pathPlan'].rProb > 0.5
-      left_lane_visible = sm['pathPlan'].lProb > 0.5
-      self.rightLaneDepart = bool(ldw_allowed and sm['pathPlan'].rPoly[3] > -(0.93 + CAMERA_OFFSET) and right_lane_visible)
-      self.leftLaneDepart = bool(ldw_allowed and sm['pathPlan'].lPoly[3] < (0.93 - CAMERA_OFFSET) and left_lane_visible)
+      right_lane_visible = self.sm['pathPlan'].rProb > 0.5
+      left_lane_visible = self.sm['pathPlan'].lProb > 0.5
+      self.rightLaneDepart = bool(ldw_allowed and self.sm['pathPlan'].rPoly[3] > -(0.93 + CAMERA_OFFSET) and right_lane_visible)
+      self.leftLaneDepart = bool(ldw_allowed and self.sm['pathPlan'].lPoly[3] < (0.93 - CAMERA_OFFSET) and left_lane_visible)
     # *** compute control surfaces ***
 
     # gas and brake
