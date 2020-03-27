@@ -182,7 +182,7 @@ static void read_param_float_timeout(float* param, const char* param_name, int* 
   }
 }
 
-static void read_param_str_timeout(cost char* param, const char* param_name, int* timeout) {
+static void read_param_str_timeout(const char* param, const char* param_name, int* timeout) {
   if (*timeout > 0){
     (*timeout)--;
   } else {
