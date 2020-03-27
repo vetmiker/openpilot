@@ -294,6 +294,7 @@ typedef struct UIState {
   int alert_sound_timeout;
   int speed_lim_off_timeout;
   int is_metric_timeout;
+  int ipAddr_timeout;
   int longitudinal_control_timeout;
   int limit_set_speed_timeout;
   int hardware_timeout;
