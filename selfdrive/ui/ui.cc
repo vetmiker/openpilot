@@ -636,7 +636,8 @@ void handle_message_arne182(UIState *s, Message * msg) {
   } else if (eventarne182d.which == cereal_EventArne182_ipAddress) {
     struct cereal_IPAddress datad;
     cereal_read_IPAddress(&datad, eventarne182d.ipAddress);
-    s->ipAddr = datad.ipAddr;
+    snprintf(s->ipAddr, sizeof(s->ipAddr), "%s", datad.ipAddr.str);
+    //s->ipAddr = datad.ipAddr;
   }
 
   capn_free(&ctxarne182);
