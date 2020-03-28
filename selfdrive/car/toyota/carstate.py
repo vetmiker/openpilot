@@ -159,7 +159,7 @@ class CarState(CarStateBase):
     msg.arne182Status.leftBlindspotD2 = self.leftblindspotD2
     msg.arne182Status.gasbuttonstatus = self.gasbuttonstatus
     if not travis:
-      self.arne_sm.update()
+      self.arne_sm.update(0)
       self.arne_pm.send('arne182Status', msg)
     self.left_blinker_on = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 1
     self.right_blinker_on = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 2
