@@ -73,8 +73,12 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 - Control 3 gas profiles with sport eco and normal buttons on car ( only for toyota).
 - [Dynamic distance profiles](https://github.com/ShaneSmiskol/openpilot/tree/stock_additions-devel#dynamic-follow-3-profiles) from Shane (In other word three different dynamic profiles: `traffic`, `relaxed`, `roadtrip`). Profile can be adjusted from either `python /data/openpilot/op_edit.py` or use live tuner to change the profile live (can take up to 4 sec to for new profile to be adjusted) `python /data/openpilot/op_tune.py`.
 - Dynamic Follow Button: Now you can change the Dynamic Follow Distance just by tapping the blue button on the bottom right.
-- ALC w/ BSM : (Automatic Lane Change with Blind spot monitoring) you can now change lane automataclly. It will wait 1 sec before applying ALC. If the BSM detacts objects it will stop the lane change and will take you back in your original lane. Also, it will notify the user on the eon.
+- [Dynamic Gas:](https://github.com/ShaneSmiskol/openpilot/tree/stock_additions-devel#dynamic-gas)
+This aims to provide a smoother driving experience in stop and go traffic (under 20 mph) by modifying the maximum gas that can be applied based on your current velocity and the relative velocity of the lead car. It'll also of course increase the maximum gas when the lead is accelerating to help you get up to speed quicker than stock. And smoother; this eliminates the jerking you get from stock openpilot with comma pedal. It tries to coast if the lead is only moving slowly, it doesn't use maximum gas as soon as the lead inches forward :). When you are above 20 mph, relative velocity and the following distance is taken into consideration.
+- ALC w/ BSM : (Automatic Lane Change with Blind spot monitoring) you can now change lane automataclly. It will wait 1 sec before applying ALC. If the BSM detacts objects it will stop the lane change and will take you back in your original lane. Also, it will notify the user on the eon
 - Added ability to turn on and off RSA at certain speed. `python /data/openpilot/op_edit.py`
+- Easily view the EON's IP Address.Just look at the sidebar right under wifi singal strength's. 
+- Battery has percentage instead of the battery icon. 
 
 # Licensing
 
