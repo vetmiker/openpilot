@@ -80,12 +80,12 @@ def data_sample(CI, CC, sm, can_sock, state, mismatch_counter, can_error_counter
 
   sm.update(0)
   arne_sm.update(0)
-  
+
   events = list(CS.events)
   events += list(sm['dMonitoringState'].events)
-  
+
   events_arne182 = list(CS_arne182.events)
-  
+
   add_lane_change_event(events, sm['pathPlan'])
   enabled = isEnabled(state)
 
@@ -397,7 +397,7 @@ def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cr
       else:
         extra_text_2 = str(int(round(Filter.MIN_SPEED * CV.MS_TO_MPH))) + " mph"
     AM.add(frame, str(e) + "Permanent", enabled, extra_text_1=extra_text_1, extra_text_2=extra_text_2)
-    
+
   return actuators, v_cruise_kph, v_acc_sol, a_acc_sol, lac_log, last_blinker_frame
 
 
@@ -490,7 +490,7 @@ def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk
     "vPid": float(LoC.v_pid),
     "vCruise": float(v_cruise_kph),
     "upAccelCmd": float(LoC.pid.p),
-    "uiAccelCmd": float(LoC.pid.i),
+    "uiAccelCmd": float(LoC.pid.id),
     "ufAccelCmd": float(LoC.pid.f),
     "angleSteersDes": float(LaC.angle_steers_des),
     "vTargetLead": float(v_acc),
@@ -569,7 +569,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
 
   if arne_sm is None:
     arne_sm = messaging_arne.SubMaster(['arne182Status', 'dynamicFollowButton'])
-    
+
   if can_sock is None:
     can_timeout = None if os.environ.get('NO_CAN_TIMEOUT', False) else 100
     can_sock = messaging.sub_sock('can', timeout=can_timeout)
