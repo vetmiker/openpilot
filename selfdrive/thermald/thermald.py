@@ -245,7 +245,7 @@ def thermald_thread():
       ts_last_ip = ts
       params.put("IPAddress", ip_addr) 
       msg2 = messaging_arne.new_message()
-      msg2.init('ipAddress ')
+      msg2.init('ipAddress')
       msg2.ipAddress.ipAddr = ip_addr
       arne_pm.send('ipAddress', msg2)
       
