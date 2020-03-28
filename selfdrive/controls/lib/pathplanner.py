@@ -51,7 +51,7 @@ class PathPlanner():
     self.LP = LanePlanner()
     self.arne_sm = messaging_arne.SubMaster(['arne182Status'])
     if not travis:
-      self.arne_pm = messaging_arne.PubMaster('latControl')
+      self.arne_pm = messaging_arne.PubMaster(['latControl'])
     self.last_cloudlog_t = 0
     self.steer_rate_cost = CP.steerRateCost
 
