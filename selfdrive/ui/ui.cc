@@ -155,15 +155,6 @@ static void read_param_float(float* param, const char* param_name) {
   }
 }
 
-//static void read_param_str(const char* param, const char* param_name) {
-//  char *s;
-//  const int result = read_db_value(NULL, param_name, &s, NULL);
-//  if (result == 0) {
-//    param = s;
-//    free(s);
-//  }
-//}
-
 static void read_param_bool_timeout(bool* param, const char* param_name, int* timeout) {
   if (*timeout > 0){
     (*timeout)--;
@@ -181,15 +172,6 @@ static void read_param_float_timeout(float* param, const char* param_name, int* 
     *timeout = 2 * UI_FREQ; // 0.5Hz
   }
 }
-
-//static void read_param_str_timeout(const char* param, const char* param_name, int* timeout) {
-//  if (*timeout > 0){
-//    (*timeout)--;
-//  } else {
-//    read_param_str(param, param_name);
-//    *timeout = 2 * UI_FREQ; // 0.5Hz
-//  }
-//}
 
 static void ui_init(UIState *s) {
   memset(s, 0, sizeof(UIState));
@@ -636,8 +618,7 @@ void handle_message_arne182(UIState *s, Message * msg) {
   } else if (eventarne182d.which == cereal_EventArne182_ipAddress) {
     struct cereal_IPAddress datad;
     cereal_read_IPAddress(&datad, eventarne182d.ipAddress);
-    snprintf(s->ipAddr, sizeof(s->ipAddr), "%s", datad.ipAddr.str);
-    //s->ipAddr = datad.ipAddr;
+    snprintf(s->scene.ipAddr, sizeof(s->scene.ipAddr), "%s", datad.ipAddr.str);
   }
 
   capn_free(&ctxarne182);
