@@ -112,11 +112,10 @@ typedef struct UIScene {
   uint64_t v_cruise_update_ts;
   float v_ego;
   bool decel_for_model;
-
+  char ipAddr[20];
   float gpsAccuracy;
   float speedlimit;
   float angleSteers;
-  char ipAddr[20];
   float speedlimitaheaddistance;
   bool speedlimitahead_valid;
   bool speedlimit_valid;
@@ -246,6 +245,7 @@ typedef struct UIState {
   SubSocket *uilayout_sock;
   SubSocket *gps_sock;
   SubSocket *arne182_sock;
+  SubSocket *ipaddress_sock;
   PubSocket *dynamicfollowbutton_sock;
   Poller * poller;
   Poller * pollerarne182;
@@ -299,7 +299,6 @@ typedef struct UIState {
   int hardware_timeout;
 
   bool controls_seen;
-
   int status;
   bool is_metric;
   bool longitudinal_control;

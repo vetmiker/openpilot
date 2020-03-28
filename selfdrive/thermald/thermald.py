@@ -1,9 +1,11 @@
 #!/usr/bin/env python3.7
 import os
+import re
 import json
 import copy
-import datetime
 import psutil
+import datetime
+import subprocess
 from smbus2 import SMBus
 from cereal import log
 from common.android import ANDROID, get_network_type, get_network_strength
@@ -15,6 +17,7 @@ from common.filter_simple import FirstOrderFilter
 from selfdrive.version import terms_version, training_version
 from selfdrive.swaglog import cloudlog
 import cereal.messaging as messaging
+import cereal.messaging_arne as messaging_arne
 from selfdrive.loggerd.config import get_available_percent
 from selfdrive.pandad import get_expected_version
 from selfdrive.thermald.power_monitoring import PowerMonitoring, get_battery_capacity, get_battery_status, get_battery_current, get_battery_voltage, get_usb_present
@@ -178,7 +181,10 @@ def thermald_thread():
   current_connectivity_alert = None
   time_valid_prev = True
   should_start_prev = False
-
+  
+  ts_last_ip = None
+  ip_addr = '255.255.255.255'
+  
   is_uno = (read_tz(29, clip=False) < -1000)
   if is_uno or not ANDROID:
     handle_fan = handle_fan_uno
@@ -188,7 +194,7 @@ def thermald_thread():
 
   params = Params()
   pm = PowerMonitoring()
-
+  arne_pm = messaging_arne.PubMaster(['ipAddress'])
   while 1:
     health = messaging.recv_sock(health_sock, wait=True)
     location = messaging.recv_sock(location_sock)
@@ -226,7 +232,22 @@ def thermald_thread():
     if is_uno:
       msg.thermal.batteryPercent = 100
       msg.thermal.batteryStatus = "Charging"
-
+      
+    # dragonpilot ip Mod
+    # update ip every 10 seconds
+    ts = sec_since_boot()
+    if ts_last_ip is None or ts - ts_last_ip >= 10.:
+      try:
+        result = subprocess.check_output(["ifconfig", "wlan0"], encoding='utf8')  # pylint: disable=unexpected-keyword-arg
+        ip_addr = re.findall(r"inet addr:((\d+\.){3}\d+)", result)[0][0]
+      except:
+        ip_addr = 'N/A'
+      ts_last_ip = ts
+      msg2 = messaging_arne.new_message()
+      msg2.init('ipAddress')
+      msg2.ipAddress.ipAddr = ip_addr
+      arne_pm.send('ipAddress', msg2)
+      
     current_filter.update(msg.thermal.batteryCurrent / 1e6)
 
     # TODO: add car battery voltage check
