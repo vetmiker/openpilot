@@ -112,7 +112,7 @@ typedef struct UIScene {
   uint64_t v_cruise_update_ts;
   float v_ego;
   bool decel_for_model;
-
+  char ipAddr[20];
   float gpsAccuracy;
   float speedlimit;
   float angleSteers;
@@ -294,13 +294,11 @@ typedef struct UIState {
   int alert_sound_timeout;
   int speed_lim_off_timeout;
   int is_metric_timeout;
-  int ipAddr_timeout;
   int longitudinal_control_timeout;
   int limit_set_speed_timeout;
   int hardware_timeout;
 
   bool controls_seen;
-  char ipAddr[20];
   int status;
   bool is_metric;
   bool longitudinal_control;
