@@ -194,7 +194,7 @@ def thermald_thread():
 
   params = Params()
   pm = PowerMonitoring()
-  arne_pm = messaging_arne.PubMaster('ipAddress')
+  arne_pm = messaging_arne.PubMaster(['ipAddress'])
   while 1:
     health = messaging.recv_sock(health_sock, wait=True)
     location = messaging.recv_sock(location_sock)
