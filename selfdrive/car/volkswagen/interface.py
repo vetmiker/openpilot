@@ -87,11 +87,10 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.85
       tire_stiffness_factor = 0.8
       
-    ret.centerToFront = ret.wheelbase * 0.45
     # Not sure if I should simply exit or raise an error
     else:
       raise ValueError("Unsupported car %s" % candidate)
-
+    ret.centerToFront = ret.wheelbase * 0.45
     # TODO: get actual value, for now starting with reasonable value for
     # civic and scaling by mass and wheelbase
     ret.rotationalInertia = scale_rot_inertia(ret.mass, ret.wheelbase)
