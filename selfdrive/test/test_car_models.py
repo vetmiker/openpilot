@@ -331,14 +331,22 @@ routes = {
     'enableCamera': True,
     'enableDsu': False,
   },
-  "76b83eb0245de90e|2019-10-20--15-42-29": {
-    'carFingerprint': VOLKSWAGEN.GOLF,
-    'enableCamera': True,
-  },
   "791340bc01ed993d|2019-03-10--16-28-08": {
     'carFingerprint': SUBARU.IMPREZA,
     'enableCamera': True,
   },
+  "76b83eb0245de90e|2019-10-20--15-42-29": {
+    'carFingerprint': VOLKSWAGEN.GOLF,
+    'enableCamera': True,
+  },
+  #"tbd": {
+  #  'carFingerprint': VOLKSWAGEN.SKODA_SUPERB_B8,
+  #  'enableCamera': True,
+  #},
+  #"a589dcc642fdb10a|2020-03-28--06-56-26": {
+  #  'carFingerprint': VOLKSWAGEN.VW_TOURAN,
+  #  'enableCamera': True,
+  #},
   #"fbbfa6af821552b9|2020-03-03--08-09-43": {
   #  'carFingerprint': NISSAN.XTRAIL,
   #  'enableCamera': True,
@@ -381,6 +389,8 @@ non_tested_cars = [
   TOYOTA.CHRH,
   TOYOTA.LEXUS_CTH,
   TOYOTA.HIGHLANDERH,
+  VOLKSWAGEN.SKODA_SUPERB_B8,
+  VOLKSWAGEN.VW_TOURAN,
   ]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
 
 
