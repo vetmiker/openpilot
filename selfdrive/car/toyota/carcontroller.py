@@ -160,7 +160,7 @@ class CarController():
       #print (apply_steer)
       apply_steer_req = 1
       
-    if not enabled and self.leftLaneDepart and CS.v_ego > 12.5 and not CS.out.leftBlinker:
+    if not enabled and self.leftLaneDepart and CS.out.vEgo > 12.5 and not CS.out.leftBlinker:
       apply_steer = self.last_steer - 3
       apply_steer = max(apply_steer , -800)
       #print ("left")
