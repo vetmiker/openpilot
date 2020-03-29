@@ -339,10 +339,10 @@ routes = {
     'carFingerprint': VOLKSWAGEN.GOLF,
     'enableCamera': True,
   },
-  "972bfa9500dd3189|2020-02-24--12-34-56": {
-    'carFingerprint': VOLKSWAGEN.SKODA_SUPERB_B8,
-    'enableCamera': True,
-  },
+  #"tbd": {
+  #  'carFingerprint': VOLKSWAGEN.SKODA_SUPERB_B8,
+  #  'enableCamera': True,
+  #},
   "a589dcc642fdb10a|2020-03-28--06-56-26": {
     'carFingerprint': VOLKSWAGEN.VW_TOURAN,
     'enableCamera': True,
@@ -389,6 +389,7 @@ non_tested_cars = [
   TOYOTA.CHRH,
   TOYOTA.LEXUS_CTH,
   TOYOTA.HIGHLANDERH,
+  VOLKSWAGEN.SKODA_SUPERB_B8,
   ]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
 
 
