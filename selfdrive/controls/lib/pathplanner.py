@@ -10,7 +10,7 @@ import cereal.messaging as messaging
 import cereal.messaging_arne as messaging_arne
 from cereal import log
 from common.op_params import opParams
-#from common.travis_checker import travis
+from common.travis_checker import travis
 
 LaneChangeState = log.PathPlan.LaneChangeState
 LaneChangeDirection = log.PathPlan.LaneChangeDirection
@@ -50,6 +50,8 @@ class PathPlanner():
   def __init__(self, CP):
     self.LP = LanePlanner()
     self.arne_sm = messaging_arne.SubMaster(['arne182Status'])
+    if not travis:
+      self.arne_pm = messaging_arne.PubMaster(['latControl'])
     self.last_cloudlog_t = 0
     self.steer_rate_cost = CP.steerRateCost
 
@@ -264,3 +266,9 @@ class PathPlanner():
     dat.liveMpc.delta = list(self.mpc_solution[0].delta)
     dat.liveMpc.cost = self.mpc_solution[0].cost
     pm.send('liveMpc', dat)
+    
+    msg = messaging_arne.new_message()
+    msg.init('latControl')
+    msg.latControl.anglelater = math.degrees(list(self.mpc_solution[0].delta)[-1])
+    if not travis:
+      self.arne_pm.send('latControl', msg)
