@@ -1,5 +1,5 @@
 from cereal import car, arne182
-from selfdrive.config import Conversions as CV
+#from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import create_event, EventTypes as ET
 from selfdrive.car.volkswagen.values import CAR, BUTTON_STATES
 from common.params import Params
