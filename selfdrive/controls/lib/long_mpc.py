@@ -30,7 +30,7 @@ class LongitudinalMpc():
     self.new_lead = False
     self.TR_Mod = 0
     self.last_cloudlog_t = 0.0
-    
+
     if not travis and mpc_id == 1:
       self.pm = messaging_arne.PubMaster(['smiskolData'])
     else:
@@ -68,7 +68,7 @@ class LongitudinalMpc():
   def set_cur_state(self, v, a):
     self.cur_state[0].v_ego = v
     self.cur_state[0].a_ego = a
-    
+
   def get_TR(self, CS, lead):
     if not lead.status or travis:
       TR = 1.8
@@ -91,7 +91,7 @@ class LongitudinalMpc():
 
   def change_cost(self, TR, vEgo):
     TRs = [0.9, 1.8, 2.7]
-    costs = [1.0, 0.15, 0.05]
+    costs = [1.0, 0.11, 0.05]
     cost = interp(TR, TRs, costs)
     if self.last_cost != cost:
       self.libmpc.change_tr(MPC_COST_LONG.TTC, cost, MPC_COST_LONG.ACCELERATION, MPC_COST_LONG.JERK)
@@ -108,11 +108,11 @@ class LongitudinalMpc():
     else:  # default to relaxed/stock
       y_dist = [1.8, 1.8]
     TR = interp(CS.vEgo, x_vel, y_dist)
-    
+
     # Dynamic follow modifications (the secret sauce)
     x = [-5.0, 0.0, 5.0]  # relative velocity values
     y = [0.2, 0.0, -0.2]  # modification values
-    
+
     self.TR_Mod = interp(lead.vRel, x, y)
     TR += self.TR_Mod
 

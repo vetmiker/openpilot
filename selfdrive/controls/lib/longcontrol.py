@@ -62,7 +62,7 @@ class LongControl():
     self.long_control_state = LongCtrlState.off  # initialized to off
     kdBP = [0., 33, 55., 78]
     kdBP = [i * CV.MPH_TO_MS for i in kdBP]
-    kdV = [0.05, 0.45, 0.85, 1.3]
+    kdV = [0.05, 0.4, 0.8, 1.2]
     self.pid = PIDController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),
                              (CP.longitudinalTuning.kiBP, CP.longitudinalTuning.kiV),
                              (kdBP, kdV),
@@ -85,7 +85,7 @@ class LongControl():
       if gas_button_status == 0:
         dynamic = True
         x = [0.0, 1.4082, 2.80311, 4.22661, 5.38271, 6.16561, 7.24781, 8.28308, 10.24465, 12.96402, 15.42303, 18.11903, 20.11703, 24.46614, 29.05805, 32.71015, 35.76326]
-        y = [0.2, 0.20443, 0.21592, 0.23334, 0.25734, 0.27916, 0.3229, 0.34784, 0.36765, 0.38, 0.396, 0.409, 0.425, 0.478, 0.55, 0.621, 0.7]
+        y = [0.234, 0.237, 0.246, 0.26, 0.279, 0.297, 0.332, 0.354, 0.368, 0.377, 0.389, 0.399, 0.411, 0.45, 0.504, 0.558, 0.617]
       elif gas_button_status == 1:
         y = [0.3, 0.9, 0.9]
       elif gas_button_status == 2:
