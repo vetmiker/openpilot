@@ -45,7 +45,6 @@ class CarInterface(CarInterfaceBase):
     # ret.lateralTuning.pid.kpV = [0.15, 0.25, 0.60]
     # ret.lateralTuning.pid.kiV = [0.05, 0.05, 0.05]
 
-    ret.centerToFront = ret.wheelbase * 0.45
     ret.steerRatio = 15.6
     ret.steerRatioRear = 0.
 
@@ -87,7 +86,8 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 1700 + STD_CARGO_KG
       ret.wheelbase = 2.85
       tire_stiffness_factor = 0.8
-
+      
+    ret.centerToFront = ret.wheelbase * 0.45
     # Not sure if I should simply exit or raise an error
     else:
       raise ValueError("Unsupported car %s" % candidate)
