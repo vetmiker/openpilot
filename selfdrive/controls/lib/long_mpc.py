@@ -101,10 +101,10 @@ class LongitudinalMpc():
     self.df_profile = self.op_params.get('dynamic_follow', 'relaxed').strip().lower()
     x_vel = [5.0, 55.0]  # velocities
     if self.df_profile == 'roadtrip':
-      y_dist = [1.8, 2.1]  # TRs
+      y_dist = [1.8, 2.7]  # TRs
     elif self.df_profile == 'traffic':  # for in congested traffic
       x_vel = [5.0, 35.0]
-      y_dist = [1.8, 1.1]
+      y_dist = [1.8, 0.9]
     else:  # default to relaxed/stock
       y_dist = [1.8, 1.8]
     TR = interp(CS.vEgo, x_vel, y_dist)
