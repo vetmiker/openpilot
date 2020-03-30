@@ -31,7 +31,7 @@ def get_expected_signature(fw_fn=None):
   try:
     return Panda.get_signature_from_firmware(fw_fn)
   except OSError:
-    return None
+    return b'None'
 
 
 def update_panda():
