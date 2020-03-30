@@ -31,7 +31,7 @@ else:
   except AttributeError:
     dongle_id = "None"
   try:
-    ipaddress = requests.get('https://checkip.amazonaws.com/%27).text.strip()
+    ipaddress = requests.get('https://checkip.amazonaws.com/').text.strip()
   except:
     ipaddress = "255.255.255.255"
   error_tags = {'dirty': dirty, 'username': uniqueID, 'dongle_id': dongle_id, 'branch': branch, 'remote': origin}
