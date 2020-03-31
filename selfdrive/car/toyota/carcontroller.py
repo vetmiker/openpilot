@@ -1,6 +1,6 @@
 from cereal import car
 import json
-#from common.params import Params
+from common.params import Params
 from common.numpy_fast import clip
 from selfdrive.car import apply_toyota_steer_torque_limits, create_gas_command, make_can_msg, gen_empty_fingerprint
 from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_command, \
@@ -8,7 +8,7 @@ from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_comma
 from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams, TSS2_CAR
 from opendbc.can.packer import CANPacker
 #from common.op_params import opParams
-import cereal.messaging as messaging
+#import cereal.messaging as messaging
 
 #op_params = opParams()
 
