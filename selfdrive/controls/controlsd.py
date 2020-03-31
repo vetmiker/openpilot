@@ -30,7 +30,7 @@ from selfdrive.locationd.calibration_helpers import Calibration, Filter
 from common.op_params import opParams
 from selfdrive.controls.df_alert_manager import DfAlertManager
 
-LANE_DEPARTURE_THRESHOLD = 0.1
+#LANE_DEPARTURE_THRESHOLD = 0.1
 
 ThermalStatus = log.ThermalData.ThermalStatus
 State = log.ControlsState.OpenpilotState
@@ -438,8 +438,8 @@ def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk
 
   md = sm['model']
   if len(md.meta.desirePrediction):
-    l_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeLeft - 1]
-    r_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeRight - 1]
+    #l_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeLeft - 1]
+    #r_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeRight - 1]
 
     CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
 
