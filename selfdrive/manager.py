@@ -394,6 +394,7 @@ def manager_init(should_register=True):
 def manager_thread():
   # now loop
   thermal_sock = messaging.sub_sock('thermal')
+  gps_sock = messaging.sub_sock('gpsLocation', conflate=True)
 
   if os.getenv("GET_CPU_USAGE"):
     proc_sock = messaging.sub_sock('procLog', conflate=True)
@@ -432,8 +433,13 @@ def manager_thread():
   first_proc = None
 
   while 1:
+    gps = messaging.recv_one_or_none(gps_sock)
     msg = messaging.recv_sock(thermal_sock, wait=True)
-
+    if gps:
+      if 47.3024876979 < gps.gpsLocation.latitude < 54.983104153 and 5.98865807458 < gps.gpsLocation.longitude < 15.0169958839:
+        logger_dead = True
+      else:
+        logger_dead = False
     # heavyweight batch processes are gated on favorable thermal conditions
     if msg.thermal.thermalStatus >= ThermalStatus.yellow:
       for p in green_temp_processes:

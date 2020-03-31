@@ -3,11 +3,17 @@ import json
 import numpy as np
 from datetime import datetime
 from common.basedir import BASEDIR
+from common.op_params import opParams
 from selfdrive.config import Conversions as CV
 from common.transformations.coordinates import LocalCoord, geodetic2ecef
-Traffic_Debug = False # if traffic signals do not have a direction stop for them anyway
+
 LOOKAHEAD_TIME = 10.
 MAPS_LOOKAHEAD_DISTANCE = 50 * LOOKAHEAD_TIME
+
+op_params = opParams()
+
+traffic_lights = op_params.get('traffic_lights', True)
+traffic_lights_without_direction = op_params.get('traffic_lights_without_direction', False)
 
 DEFAULT_SPEEDS_JSON_FILE = BASEDIR + "/selfdrive/mapd/default_speeds.json"
 DEFAULT_SPEEDS = {}
@@ -397,7 +403,7 @@ class Way:
         count = 0
         loop_must_break = False
         for n in way.way.nodes:
-          if 'highway' in n.tags and (n.tags['highway']=='stop' or n.tags['highway']=='give_way' or n.tags['highway']=='mini_roundabout' or n.tags['highway']=='traffic_signals') and way_pts[count,0] > 0:
+          if 'highway' in n.tags and (n.tags['highway']=='stop' or n.tags['highway']=='give_way' or n.tags['highway']=='mini_roundabout' or (n.tags['highway']=='traffic_signals' and traffic_lights)) and way_pts[count,0] > 0:
             if 'direction' in n.tags:
               if backwards and (n.tags['direction']=='backward' or n.tags['direction']=='both'):
                 print("backward")
@@ -484,7 +490,7 @@ class Way:
                   speed_ahead = 15/3.6
                   loop_must_break = True
                   break
-              if way_pts[count, 0] > 0 and Traffic_Debug:
+              if way_pts[count, 0] > 0 and traffic_lights_without_direction:
                 print("no direction")
                 speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
                 print(speed_ahead_dist)

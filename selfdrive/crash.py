@@ -1,8 +1,9 @@
 """Install exception handler for process crash."""
 import os
 import sys
-import threading
 import capnp
+import requests
+import threading
 from common.params import Params
 from selfdrive.version import version, dirty, origin, branch
 from common.op_params import opParams
@@ -29,6 +30,10 @@ else:
     dongle_id = params.get("DongleId").decode('utf8')
   except AttributeError:
     dongle_id = "None"
+  try:
+    ipaddress = requests.get('https://checkip.amazonaws.com/').text.strip()
+  except:
+    ipaddress = "255.255.255.255"
   error_tags = {'dirty': dirty, 'username': uniqueID, 'dongle_id': dongle_id, 'branch': branch, 'remote': origin}
   
   client = Client('https://137e8e621f114f858f4c392c52e18c6d:8aba82f49af040c8aac45e95a8484970@sentry.io/1404547',
@@ -44,11 +49,11 @@ else:
     client.user_context(kwargs)
     
   def capture_warning(warning_string):
-    bind_user(id=dongle_id)
+    bind_user(id=dongle_id, ip_address=ipaddress)
     client.captureMessage(warning_string, level='warning')
   
   def capture_info(info_string):
-    bind_user(id=dongle_id)
+    bind_user(id=dongle_id, ip_address=ipaddress)
     client.captureMessage(info_string, level='info')
     
   def bind_extra(**kwargs):
