@@ -16,8 +16,8 @@ VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 # Accel limits
 ACCEL_HYST_GAP = 0.02  # don't change accel command for small oscilalitons within this value
-ACCEL_MAX = 3.5  # 1.5 m/s2
-ACCEL_MIN = -3.5 # 3   m/s2
+ACCEL_MAX = 3.5  # 3.5 m/s2
+ACCEL_MIN = -3.5 # 3.5 m/s2
 ACCEL_SCALE = max(ACCEL_MAX, -ACCEL_MIN)
 
 # Blindspot codes
@@ -162,30 +162,30 @@ class CarController():
       self.last_fault_frame = frame
 
     # Cut steering for 1s after fault
-    if (frame - self.last_fault_frame < 100) or abs(CS.out.steeringRate) > 100 or abs(CS.out.steeringAngle) > 100:
+    if (frame - self.last_fault_frame < 100) or abs(CS.out.steeringRate) > 100: # or abs(CS.out.steeringAngle) > 100:
       new_steer = 0
       apply_steer_req = 0
     else:
       apply_steer_req = 1
       
     if not enabled and right_lane_depart and CS.out.vEgo > 12.5 and not CS.out.rightBlinker:
-      apply_steer = self.last_steer + 3
-      apply_steer = min(apply_steer , 800)
+      new_steer = self.last_steer + 3
+      new_steer = min(new_steer , 800)
       print ("right")
-      print (apply_steer)
+      print (new_steer)
       apply_steer_req = 1
       
     if not enabled and left_lane_depart and CS.out.vEgo > 12.5 and not CS.out.leftBlinker:
-      apply_steer = self.last_steer - 3
-      apply_steer = max(apply_steer , -800)
+      new_steer = self.last_steer - 3
+      new_steer = max(new_steer , -800)
       print ("left")
-      print (apply_steer)
+      print (new_steer)
       apply_steer_req = 1
       
     apply_steer = apply_toyota_steer_torque_limits(new_steer, self.last_steer, CS.out.steeringTorqueEps, SteerLimitParams)
     self.steer_rate_limited = new_steer != apply_steer
 
-    if not enabled:
+    if not enabled and abs(apply_steer) > 800 and not (right_lane_depart or left_lane_depart):
       apply_steer = 0
       apply_steer_req = 0
 

@@ -301,7 +301,7 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
 
 def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cruise_kph, v_cruise_kph_last,
 
-                  AM, rk, LaC, LoC, read_only, is_metric, cal_perc, last_blinker_frame_right, last_blinker_frame_left, arne_sm, events_arne182, radarstate):
+                  AM, rk, LaC, LoC, read_only, is_metric, cal_perc, last_blinker_frame, arne_sm, events_arne182, radarstate):
 
   """Given the state, this function returns an actuators packet"""
 
@@ -310,10 +310,8 @@ def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cr
   enabled = isEnabled(state)
   active = isActive(state)
 
-  if CS.leftBlinker:
-    last_blinker_frame_left = frame
-  if CS.rightBlinker:
-    last_blinker_frame_right = frame
+  if CS.leftBlinker or CS.rightBlinker:
+    last_blinker_frame = frame
 
   if plan.fcw:
     # send FCW alert if triggered by planner
@@ -400,12 +398,12 @@ def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cr
         extra_text_2 = str(int(round(Filter.MIN_SPEED * CV.MS_TO_MPH))) + " mph"
     AM.add(frame, str(e) + "Permanent", enabled, extra_text_1=extra_text_1, extra_text_2=extra_text_2)
 
-  return actuators, v_cruise_kph, v_acc_sol, a_acc_sol, lac_log, last_blinker_frame_right, last_blinker_frame_left
+  return actuators, v_cruise_kph, v_acc_sol, a_acc_sol, lac_log, last_blinker_frame
 
 
 def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk, AM,
               LaC, LoC, read_only, start_time, v_acc, a_acc, lac_log, events_prev,
-              last_blinker_frame_right, last_blinker_frame_left, is_ldw_enabled, can_error_counter, op_params):
+              last_blinker_frame, is_ldw_enabled, can_error_counter, op_params):
 
   """Send actuators and hud commands to the car, send controlsstate and MPC logging"""
 
@@ -431,10 +429,9 @@ def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk
   CC.hudControl.rightLaneVisible = bool(right_lane_visible)
   CC.hudControl.leftLaneVisible = bool(left_lane_visible)
 
-  recent_blinker_right = (sm.frame - last_blinker_frame_right) * DT_CTRL < 5.0  # 5s blinker cooldown
-  recent_blinker_left = (sm.frame - last_blinker_frame_left) * DT_CTRL < 5.0  # 5s blinker cooldown
+  recent_blinker = (sm.frame - last_blinker_frame) * DT_CTRL < 5.0  # 5s blinker cooldown
   calibrated = sm['liveCalibration'].calStatus == Calibration.CALIBRATED
-  ldw_allowed = CS.vEgo > 5.0 and is_ldw_enabled and calibrated
+  ldw_allowed = CS.vEgo > 12.5 and is_ldw_enabled and calibrated
 
   md = sm['model']
   if len(md.meta.desirePrediction):
@@ -443,8 +440,8 @@ def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk
 
     CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
 
-    l_lane_close = left_lane_visible and (sm['pathPlan'].lPoly[3] < (0.93 - CAMERA_OFFSET)) and not recent_blinker_left
-    r_lane_close = right_lane_visible and (sm['pathPlan'].rPoly[3] > -(0.93 + CAMERA_OFFSET)) and not recent_blinker_right
+    l_lane_close = left_lane_visible and (sm['pathPlan'].lPoly[3] < (0.9 - CAMERA_OFFSET)) and not recent_blinker
+    r_lane_close = right_lane_visible and (sm['pathPlan'].rPoly[3] > -(0.85 + CAMERA_OFFSET)) and not recent_blinker
 
     if ldw_allowed:
       CC.hudControl.leftLaneDepart = bool(l_lane_close) #bool(l_lane_change_prob > LANE_DEPARTURE_THRESHOLD and l_lane_close)
@@ -621,8 +618,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
   v_cruise_kph_last = 0
   mismatch_counter = 0
   can_error_counter = 0
-  last_blinker_frame_right = 0
-  last_blinker_frame_left = 0
+  last_blinker_frame = 0
   events_prev = []
 
   sm['liveCalibration'].calStatus = Calibration.INVALID
@@ -693,16 +689,16 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
       prof.checkpoint("State transition")
 
     # Compute actuators (runs PID loops and lateral MPC)
-    actuators, v_cruise_kph, v_acc, a_acc, lac_log, last_blinker_frame_right, last_blinker_frame_left = \
+    actuators, v_cruise_kph, v_acc, a_acc, lac_log, last_blinker_frame = \
       state_control(sm.frame, sm.rcv_frame, sm['plan'], sm['pathPlan'], CS, CP, state, events, v_cruise_kph, v_cruise_kph_last, AM, rk,
-                    LaC, LoC, read_only, is_metric, cal_perc, last_blinker_frame_right, last_blinker_frame_left, arne_sm, events_arne182, sm['radarState'])
+                    LaC, LoC, read_only, is_metric, cal_perc, last_blinker_frame, arne_sm, events_arne182, sm['radarState'])
 
     prof.checkpoint("State Control")
 
     # Publish data
     CC, events_prev = data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk, AM, LaC,
-                                LoC, read_only, start_time, v_acc, a_acc, lac_log, events_prev, last_blinker_frame_right,
-                                last_blinker_frame_left, is_ldw_enabled, can_error_counter, op_params)
+                                LoC, read_only, start_time, v_acc, a_acc, lac_log, events_prev, last_blinker_frame,
+                                is_ldw_enabled, can_error_counter, op_params)
     prof.checkpoint("Sent")
 
     rk.monitor_time()
