@@ -127,7 +127,7 @@ ALERTS = [
       "TRAFFICD IS DEAD",
       "trafficd not responding!",
       AlertStatus.critical, AlertSize.mid,
-      Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.chimeWarningRepeat, 2., .2, 3.),
+      Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.chimeWarning2, 2., .2, 3.),
 
   Alert(
       "steerTempUnavailable",
