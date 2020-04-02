@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import platform
 
 AddOption('--test',
           action='store_true',
@@ -11,6 +12,8 @@ AddOption('--asan',
           help='turn on ASAN')
 
 arch = subprocess.check_output(["uname", "-m"], encoding='utf8').rstrip()
+if platform.system() == "Darwin":
+  arch = "Darwin"
 
 if arch == "aarch64":
   lenv = {
@@ -201,9 +204,11 @@ SConscript(['common/SConscript'])
 SConscript(['common/kalman/SConscript'])
 SConscript(['phonelibs/SConscript'])
 
-SConscript(['selfdrive/modeld/SConscript'])
-SConscript(['selfdrive/camerad/SConscript'])
-SConscript(['selfdrive/trafficd/SConscript'])
+if arch != "Darwin":
+  SConscript(['selfdrive/camerad/SConscript'])
+  SConscript(['selfdrive/modeld/SConscript'])
+  SConscript(['selfdrive/trafficd/SConscript'])
+
 SConscript(['selfdrive/controls/lib/cluster/SConscript'])
 SConscript(['selfdrive/controls/lib/lateral_mpc/SConscript'])
 SConscript(['selfdrive/controls/lib/longitudinal_mpc/SConscript'])
