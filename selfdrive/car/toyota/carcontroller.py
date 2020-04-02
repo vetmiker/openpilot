@@ -7,17 +7,17 @@ from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_comma
                                            create_accel_command, create_acc_cancel_command, create_fcw_command
 from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams, TSS2_CAR
 from opendbc.can.packer import CANPacker
-from common.op_params import opParams
-import cereal.messaging as messaging
+#from common.op_params import opParams
+#import cereal.messaging as messaging
 
-op_params = opParams()
+#op_params = opParams()
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 # Accel limits
 ACCEL_HYST_GAP = 0.02  # don't change accel command for small oscilalitons within this value
-ACCEL_MAX = 3.5  # 1.5 m/s2
-ACCEL_MIN = -3.5 # 3   m/s2
+ACCEL_MAX = 3.5  # 3.5 m/s2
+ACCEL_MIN = -3.5 # 3.5 m/s2
 ACCEL_SCALE = max(ACCEL_MAX, -ACCEL_MIN)
 
 # Blindspot codes
@@ -78,9 +78,9 @@ class CarController():
     self.blindspot_debug_enabled_left = False
     self.blindspot_debug_enabled_right = False
     
-    self.sm = messaging.SubMaster(['pathPlan'])
-    self.rightLaneDepart = False
-    self.leftLaneDepart = False
+    #self.sm = messaging.SubMaster(['pathPlan'])
+    #self.rightLaneDepart = False
+    #self.leftLaneDepart = False
     
     self.last_fault_frame = -200
     self.steer_rate_limited = False
@@ -102,15 +102,30 @@ class CarController():
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, hud_alert,
              left_line, right_line, lead, left_lane_depart, right_lane_depart):
-    self.sm.update(0)
-    if self.sm.updated['pathPlan']:
-      blinker = CS.out.leftBlinker or CS.out.rightBlinker
-      ldw_allowed = CS.out.vEgo > 12.5 and not blinker
-      CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
-      right_lane_visible = self.sm['pathPlan'].rProb > 0.5
-      left_lane_visible = self.sm['pathPlan'].lProb > 0.5
-      self.rightLaneDepart = bool(ldw_allowed and self.sm['pathPlan'].rPoly[3] > -(0.93 + CAMERA_OFFSET) and right_lane_visible)
-      self.leftLaneDepart = bool(ldw_allowed and self.sm['pathPlan'].lPoly[3] < (0.93 - CAMERA_OFFSET) and left_lane_visible)
+    #if not enabled:
+    #  self.sm.update(0)
+    #if self.sm.updated['pathPlan']:
+    #  blinker = CS.out.leftBlinker or CS.out.rightBlinker
+    #  ldw_allowed = CS.out.vEgo > 12.5 and not blinker
+    #  CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
+    #  right_lane_visible = self.sm['pathPlan'].rProb > 0.5
+    #  left_lane_visible = self.sm['pathPlan'].lProb > 0.5
+    #  self.rightLaneDepart = bool(ldw_allowed and self.sm['pathPlan'].rPoly[3] > -(0.93 + CAMERA_OFFSET) and right_lane_visible)
+    #  self.leftLaneDepart = bool(ldw_allowed and self.sm['pathPlan'].lPoly[3] < (0.93 - CAMERA_OFFSET) and left_lane_visible)
+    #  print("blinker")
+    #  print(blinker)
+    #  print("ldw_allowed")
+    #  print(ldw_allowed)
+    #  print("CAMERA_OFFSET")
+    #  print(CAMERA_OFFSET)
+    #  print("right_lane_visible")
+    #  print(right_lane_visible)
+    #  print("left_lane_visible")
+    #  print(left_lane_visible)
+    #  print("self.rightLaneDepart")
+    #  print(self.rightLaneDepart)
+    #  print("self.leftLaneDepart")
+    #  print(self.leftLaneDepart)
     # *** compute control surfaces ***
 
     # gas and brake
@@ -147,30 +162,30 @@ class CarController():
       self.last_fault_frame = frame
 
     # Cut steering for 1s after fault
-    if (frame - self.last_fault_frame < 100) or abs(CS.out.steeringRate) > 100 or abs(CS.out.steeringAngle) > 100:
+    if (frame - self.last_fault_frame < 100) or abs(CS.out.steeringRate) > 100 or (abs(CS.out.steeringAngle) > 100 and CS.CP.carFingerprint == CAR.RAV4H):
       new_steer = 0
       apply_steer_req = 0
     else:
       apply_steer_req = 1
       
-    if not enabled and self.rightLaneDepart and CS.out.vEgo > 12.5 and not CS.out.rightBlinker:
-      apply_steer = self.last_steer + 3
-      apply_steer = min(apply_steer , 800)
-      #print ("right")
-      #print (apply_steer)
+    if not enabled and right_lane_depart and CS.out.vEgo > 12.5 and not CS.out.rightBlinker:
+      new_steer = self.last_steer + 3
+      new_steer = min(new_steer , 800)
+      print ("right")
+      print (new_steer)
       apply_steer_req = 1
       
-    if not enabled and self.leftLaneDepart and CS.out.vEgo > 12.5 and not CS.out.leftBlinker:
-      apply_steer = self.last_steer - 3
-      apply_steer = max(apply_steer , -800)
-      #print ("left")
-      #print (apply_steer)
+    if not enabled and left_lane_depart and CS.out.vEgo > 12.5 and not CS.out.leftBlinker:
+      new_steer = self.last_steer - 3
+      new_steer = max(new_steer , -800)
+      print ("left")
+      print (new_steer)
       apply_steer_req = 1
       
     apply_steer = apply_toyota_steer_torque_limits(new_steer, self.last_steer, CS.out.steeringTorqueEps, SteerLimitParams)
     self.steer_rate_limited = new_steer != apply_steer
 
-    if not enabled:
+    if not enabled and abs(apply_steer) > 800 and not (right_lane_depart or left_lane_depart):
       apply_steer = 0
       apply_steer_req = 0
 

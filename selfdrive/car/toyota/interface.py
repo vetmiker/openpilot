@@ -7,6 +7,8 @@ from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness,
 from selfdrive.swaglog import cloudlog
 from selfdrive.car.interfaces import CarInterfaceBase
 
+GearShifter = car.CarState.GearShifter
+
 LaneChangeState = log.PathPlan.LaneChangeState
 
 class CarInterface(CarInterfaceBase):
@@ -24,7 +26,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.steerActuatorDelay = 0.12  # Default delay, Prius has larger delay
     ret.steerLimitTimer = 0.4
-    
+
     #if ret.enableGasInterceptor:
     #  ret.gasMaxBP = [0., 9., 55]
     #  ret.gasMaxV = [0.2, 0.5, 0.7]
@@ -35,7 +37,7 @@ class CarInterface(CarInterfaceBase):
     ret.gasMaxV = [0.2, 0.5, 0.7]
     ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
     ret.longitudinalTuning.kiV = [0.15, 0.10]
-    
+
     if candidate not in [CAR.PRIUS, CAR.RAV4, CAR.RAV4H]: # These cars use LQR/INDI
       ret.lateralTuning.init('pid')
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
@@ -73,7 +75,7 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.lqr.k = [-110.73572306, 451.22718255]
       ret.lateralTuning.lqr.l = [0.3233671, 0.3185757]
       ret.lateralTuning.lqr.dcGain = 0.002237852961363602
-      
+
     elif candidate in [CAR.RAV4]:
       stop_and_go = True if (candidate in CAR.RAV4H) else False
       ret.safetyParam = 73
@@ -163,7 +165,7 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 4700. * CV.LB_TO_KG + STD_CARGO_KG  # 4260 + 4-5 people
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.18], [0.015]]  # community tuning
       ret.lateralTuning.pid.kf = 0.00012  # community tuning
-      
+
     elif candidate in [CAR.HIGHLANDER, CAR.HIGHLANDERH]:
       stop_and_go = True
       ret.safetyParam = 73
@@ -332,9 +334,12 @@ class CarInterface(CarInterfaceBase):
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
-    
+
+    # gear except P, R
+    extra_gears = [GearShifter.neutral, GearShifter.eco, GearShifter.manumatic, GearShifter.drive, GearShifter.sport, GearShifter.low, GearShifter.brake, GearShifter.unknown]
+
     # events
-    events, eventsArne182 = self.create_common_events(ret)
+    events, eventsArne182 = self.create_common_events(ret, extra_gears)
 
     # cruise state
     if not self.cruise_enabled_prev:
@@ -356,7 +361,7 @@ class CarInterface(CarInterfaceBase):
 
     if self.cp_cam.can_invalid_cnt >= 200 and self.CP.enableCamera:
       events.append(create_event('invalidGiraffeToyota', [ET.PERMANENT]))
-    
+
     if not self.waiting and ret.vEgo < 0.3 and not ret.gasPressed and self.CP.carFingerprint == CAR.RAV4H:
       self.waiting = True
     if self.waiting:

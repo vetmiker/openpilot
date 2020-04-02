@@ -30,7 +30,7 @@ from selfdrive.locationd.calibration_helpers import Calibration, Filter
 from common.op_params import opParams
 from selfdrive.controls.df_alert_manager import DfAlertManager
 
-LANE_DEPARTURE_THRESHOLD = 0.1
+#LANE_DEPARTURE_THRESHOLD = 0.1
 
 ThermalStatus = log.ThermalData.ThermalStatus
 State = log.ControlsState.OpenpilotState
@@ -80,12 +80,12 @@ def data_sample(CI, CC, sm, can_sock, state, mismatch_counter, can_error_counter
 
   sm.update(0)
   arne_sm.update(0)
-  
+
   events = list(CS.events)
   events += list(sm['dMonitoringState'].events)
-  
+
   events_arne182 = list(CS_arne182.events)
-  
+
   add_lane_change_event(events, sm['pathPlan'])
   enabled = isEnabled(state)
 
@@ -397,7 +397,7 @@ def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cr
       else:
         extra_text_2 = str(int(round(Filter.MIN_SPEED * CV.MS_TO_MPH))) + " mph"
     AM.add(frame, str(e) + "Permanent", enabled, extra_text_1=extra_text_1, extra_text_2=extra_text_2)
-    
+
   return actuators, v_cruise_kph, v_acc_sol, a_acc_sol, lac_log, last_blinker_frame
 
 
@@ -431,21 +431,21 @@ def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk
 
   recent_blinker = (sm.frame - last_blinker_frame) * DT_CTRL < 5.0  # 5s blinker cooldown
   calibrated = sm['liveCalibration'].calStatus == Calibration.CALIBRATED
-  ldw_allowed = CS.vEgo > 31 * CV.MPH_TO_MS and not recent_blinker and is_ldw_enabled and not isActive(state) and calibrated
+  ldw_allowed = CS.vEgo > 12.5 and is_ldw_enabled and calibrated
 
   md = sm['model']
   if len(md.meta.desirePrediction):
-    l_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeLeft - 1]
-    r_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeRight - 1]
+    #l_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeLeft - 1]
+    #r_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeRight - 1]
 
     CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
 
-    l_lane_close = left_lane_visible and (sm['pathPlan'].lPoly[3] < (1.08 - CAMERA_OFFSET))
-    r_lane_close = right_lane_visible and (sm['pathPlan'].rPoly[3] > -(1.08 + CAMERA_OFFSET))
+    l_lane_close = left_lane_visible and (sm['pathPlan'].lPoly[3] < (0.9 - CAMERA_OFFSET)) and not recent_blinker
+    r_lane_close = right_lane_visible and (sm['pathPlan'].rPoly[3] > -(0.85 + CAMERA_OFFSET)) and not recent_blinker
 
     if ldw_allowed:
-      CC.hudControl.leftLaneDepart = bool(l_lane_change_prob > LANE_DEPARTURE_THRESHOLD and l_lane_close)
-      CC.hudControl.rightLaneDepart = bool(r_lane_change_prob > LANE_DEPARTURE_THRESHOLD and r_lane_close)
+      CC.hudControl.leftLaneDepart = bool(l_lane_close) #bool(l_lane_change_prob > LANE_DEPARTURE_THRESHOLD and l_lane_close)
+      CC.hudControl.rightLaneDepart = bool(r_lane_close) #bool(r_lane_change_prob > LANE_DEPARTURE_THRESHOLD and r_lane_close)
 
   if CC.hudControl.rightLaneDepart or CC.hudControl.leftLaneDepart:
     AM.add(sm.frame, 'ldwPermanent', False)
@@ -490,7 +490,7 @@ def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk
     "vPid": float(LoC.v_pid),
     "vCruise": float(v_cruise_kph),
     "upAccelCmd": float(LoC.pid.p),
-    "uiAccelCmd": float(LoC.pid.i),
+    "uiAccelCmd": float(LoC.pid.id),
     "ufAccelCmd": float(LoC.pid.f),
     "angleSteersDes": float(LaC.angle_steers_des),
     "vTargetLead": float(v_acc),
@@ -569,7 +569,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
 
   if arne_sm is None:
     arne_sm = messaging_arne.SubMaster(['arne182Status', 'dynamicFollowButton'])
-    
+
   if can_sock is None:
     can_timeout = None if os.environ.get('NO_CAN_TIMEOUT', False) else 100
     can_sock = messaging.sub_sock('can', timeout=can_timeout)

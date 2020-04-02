@@ -44,9 +44,9 @@ _A_CRUISE_MIN_BP = [0.0, 5.0, 10.0, 20.0, 55.0]
 # need fast accel at very low speed for stop and go
 # make sure these accelerations are smaller than mpc limits
 _A_CRUISE_MAX_V = [2.0, 2.0, 1.5, .5, .3]
-_A_CRUISE_MAX_V_ECO = [0.6, 0.7, 0.8, 0.4, 0.2]
-_A_CRUISE_MAX_V_SPORT = [3.0, 3.5, 4.0, 4.0, 4.0]
-_A_CRUISE_MAX_V_FOLLOWING = [1.4, 1.3, 1.3, .7, .3]
+_A_CRUISE_MAX_V_ECO = [0.8, 0.9, 1.0, 0.4, 0.2]
+_A_CRUISE_MAX_V_SPORT = [3.0, 3.5, 3.0, 2.0, 2.0]
+_A_CRUISE_MAX_V_FOLLOWING = [1.6, 1.4, 1.4, .7, .3]
 _A_CRUISE_MAX_BP = [0., 5., 10., 20., 55.]
 
 # Lookup table for turns
@@ -293,7 +293,6 @@ class Planner():
       pass
 
     decel_for_turn = bool(v_curvature_map < min([v_cruise_setpoint, v_speedlimit, v_ego + 1.]))
-    v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit, v_speedlimit_ahead])
 
     # Calculate speed for normal cruise control
     if enabled and not self.first_loop and not sm['carState'].brakePressed and not sm['carState'].gasPressed:
@@ -317,6 +316,9 @@ class Planner():
         accel_limits[0] = required_decel
         accel_limits[1] = required_decel
         self.a_acc_start = required_decel
+        v_speedlimit_ahead = v_ego
+
+      v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit, v_speedlimit_ahead])
 
       self.v_cruise, self.a_cruise = speed_smoother(self.v_acc_start, self.a_acc_start,
                                                     v_cruise_setpoint,
