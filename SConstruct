@@ -216,7 +216,6 @@ SConscript(['phonelibs/SConscript'])
 if arch != "Darwin":
   SConscript(['selfdrive/camerad/SConscript'])
   SConscript(['selfdrive/modeld/SConscript'])
-  SConscript(['selfdrive/trafficd/SConscript'])
 
 SConscript(['selfdrive/controls/lib/cluster/SConscript'])
 SConscript(['selfdrive/controls/lib/lateral_mpc/SConscript'])
@@ -232,6 +231,7 @@ if arch == "aarch64":
   SConscript(['selfdrive/logcatd/SConscript'])
   SConscript(['selfdrive/sensord/SConscript'])
   SConscript(['selfdrive/clocksd/SConscript'])
+  SConscript(['selfdrive/trafficd/SConscript'])
 
 SConscript(['selfdrive/locationd/SConscript'])
 SConscript(['selfdrive/locationd/kalman/SConscript'])
