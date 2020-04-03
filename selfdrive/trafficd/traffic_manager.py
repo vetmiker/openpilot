@@ -63,7 +63,7 @@ class Traffic:
 
     # below is a weighted average, the further back in time we go, the less we care (and vice versa)
     time_weighted_preds = [[label * self.weights[idx] for label in pred] for idx, pred in enumerate(self.past_preds)]
-    time_weighted_preds = [sum(label) / self.weight_sum for label in np.array(time_weighted_preds).T]
+    time_weighted_preds = [sum(label) / self.weight_sum for label in np.array(time_weighted_preds).T]  # pylint: disable=E1133
 
     prediction = np.argmax(time_weighted_preds)  # get most confident prediction
     confidence = clip(time_weighted_preds[prediction], 0, 1)
