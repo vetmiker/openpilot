@@ -243,8 +243,7 @@ def thermald_thread():
       except:
         ip_addr = 'N/A'
       ts_last_ip = ts
-      msg2 = messaging_arne.new_message()
-      msg2.init('ipAddress')
+      msg2 = messaging_arne.new_message('ipAddress')
       msg2.ipAddress.ipAddr = ip_addr
       arne_pm.send('ipAddress', msg2)
       

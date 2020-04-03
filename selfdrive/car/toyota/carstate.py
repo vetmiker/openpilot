@@ -110,8 +110,7 @@ class CarState(CarStateBase):
       self.gasbuttonstatus = 2
     if self.sport_on == 0 and self.econ_on == 0:
       self.gasbuttonstatus = 0
-    msg = messaging_arne.new_message()
-    msg.init('arne182Status')
+    msg = messaging_arne.new_message('arne182Status')
     if frame > 999 and not (self.CP.carFingerprint in TSS2_CAR):
       if cp.vl["DEBUG"]['BLINDSPOTSIDE']==65: #Left
         if cp.vl["DEBUG"]['BLINDSPOTD1'] != self.leftblindspotD1:
@@ -277,8 +276,7 @@ class CarState(CarStateBase):
     self.splsgn4 = cp_cam.vl["RSA2"]['SPLSGN4']
     self.noovertake = self.tsgn1 == 65 or self.tsgn2 == 65 or self.tsgn3 == 65 or self.tsgn4 == 65 or self.tsgn1 == 66 or self.tsgn2 == 66 or self.tsgn3 == 66 or self.tsgn4 == 66
     if self.spdval1 > 0 or self.spdval2 > 0:
-      dat = messaging_arne.new_message()
-      dat.init('liveTrafficData')
+      dat = messaging_arne.new_message('liveTrafficData')
       if self.spdval1 > 0:
         dat.liveTrafficData.speedLimitValid = True
         if self.tsgn1 == 36:

@@ -270,8 +270,7 @@ class PathPlanner():
     dat.liveMpc.cost = self.mpc_solution[0].cost
     pm.send('liveMpc', dat)
 
-    msg = messaging_arne.new_message()
-    msg.init('latControl')
+    msg = messaging_arne.new_message('latControl')
     msg.latControl.anglelater = math.degrees(list(self.mpc_solution[0].delta)[-1])
     if not travis:
       self.arne_pm.send('latControl', msg)
