@@ -32,7 +32,6 @@ if arch == "aarch64":
     "/data/data/com.termux/files/usr/lib",
     "/system/vendor/lib64",
     "/system/comma/usr/lib",
-    "#phonelibs/yaml-cpp/lib",
     "#phonelibs/nanovg",
     "#phonelibs/libyuv/lib",
   ]
@@ -51,25 +50,36 @@ else:
     "#phonelibs/zmq/x64/include",
     "#external/tensorflow/include",
   ]
-  libpath = [
-    "#phonelibs/capnp-cpp/x64/lib",
-    "#phonelibs/capnp-c/x64/lib",
-    "#phonelibs/yaml-cpp/x64/lib",
-    "#phonelibs/snpe/x86_64-linux-clang",
-    "#phonelibs/zmq/x64/lib",
-    "#phonelibs/libyuv/x64/lib",
-    "#external/zmq/lib",
-    "#external/tensorflow/lib",
-    "#cereal",
-    "#selfdrive/common",
-    "/usr/lib",
-    "/usr/local/lib",
-  ]
+
+  if arch == "Darwin":
+    libpath = [
+      "#phonelibs/capnp-cpp/mac/lib",
+      "#phonelibs/capnp-c/mac/lib",
+      "#phonelibs/libyuv/mac/lib",
+      "#cereal",
+      "#selfdrive/common",
+      "/usr/local/lib",
+      "/System/Library/Frameworks/OpenGL.framework/Libraries",
+    ]
+  else:
+    libpath = [
+      "#phonelibs/capnp-cpp/x64/lib",
+      "#phonelibs/capnp-c/x64/lib",
+      "#phonelibs/snpe/x86_64-linux-clang",
+      "#phonelibs/zmq/x64/lib",
+      "#phonelibs/libyuv/x64/lib",
+      "#external/zmq/lib",
+      "#external/tensorflow/lib",
+      "#cereal",
+      "#selfdrive/common",
+      "/usr/lib",
+      "/usr/local/lib",
+    ]
 
   rpath = ["phonelibs/capnp-cpp/x64/lib",
+           "phonelibs/zmq/x64/lib",
            "external/tensorflow/lib",
            "cereal",
-           "phonelibs/zmq/x64/lib",
            "selfdrive/common"]
 
   # allows shared libraries to work globally
@@ -102,7 +112,6 @@ env = Environment(
     "#selfdrive",
     "#phonelibs/bzip2",
     "#phonelibs/libyuv/include",
-    "#phonelibs/yaml-cpp/include",
     "#phonelibs/openmax/include",
     "#phonelibs/json/src",
     "#phonelibs/json11",
@@ -123,7 +132,7 @@ env = Environment(
     "#selfdrive/modeld",
     "#cereal/messaging",
     "#cereal/messaging_arne",
-    "#selfdrive/trafficd","#selfdrive/trafficd",
+    "#selfdrive/trafficd",
     "#cereal",
     "#opendbc/can",
   ],
