@@ -408,7 +408,7 @@ class Way:
             arne_sm.update(0)
             traffic_status = arne_sm['trafficModelEvent'].status
             traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
-            if traffic_status == 'DEAD'
+            if traffic_status == 'DEAD':
               pass
             elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and traffic_status == 'GO':
               loop_must_break = True
