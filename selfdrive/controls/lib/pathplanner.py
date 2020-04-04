@@ -87,7 +87,7 @@ class PathPlanner():
 
   def update(self, sm, pm, CP, VM):
     self.arne_sm.update(0)
-    gas_button_status = arne_sm['arne182Status'].gasbuttonstatus
+    gas_button_status = self.arne_sm['arne182Status'].gasbuttonstatus
     if gas_button_status == 1:
       self.blindspotwait = 10
     elif gas_button_status == 2:
