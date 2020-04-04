@@ -93,6 +93,9 @@ struct CarEventArne182 @0x9b1657f34caf3ad4 {
     leftALCbsm @6;
     preventALC @7;
     dfButtonAlert @8;
+    trafficGo @9;
+    trafficSlow @10;
+    trafficDead @11;
   }
 }
 
@@ -151,6 +154,15 @@ struct IPAddress {
  ipAddr @0 :Text; # dragonpilot
 }
 
+struct TrafficModelRaw {
+  prediction @0 :List(Float32);
+}
+
+struct TrafficModelEvent {
+  status @0 :Text;
+  confidence @1 :Float32;
+}
+
 struct EventArne182 {
   # in nanoseconds?
   logMonoTime @0 :UInt64;
@@ -166,5 +178,7 @@ struct EventArne182 {
     smiskolData @8 :SmiskolData;
     dynamicFollowButton @9 :DynamicFollowButton;
     ipAddress @10 :IPAddress;
+    trafficModelRaw @11: TrafficModelRaw;
+    trafficModelEvent @12: TrafficModelEvent;
   }
 }

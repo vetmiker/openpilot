@@ -155,6 +155,16 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
   # entrance in SOFT_DISABLING state
   soft_disable_timer = max(0, soft_disable_timer - 1)
 
+  traffic_status = arne_sm['trafficModelEvent'].status	
+  traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)	
+  if traffic_status == 'SLOW':	
+    AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))	
+  if traffic_confidence >= 95:	
+    if traffic_status == 'GO':	
+      AM.add(frame, 'trafficGo', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))	
+    elif traffic_status == 'DEAD':  # confidence will be 100	
+      AM.add(frame, 'trafficDead', enabled)
+  
   df_alert = df_alert_manager.update(arne_sm)
   if df_alert is not None:
     AM.add(frame, 'dfButtonAlert', enabled, extra_text_1=df_alert, extra_text_2='Dynamic follow: {} profile active'.format(df_alert))
@@ -441,7 +451,7 @@ def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk
     CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
 
     l_lane_close = left_lane_visible and (sm['pathPlan'].lPoly[3] < (0.9 - CAMERA_OFFSET)) and not recent_blinker
-    r_lane_close = right_lane_visible and (sm['pathPlan'].rPoly[3] > -(0.85 + CAMERA_OFFSET)) and not recent_blinker
+    r_lane_close = right_lane_visible and (sm['pathPlan'].rPoly[3] > -(0.8 + CAMERA_OFFSET)) and not recent_blinker
 
     if ldw_allowed:
       CC.hudControl.leftLaneDepart = bool(l_lane_close) #bool(l_lane_change_prob > LANE_DEPARTURE_THRESHOLD and l_lane_close)
@@ -568,7 +578,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
                               'model', 'gpsLocation', 'radarState'], ignore_alive=['gpsLocation'])
 
   if arne_sm is None:
-    arne_sm = messaging_arne.SubMaster(['arne182Status', 'dynamicFollowButton'])
+    arne_sm = messaging_arne.SubMaster(['arne182Status', 'dynamicFollowButton', 'trafficModelEvent'])
 
   if can_sock is None:
     can_timeout = None if os.environ.get('NO_CAN_TIMEOUT', False) else 100

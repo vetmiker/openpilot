@@ -19,6 +19,8 @@ from common.travis_checker import travis
 from common.op_params import opParams
 op_params = opParams()
 osm = op_params.get('osm', True)
+smart_speed = op_params.get('smart_speed', True)
+smart_speed_max_vego = op_params.get('smart_speed_max_vego', default=26.8)
 offset_limit = op_params.get('offset_limit', default=0.0)
 
 if not travis:
@@ -241,7 +243,7 @@ class Planner():
     v_speedlimit_ahead = NO_CURVATURE_SPEED
     now = datetime.now()
     try:
-      if sm['liveMapData'].speedLimitValid and osm and self.osm and (sm['liveMapData'].lastGps.timestamp -time.mktime(now.timetuple()) * 1000) < 10000:
+      if sm['liveMapData'].speedLimitValid and osm and self.osm and (sm['liveMapData'].lastGps.timestamp -time.mktime(now.timetuple()) * 1000) < 10000 and (smart_speed or smart_speed_max_vego > v_ego):
         speed_limit = sm['liveMapData'].speedLimit
         if speed_limit is not None:
           v_speedlimit = speed_limit
@@ -252,7 +254,7 @@ class Planner():
             v_speedlimit = v_speedlimit + fixed_offset
       else:
         speed_limit = None
-      if sm['liveMapData'].speedLimitAheadValid and osm and self.osm and sm['liveMapData'].speedLimitAheadDistance < speed_ahead_distance and (sm['liveMapData'].lastGps.timestamp -time.mktime(now.timetuple()) * 1000) < 10000:
+      if sm['liveMapData'].speedLimitAheadValid and osm and self.osm and sm['liveMapData'].speedLimitAheadDistance < speed_ahead_distance and (sm['liveMapData'].lastGps.timestamp -time.mktime(now.timetuple()) * 1000) < 10000 and (smart_speed or smart_speed_max_vego > v_ego):
         distanceatlowlimit = 50
         if sm['liveMapData'].speedLimitAhead < 21/3.6:
           distanceatlowlimit = speed_ahead_distance = (v_ego - sm['liveMapData'].speedLimitAhead)*3.6*2

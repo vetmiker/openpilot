@@ -4,12 +4,13 @@ import numpy as np
 from datetime import datetime
 from common.basedir import BASEDIR
 from common.op_params import opParams
+import cereal.messaging_arne as messaging_arne
 from selfdrive.config import Conversions as CV
 from common.transformations.coordinates import LocalCoord, geodetic2ecef
 
 LOOKAHEAD_TIME = 10.
 MAPS_LOOKAHEAD_DISTANCE = 50 * LOOKAHEAD_TIME
-
+arne_sm = messaging_arne.SubMaster(['trafficModelEvent'])
 op_params = opParams()
 
 traffic_lights = op_params.get('traffic_lights', True)
@@ -404,6 +405,19 @@ class Way:
         loop_must_break = False
         for n in way.way.nodes:
           if 'highway' in n.tags and (n.tags['highway']=='stop' or n.tags['highway']=='give_way' or n.tags['highway']=='mini_roundabout' or (n.tags['highway']=='traffic_signals' and traffic_lights)) and way_pts[count,0] > 0:
+            arne_sm.update(0)
+            traffic_status = arne_sm['trafficModelEvent'].status
+            traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
+            if traffic_status == 'DEAD':
+              pass
+            elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and traffic_status == 'GO':
+              loop_must_break = True
+              break
+            elif traffic_confidence >= 75 and traffic_status == 'SLOW' and n.tags['highway'] != 'motorway':
+              speed_ahead = 0
+              speed_ahead_dist = 250
+              loop_must_break = True
+              break
             if 'direction' in n.tags:
               if backwards and (n.tags['direction']=='backward' or n.tags['direction']=='both'):
                 print("backward")
