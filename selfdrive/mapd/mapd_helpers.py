@@ -413,7 +413,7 @@ class Way:
             elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and traffic_status == 'GO':
               loop_must_break = True
               break
-            elif traffic_confidence >= 75 and traffic_status == 'SLOW':
+            elif traffic_confidence >= 75 and traffic_status == 'SLOW' and n.tags['highway'] != 'motorway':
               speed_ahead = 0
               speed_ahead_dist = 250
               loop_must_break = True
