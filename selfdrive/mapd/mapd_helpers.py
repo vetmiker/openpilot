@@ -413,11 +413,11 @@ class Way:
             elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and traffic_status == 'GO':
               loop_must_break = True
               break
-            elif traffic_confidence >= 75 and traffic_status == 'SLOW' and n.tags['highway'] != 'motorway':
-              speed_ahead = 0
-              speed_ahead_dist = 250
-              loop_must_break = True
-              break
+            #elif traffic_confidence >= 75 and traffic_status == 'SLOW' and n.tags['highway'] != 'motorway':
+            #  speed_ahead = 0
+            #  speed_ahead_dist = 250
+            #  loop_must_break = True
+            #  break
             if 'direction' in n.tags:
               if backwards and (n.tags['direction']=='backward' or n.tags['direction']=='both'):
                 print("backward")
@@ -514,7 +514,11 @@ class Way:
                 loop_must_break = True
                 break
           if 'railway' in n.tags and n.tags['railway']=='level_crossing':
-            if way_pts[count, 0] > 0:
+            arne_sm.update(0)
+            traffic_status = arne_sm['trafficModelEvent'].status
+            traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
+             
+            if (way_pts[count, 0] > 0) and not (traffic_confidence >= 75 and traffic_status == 'GO'):
               speed_ahead = 0
               speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
               loop_must_break = True
