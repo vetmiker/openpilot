@@ -99,14 +99,14 @@ ALERTS = [
       "WAITING...",
       "Press gas/resume to gain full control!",
       AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 1.),
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 0.2),
 
   Alert(
       "longControlDisabled",
       "BRAKE PRESSED",
       "Longitudinal Control Disabled",
       AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 1.),
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 0.2),
 
   Alert(
       "trafficSlow",
