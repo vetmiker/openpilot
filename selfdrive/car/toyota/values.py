@@ -511,7 +511,6 @@ FW_VERSIONS = {
       b'8965B47022\x00\x00\x00\x00\x00\x00',
       b'8965B47023\x00\x00\x00\x00\x00\x00',
       b'8965B47050\x00\x00\x00\x00\x00\x00',
-      b'8965B47060\x00\x00\x00\x00\x00\x00',  # Think this the EPS with good angle sensor
     ],
     (Ecu.esp, 0x7b0, None): [
       b'F152647290\x00\x00\x00\x00\x00\x00',
