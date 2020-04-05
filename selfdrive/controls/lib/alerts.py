@@ -113,7 +113,7 @@ ALERTS = [
       "TRAFFIC LIGHT - SLOW DOWN",
       "Red traffic light ahead",
       AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, 0.1, 2., 0.2),
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, 0.1, 2., 0.2),
 
   Alert(
       "trafficGo",
