@@ -247,7 +247,7 @@ class CarState(CarStateBase):
     self.pcm_acc_active = bool(cp.vl["PCM_CRUISE"]['CRUISE_ACTIVE'])
     ret.cruiseState.enabled = self.pcm_acc_active
 
-    if self.CP.carFingerprint == CAR.PRIUS:
+    if self.CP.carFingerprint in [CAR.PRIUS, CAR.PRIUS_2019]:
       ret.genericToggle = cp.vl["AUTOPARK_STATUS"]['STATE'] != 0
     else:
       ret.genericToggle = bool(cp.vl["LIGHT_STALK"]['AUTO_HIGH_BEAM'])
@@ -354,7 +354,7 @@ class CarState(CarStateBase):
       checks.append(("PCM_CRUISE_2", 33))
 
 
-    if CP.carFingerprint == CAR.PRIUS:
+    if CP.carFingerprint in [CAR.PRIUS, CAR.PRIUS_2019]:
       signals += [("STATE", "AUTOPARK_STATUS", 0)]
 
     # add gas interceptor reading if we are using it
@@ -428,7 +428,7 @@ class CarState(CarStateBase):
       checks.append(("PCM_CRUISE_2", 33))
 
 
-    if CP.carFingerprint == CAR.PRIUS:
+    if CP.carFingerprint in [CAR.PRIUS, CAR.PRIUS_2019]:
       signals += [("STATE", "AUTOPARK_STATUS", 0)]
 
     # add gas interceptor reading if we are using it
