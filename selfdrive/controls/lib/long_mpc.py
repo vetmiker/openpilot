@@ -84,8 +84,7 @@ class LongitudinalMpc():
 
   def send_cur_TR(self, TR):
     if self.mpc_id == 1 and self.pm is not None:
-      dat = messaging_arne.new_message()
-      dat.init('smiskolData')
+      dat = messaging_arne.new_message('smiskolData')
       dat.smiskolData.mpcTR = TR
       self.pm.send('smiskolData', dat)
 

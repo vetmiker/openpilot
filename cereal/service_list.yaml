@@ -96,6 +96,8 @@ alcaState: [8215, false, 0.]
 # smiskolData
 smiskolData: [8216, false, 20.]
 dynamicFollowButton: [8217, false, 0.]
+trafficModelEvent: [8218, false, 5.]
+trafficModelRaw: [8219, false, 5.]
 
 # 8080 is reserved for slave testing daemon
 # 8762 is reserved for logserver
