@@ -861,5 +861,5 @@ ALERTS = [
       "TAKE CONTROL",
       "Lane Departure Detected",
       AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.none, AudibleAlert.chimePrompt, 1., 2., 2.),
+      Priority.LOW, VisualAlert.none, AudibleAlert.none, 1., 2., 2.),
 ]
