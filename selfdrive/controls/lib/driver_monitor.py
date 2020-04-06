@@ -9,7 +9,7 @@ from common.travis_checker import travis
 
 
 if not travis:
-  awareness_factor = opParams().get('awareness_factor', default=10.0)
+  awareness_factor = opParams().get('awareness_factor', default=1.0)
 else:
   awareness_factor = 1
 
