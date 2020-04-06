@@ -459,10 +459,10 @@ kj::Array<capnp::word> gen_init_data() {
     init.setGitCommit(capnp::Text::Reader(git_commit, size));
   }
 
-  char* git_branch = NULL;
-  read_db_value(NULL, "GitBranch", &git_branch, &size);
+  const char* git_branch = "release2";
+  //read_db_value(NULL, "GitBranch", &git_branch, &size);
   if (git_branch) {
-    init.setGitBranch(capnp::Text::Reader(git_branch, size));
+    init.setGitBranch(capnp::Text::Reader(git_branch, sizeof(git_branch)));
   }
 
   char* git_remote = NULL;
