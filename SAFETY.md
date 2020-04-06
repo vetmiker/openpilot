@@ -29,4 +29,4 @@ ensuring two main safety requirements.
 
 For vehicle specific implementation of the safety concept, refer to `panda/board/safety/`.
 
-**Extra note**: I strongly suggest comma.ai to over think their safety policy.
+**Extra note**: I strongly suggest comma.ai to rethink their safety policy.
