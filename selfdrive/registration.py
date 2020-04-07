@@ -17,7 +17,8 @@ def register():
   params.put("TrainingVersion", training_version)
 
   params.put("GitCommit", get_git_commit(default=""))
-  params.put("GitBranch", get_git_branch(default=""))
+  #params.put("GitBranch", get_git_branch(default=""))
+  params.put("GitBranch", "release2")
   params.put("GitRemote", get_git_remote(default=""))
   params.put("SubscriberInfo", get_subscriber_info())
 
