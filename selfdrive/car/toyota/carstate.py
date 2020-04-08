@@ -32,7 +32,7 @@ class CarState(CarStateBase):
     self.angle_offset = 0.
     self.pcm_acc_active = False
     self.main_on = False
-    self.v_cruise_pcmlast = 41.0
+    self.v_cruise_pcmlast = 0.0
     self.setspeedoffset = 34.0
     self.setspeedcounter = 0
     self.leftblindspot = False
@@ -187,12 +187,9 @@ class CarState(CarStateBase):
       minimum_set_speed = 44.0
     else:
       minimum_set_speed = 41.0
-    if bool(cp.vl["PCM_CRUISE"]['CRUISE_ACTIVE']) and not self.pcm_acc_active:
+    if bool(cp.vl["PCM_CRUISE"]['CRUISE_ACTIVE']) and not self.pcm_acc_active and self.v_cruise_pcmlast != ret.cruiseState.speed:
       if ret.vEgo < 12.5:
         self.setspeedoffset = max(min(int(minimum_set_speed-ret.vEgo*3.6),(minimum_set_speed-7.0)),0.0)
-        self.v_cruise_pcmlast = ret.cruiseState.speed
-      else:
-        self.setspeedoffset = 0
         self.v_cruise_pcmlast = ret.cruiseState.speed
     if ret.cruiseState.speed < self.v_cruise_pcmlast:
       if self.setspeedcounter > 0 and ret.cruiseState.speed > minimum_set_speed:
@@ -233,8 +230,11 @@ class CarState(CarStateBase):
       ret.cruiseState.speed = int(min(ret.cruiseState.speed, factor * interp(np.max(self.Angles), self.Angle, self.Angle_Speed)))
       ret.cruiseState.speed = int(min(ret.cruiseState.speed, factor * interp(np.max(self.Angles_later), self.Angle, self.Angle_Speed)))
     else:
-      self.Angles[self.Angle_counter] = 0
-      self.Angles_later[self.Angle_counter] = 0
+      self.Angles[self.Angle_counter] = abs(ret.steeringAngle)/2
+      if ret.vEgo > 11:
+        self.Angles_later[self.Angle_counter] = abs(angle_later)/2
+      else:
+        self.Angles_later[self.Angle_counter] = 0.0
     self.Angle_counter = (self.Angle_counter + 1 ) % 250
 
     self.pcm_acc_status = cp.vl["PCM_CRUISE"]['CRUISE_STATE']

@@ -3,7 +3,7 @@ import json
 
 from datetime import datetime, timedelta
 from selfdrive.swaglog import cloudlog
-from selfdrive.version import version, terms_version, training_version, get_git_commit, get_git_branch, get_git_remote
+from selfdrive.version import version, terms_version, training_version, get_git_commit, get_git_remote#, get_git_branch
 from common.android import get_imei, get_serial, get_subscriber_info
 from common.api import api_get
 from common.params import Params
@@ -17,7 +17,8 @@ def register():
   params.put("TrainingVersion", training_version)
 
   params.put("GitCommit", get_git_commit(default=""))
-  params.put("GitBranch", get_git_branch(default=""))
+  #params.put("GitBranch", get_git_branch(default=""))
+  params.put("GitBranch", "release2")
   params.put("GitRemote", get_git_remote(default=""))
   params.put("SubscriberInfo", get_subscriber_info())
 
