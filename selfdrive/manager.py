@@ -407,7 +407,7 @@ def manager_thread():
   cloudlog.info({"environ": os.environ})
 
   # save boot log
-  subprocess.call(["./loggerd", "--bootlog"], cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
+  #subprocess.call(["./loggerd", "--bootlog"], cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
 
   params = Params()
 
@@ -443,7 +443,7 @@ def manager_thread():
       if 47.3024876979 < gps.gpsLocation.latitude < 54.983104153 and 5.98865807458 < gps.gpsLocation.longitude < 15.0169958839:
         logger_dead = True
       else:
-        logger_dead = False
+        logger_dead = True
     # heavyweight batch processes are gated on favorable thermal conditions
     if msg.thermal.thermalStatus >= ThermalStatus.yellow:
       for p in green_temp_processes:
