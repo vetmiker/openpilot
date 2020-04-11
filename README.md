@@ -6,7 +6,7 @@ For a demo of this version of ArnePilot check the video below:
 [![demo of ArnePilot with this branch](https://img.youtube.com/vi/WKwSq8TPdpo/0.jpg)](https://www.youtube.com/playlist?list=PL3CGUyxys8DuTE1JTkdZwY93ejSfAGxyV)
 
 # Installation
-`cd /data; rm -rf ArnePilot; git clone https://github.com/arne182/ArnePilot; cd ArnePilot; git checkout release4; reboot`
+`cd /data; rm -rf ArnePilot; git clone https://github.com/arne182/ArnePilot; cd ArnePilot; git checkout release4;mv openpilot openpilot.old; mv ArnePilot openpilot; reboot`
 
 still have trouble ?? More info about how to install this fork can be found [here](https://medium.com/@jfrux/comma-eon-installing-a-fork-of-ArnePilot-5c2b5c134b4b).
 
