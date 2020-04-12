@@ -160,8 +160,8 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
   if traffic_status == 'SLOW':
     AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
   if traffic_confidence >= 95:
-    elif traffic_status == 'GREEN':
-      AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+    #if traffic_status == 'GREEN':
+    #  AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
     if traffic_status == 'DEAD':  # confidence will be 100
       AM.add(frame, 'trafficDead', enabled)
 
