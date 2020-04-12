@@ -157,12 +157,12 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
 
   traffic_status = arne_sm['trafficModelEvent'].status
   traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
-  if traffic_status == 'SLOW':
-    AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
-  if traffic_confidence >= 95:
-    #if traffic_status == 'GREEN':
-    #  AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
-    if traffic_status == 'DEAD':  # confidence will be 100
+  if traffic_confidence >= 75:
+    if traffic_status == 'SLOW':
+      AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+    elif traffic_status == 'GREEN':
+      AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+    elif traffic_status == 'DEAD':  # confidence will be 100
       AM.add(frame, 'trafficDead', enabled)
 
   df_alert = df_alert_manager.update(arne_sm)
