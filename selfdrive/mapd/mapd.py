@@ -263,7 +263,7 @@ class MapsdThread(LoggerThread):
             fix_ok = gps.flags & 1
             self.logger.debug("fix_ok = %s" % str(fix_ok))
 
-            if gps.accuracy > 2.0 and not speedLimittrafficvalid:
+            if gps.accuracy > 2.5 and not speedLimittrafficvalid:
                 fix_ok = False
             if not fix_ok or self.sharedParams['last_query_result'] is None or not self.sharedParams['cache_valid']:
                 self.logger.debug("fix_ok %s" % fix_ok)

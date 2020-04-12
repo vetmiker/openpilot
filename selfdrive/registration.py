@@ -3,7 +3,7 @@ import json
 
 from datetime import datetime, timedelta
 from selfdrive.swaglog import cloudlog
-from selfdrive.version import version, terms_version, training_version, get_git_commit, get_git_branch, get_git_remote
+from selfdrive.version import version, terms_version, training_version, get_git_commit, get_git_remote, get_git_branch
 from common.android import get_imei, get_serial, get_subscriber_info
 from common.api import api_get
 from common.params import Params

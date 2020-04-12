@@ -54,7 +54,7 @@ class PathPlanner():
       self.arne_pm = messaging_arne.PubMaster(['latControl'])
     self.last_cloudlog_t = 0
     self.steer_rate_cost = CP.steerRateCost
-
+    self.blindspotwait = 30
     self.setup_mpc()
     self.solution_invalid_cnt = 0
     self.lane_change_enabled = Params().get('LaneChangeEnabled') == b'1'
@@ -87,6 +87,13 @@ class PathPlanner():
 
   def update(self, sm, pm, CP, VM):
     self.arne_sm.update(0)
+    gas_button_status = self.arne_sm['arne182Status'].gasbuttonstatus
+    if gas_button_status == 1:
+      self.blindspotwait = 10
+    elif gas_button_status == 2:
+      self.blindspotwait = 30
+    else:
+      self.blindspotwait = 20
     if self.arne_sm['arne182Status'].rightBlindspot:
       self.blindspotTrueCounterright = 0
     else:
@@ -130,8 +137,8 @@ class PathPlanner():
       torque_applied = (sm['carState'].steeringPressed and \
                        ((sm['carState'].steeringTorque > 0 and lane_change_direction == LaneChangeDirection.left and not self.arne_sm['arne182Status'].leftBlindspot) or \
                         (sm['carState'].steeringTorque < 0 and lane_change_direction == LaneChangeDirection.right and not self.arne_sm['arne182Status'].rightBlindspot))) or \
-                       (not self.alca_nudge_required and self.blindspotTrueCounterleft > 30 and lane_change_direction == LaneChangeDirection.left) or \
-                       (not self.alca_nudge_required and self.blindspotTrueCounterright > 30 and lane_change_direction == LaneChangeDirection.right)
+                       (not self.alca_nudge_required and self.blindspotTrueCounterleft > self.blindspotwait and lane_change_direction == LaneChangeDirection.left) or \
+                       (not self.alca_nudge_required and self.blindspotTrueCounterright > self.blindspotwait and lane_change_direction == LaneChangeDirection.right)
       #else:
       #  torque_applied = True
 

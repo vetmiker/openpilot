@@ -32,7 +32,7 @@ class CarState(CarStateBase):
     self.angle_offset = 0.
     self.pcm_acc_active = False
     self.main_on = False
-    self.v_cruise_pcmlast = 41.0
+    self.v_cruise_pcmlast = 0.0
     self.setspeedoffset = 34.0
     self.setspeedcounter = 0
     self.leftblindspot = False
@@ -187,12 +187,9 @@ class CarState(CarStateBase):
       minimum_set_speed = 44.0
     else:
       minimum_set_speed = 41.0
-    if bool(cp.vl["PCM_CRUISE"]['CRUISE_ACTIVE']) and not self.pcm_acc_active:
+    if bool(cp.vl["PCM_CRUISE"]['CRUISE_ACTIVE']) and not self.pcm_acc_active and self.v_cruise_pcmlast != ret.cruiseState.speed:
       if ret.vEgo < 12.5:
         self.setspeedoffset = max(min(int(minimum_set_speed-ret.vEgo*3.6),(minimum_set_speed-7.0)),0.0)
-        self.v_cruise_pcmlast = ret.cruiseState.speed
-      else:
-        self.setspeedoffset = 0
         self.v_cruise_pcmlast = ret.cruiseState.speed
     if ret.cruiseState.speed < self.v_cruise_pcmlast:
       if self.setspeedcounter > 0 and ret.cruiseState.speed > minimum_set_speed:
@@ -233,8 +230,11 @@ class CarState(CarStateBase):
       ret.cruiseState.speed = int(min(ret.cruiseState.speed, factor * interp(np.max(self.Angles), self.Angle, self.Angle_Speed)))
       ret.cruiseState.speed = int(min(ret.cruiseState.speed, factor * interp(np.max(self.Angles_later), self.Angle, self.Angle_Speed)))
     else:
-      self.Angles[self.Angle_counter] = 0
-      self.Angles_later[self.Angle_counter] = 0
+      self.Angles[self.Angle_counter] = abs(ret.steeringAngle)/2
+      if ret.vEgo > 11:
+        self.Angles_later[self.Angle_counter] = abs(angle_later)/2
+      else:
+        self.Angles_later[self.Angle_counter] = 0.0
     self.Angle_counter = (self.Angle_counter + 1 ) % 250
 
     self.pcm_acc_status = cp.vl["PCM_CRUISE"]['CRUISE_STATE']
@@ -247,7 +247,7 @@ class CarState(CarStateBase):
     self.pcm_acc_active = bool(cp.vl["PCM_CRUISE"]['CRUISE_ACTIVE'])
     ret.cruiseState.enabled = self.pcm_acc_active
 
-    if self.CP.carFingerprint == CAR.PRIUS:
+    if self.CP.carFingerprint in [CAR.PRIUS, CAR.PRIUS_2019]:
       ret.genericToggle = cp.vl["AUTOPARK_STATUS"]['STATE'] != 0
     else:
       ret.genericToggle = bool(cp.vl["LIGHT_STALK"]['AUTO_HIGH_BEAM'])
@@ -354,7 +354,7 @@ class CarState(CarStateBase):
       checks.append(("PCM_CRUISE_2", 33))
 
 
-    if CP.carFingerprint == CAR.PRIUS:
+    if CP.carFingerprint in [CAR.PRIUS, CAR.PRIUS_2019]:
       signals += [("STATE", "AUTOPARK_STATUS", 0)]
 
     # add gas interceptor reading if we are using it
@@ -428,7 +428,7 @@ class CarState(CarStateBase):
       checks.append(("PCM_CRUISE_2", 33))
 
 
-    if CP.carFingerprint == CAR.PRIUS:
+    if CP.carFingerprint in [CAR.PRIUS, CAR.PRIUS_2019]:
       signals += [("STATE", "AUTOPARK_STATUS", 0)]
 
     # add gas interceptor reading if we are using it

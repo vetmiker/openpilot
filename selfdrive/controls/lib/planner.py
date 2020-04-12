@@ -193,8 +193,11 @@ class Planner():
     v_ego = sm['carState'].vEgo
     blinkers = sm['carState'].leftBlinker or sm['carState'].rightBlinker
     if blinkers:
-      steering_angle = 0.
-      angle_later = 0.
+      steering_angle = sm['carState'].steeringAngle/2.0
+      if v_ego < 11:
+        angle_later = 0.
+      else:
+        angle_later = arne_sm['latControl'].anglelater/2.0
     else:
       steering_angle = sm['carState'].steeringAngle
       if v_ego < 11:
@@ -319,9 +322,11 @@ class Planner():
         accel_limits[1] = required_decel
         self.a_acc_start = required_decel
         v_speedlimit_ahead = v_ego
-
+      
       v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit, v_speedlimit_ahead])
-
+      if (self.mpc1.prev_lead_status and self.mpc1.v_mpc < v_ego-1.0) or (self.mpc2.prev_lead_status and self.mpc2.v_mpc < v_ego - 1.0):
+        v_cruise_setpoint = v_ego
+        model_speed = v_ego
       self.v_cruise, self.a_cruise = speed_smoother(self.v_acc_start, self.a_acc_start,
                                                     v_cruise_setpoint,
                                                     accel_limits_turns[1], accel_limits_turns[0],
