@@ -155,16 +155,16 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
   # entrance in SOFT_DISABLING state
   soft_disable_timer = max(0, soft_disable_timer - 1)
 
-  traffic_status = arne_sm['trafficModelEvent'].status	
-  traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)	
-  if traffic_status == 'SLOW':	
-    AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))	
-  if traffic_confidence >= 95:	
-    #if traffic_status == 'GO':	
-    #  AM.add(frame, 'trafficGo', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))	
-    if traffic_status == 'DEAD':  # confidence will be 100	
+  traffic_status = arne_sm['trafficModelEvent'].status
+  traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
+  if traffic_status == 'SLOW':
+    AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+  if traffic_confidence >= 95:
+    elif traffic_status == 'GREEN':
+      AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+    if traffic_status == 'DEAD':  # confidence will be 100
       AM.add(frame, 'trafficDead', enabled)
-  
+
   df_alert = df_alert_manager.update(arne_sm)
   if df_alert is not None:
     AM.add(frame, 'dfButtonAlert', enabled, extra_text_1=df_alert, extra_text_2='Dynamic follow: {} profile active'.format(df_alert))
