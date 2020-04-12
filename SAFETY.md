@@ -12,8 +12,7 @@ However, even with an attentive driver, we must make further efforts for the sys
 safe. We repeat, **driver alertness is necessary, but not sufficient, for openpilot to be
 used safely** and this fork of openpilot is provided with no warranty of fitness for any purpose.
 
-this fork of openpilot is developed in good faith to be compliant with FMVSS requirements and to follow
-industry standards of safety for Level 3 Driver Assistance Systems. 
+this fork of openpilot is developed to become a Level 3 system, where currently it is at about 2.6 from my standpoint. 
 We also perform software-in-the-loop, hardware-in-the-loop and in-vehicle tests before each software release.
 Maintaining that the user is always in control and lateral input shall not disengage longitudinal control 
 and logitudinal control shall not disengage lateral input.
