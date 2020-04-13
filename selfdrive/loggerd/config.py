@@ -4,14 +4,16 @@ if os.environ.get('LOGGERD_ROOT', False):
   ROOT = os.environ['LOGGERD_ROOT']
   print("Custom loggerd root: ", ROOT)
 else:
-  ROOT = '/data/media/0/realdata/'
+  ROOT = '/data/media/0/ArnePilotdata/'
+  if not os.path.exists(ROOT):
+    os.mkdir(ROOT)
 
 SEGMENT_LENGTH = 60
 
 
 def get_available_percent(default=None):
     try:
-      statvfs = os.statvfs(ROOT)
+      statvfs = os.statvfs(#)
       available_percent = 100.0 * statvfs.f_bavail / statvfs.f_blocks
     except OSError:
       available_percent = default
