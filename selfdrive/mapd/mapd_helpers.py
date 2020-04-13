@@ -510,7 +510,7 @@ class Way:
                 loop_must_break = True
                 break
           if 'railway' in n.tags and n.tags['railway']=='level_crossing':
-            if (way_pts[count, 0] > 0) and not (traffic_confidence >= 75 and (traffic_status == 'GREEN' or (traffic_status == 'NONE' and last_not_none_signal == 'GREEN'))):
+            if (way_pts[count, 0] > 0) and (traffic_confidence >= 75 and (traffic_status == 'SLOW' or (traffic_status == 'NONE' and last_not_none_signal == 'SLOW'))):
               speed_ahead = 0
               speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
               loop_must_break = True
