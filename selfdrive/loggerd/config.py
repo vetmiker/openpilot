@@ -13,7 +13,7 @@ SEGMENT_LENGTH = 60
 
 def get_available_percent(default=None):
     try:
-      statvfs = os.statvfs(#)
+      statvfs = os.statvfs(ROOT)
       available_percent = 100.0 * statvfs.f_bavail / statvfs.f_blocks
     except OSError:
       available_percent = default
