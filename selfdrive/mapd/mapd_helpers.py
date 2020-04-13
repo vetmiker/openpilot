@@ -15,8 +15,8 @@ op_params = opParams()
 
 traffic_lights = op_params.get('traffic_lights', True)
 traffic_lights_without_direction = op_params.get('traffic_lights_without_direction', False)
-last_not_none_signal = 'None'
-last_not_none_signal_counter = 0
+#last_not_none_signal = 'None'
+#last_not_none_signal_counter = 0
 
 DEFAULT_SPEEDS_JSON_FILE = BASEDIR + "/selfdrive/mapd/default_speeds.json"
 DEFAULT_SPEEDS = {}
@@ -410,17 +410,17 @@ class Way:
             arne_sm.update(0)
             traffic_status = arne_sm['trafficModelEvent'].status
             traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
-            if traffic_status == 'GREEN' or traffic_status == 'SLOW':
-              last_not_none_signal = traffic_status
-              last_not_none_signal_counter = 0
-            elif traffic_status == 'NONE' and last_not_none_signal != 'NONE':
-              if last_not_none_signal_counter < 100:
-                last_not_none_signal_counter = last_not_none_signal_counter + 1
-              else:
-                last_not_none_signal = 'NONE'
+            #if traffic_status == 'GREEN' or traffic_status == 'SLOW':
+            #  last_not_none_signal = traffic_status
+            #  last_not_none_signal_counter = 0
+            #elif traffic_status == 'NONE' and last_not_none_signal != 'NONE':
+            #  if last_not_none_signal_counter < 100:
+            #    last_not_none_signal_counter = last_not_none_signal_counter + 1
+            #  else:
+            #    last_not_none_signal = 'NONE'
             if traffic_status == 'DEAD':
               pass
-            elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and (traffic_status == 'GREEN' or (traffic_status == 'NONE' and last_not_none_signal == 'GREEN')):
+            elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and (traffic_status == 'GREEN'): #or (traffic_status == 'NONE' and last_not_none_signal == 'GREEN')):
               loop_must_break = True
               break
             #elif traffic_confidence >= 75 and traffic_status == 'SLOW' and n.tags['highway'] != 'motorway':
@@ -527,16 +527,16 @@ class Way:
             arne_sm.update(0)
             traffic_status = arne_sm['trafficModelEvent'].status
             traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
-            if traffic_status == 'GREEN' or traffic_status == 'SLOW':
-              last_not_none_signal = traffic_status
-              last_not_none_signal_counter = 0
-            elif traffic_status == 'NONE' and last_not_none_signal != 'NONE':
-              if last_not_none_signal_counter < 100:
-                last_not_none_signal_counter = last_not_none_signal_counter + 1
-              else:
-                last_not_none_signal = 'NONE'
+            #if traffic_status == 'GREEN' or traffic_status == 'SLOW':
+            #  last_not_none_signal = traffic_status
+            #  last_not_none_signal_counter = 0
+            #elif traffic_status == 'NONE' and last_not_none_signal != 'NONE':
+            #  if last_not_none_signal_counter < 100:
+            #    last_not_none_signal_counter = last_not_none_signal_counter + 1
+            #  else:
+            #    last_not_none_signal = 'NONE'
               
-            if (way_pts[count, 0] > 0) and not (traffic_confidence >= 75 and (traffic_status == 'GREEN' or (traffic_status == 'NONE' and last_not_none_signal == 'GREEN'))):
+            if (way_pts[count, 0] > 0) and not (traffic_confidence >= 75 and (traffic_status == 'GREEN')):# or (traffic_status == 'NONE' and last_not_none_signal == 'GREEN'))):
               speed_ahead = 0
               speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
               loop_must_break = True
