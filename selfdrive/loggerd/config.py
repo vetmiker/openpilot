@@ -1,12 +1,18 @@
 import os
+from common.travis_checker import travis
 
 if os.environ.get('LOGGERD_ROOT', False):
   ROOT = os.environ['LOGGERD_ROOT']
   print("Custom loggerd root: ", ROOT)
+elif travis:
+  ROOT = '/data/media/0/realdata/'
 else:
   ROOT = '/data/media/0/ArnePilotdata/'
   if not os.path.exists(ROOT):
-    os.mkdir(ROOT)
+    try:
+      os.mkdir(ROOT)
+    except:
+      pass
 
 SEGMENT_LENGTH = 60
 
