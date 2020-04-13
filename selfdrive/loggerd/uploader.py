@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import os
 import re
-import time
+#import time
 import json
-import random
+#import random
 import ctypes
 import inspect
 import requests
@@ -12,7 +12,7 @@ import threading
 import subprocess
 
 from selfdrive.swaglog import cloudlog
-from selfdrive.loggerd.config import ROOT
+#from selfdrive.loggerd.config import ROOT
 from selfdrive.data_collection import gps_uploader
 
 from common import android
@@ -251,7 +251,7 @@ def uploader_fn(exit_event):
     on_hotspot = is_on_hotspot()
     on_wifi = is_on_wifi()
     should_upload = on_wifi and not on_hotspot
-    if on_wifi and not on_hotspot:
+    if should_upload:
       try:
         if last_gps_size == os.path.getsize("/data/openpilot/selfdrive/data_collection/gps-data"):
           gps_uploader.upload_data()
