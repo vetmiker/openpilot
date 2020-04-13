@@ -202,9 +202,9 @@ ALERTS = [
   Alert(
       "startup",
       "Be ready to take over at any time",
-      "Always keep hands on wheel and eyes on road",
+      "Do not forget to PRAY!",
       AlertStatus.normal, AlertSize.mid,
-      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 5.),
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 8.),
 
   Alert(
       "startupMaster",
