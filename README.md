@@ -5,6 +5,8 @@ This README describes the custom features build by me (Arne Schwarck) on top of 
 For a demo of this version of ArnePilot check the video below:
 [![demo of ArnePilot with this branch](https://img.youtube.com/vi/WKwSq8TPdpo/0.jpg)](https://www.youtube.com/playlist?list=PL3CGUyxys8DuTE1JTkdZwY93ejSfAGxyV)
 
+Find me on Discord https://discord.gg/R5YtuVB
+
 # Installation
 `cd /data; rm -rf ArnePilot; git clone https://github.com/arne182/ArnePilot; cd ArnePilot; git checkout release4;mv openpilot openpilot.old; mv ArnePilot openpilot; reboot`
 
