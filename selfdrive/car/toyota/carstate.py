@@ -97,11 +97,17 @@ class CarState(CarStateBase):
 
     ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
     try:
-      self.econ_on = cp.vl["GEAR_PACKET"]['ECON_ON']
+      if self.CP.carFingerprint in [CAR.COROLLAH_TSS2, CAR.LEXUS_ESH_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_UXH_TSS2]:
+        self.econ_on = cp.vl["GEAR_PACKET2"]['ECON_ON']
+      else:
+        self.econ_on = cp.vl["GEAR_PACKET"]['ECON_ON']
     except:
       self.econ_on = 0
     try:
-      self.sport_on = cp.vl["GEAR_PACKET"]['SPORT_ON']
+      if self.CP.carFingerprint in [CAR.COROLLAH_TSS2, CAR.LEXUS_ESH_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_UXH_TSS2]:
+        self.sport_on = cp.vl["GEAR_PACKET2"]['SPORT_ON']
+      else:
+        self.sport_on = cp.vl["GEAR_PACKET"]['SPORT_ON']
     except:
       self.sport_on = 0
     if self.sport_on == 1:
@@ -427,7 +433,9 @@ class CarState(CarStateBase):
       signals.append(("LOW_SPEED_LOCKOUT", "PCM_CRUISE_2", 0))
       checks.append(("PCM_CRUISE_2", 33))
 
-
+    if CP.carFingerprint in [CAR.COROLLAH_TSS2, CAR.LEXUS_ESH_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_UXH_TSS2]:
+      signals.append(("SPORT_ON", "GEAR_PACKET2", 0))
+      signals.append(("ECON_ON", "GEAR_PACKET2", 0))
     if CP.carFingerprint in [CAR.PRIUS, CAR.PRIUS_2019]:
       signals += [("STATE", "AUTOPARK_STATUS", 0)]
 
