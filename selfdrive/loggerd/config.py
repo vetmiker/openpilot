@@ -10,7 +10,7 @@ else:
   ROOT = '/data/media/0/ArnePilotdata/'
   if not os.path.exists(ROOT):
     try:
-      os.mkdir(ROOT)
+      os.makedirs(ROOT,0777)
     except:
       pass
 
