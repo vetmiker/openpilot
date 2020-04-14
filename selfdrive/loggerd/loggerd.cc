@@ -56,7 +56,7 @@
 
 #define CAMERA_FPS 20
 #define SEGMENT_LENGTH 60
-#define LOG_ROOT "/data/media/0/realdata"
+#define LOG_ROOT "/data/media/0/ArnePilotdata"
 #define ENABLE_LIDAR 0
 
 #define RAW_CLIP_LENGTH 100 // 5 seconds at 20fps
