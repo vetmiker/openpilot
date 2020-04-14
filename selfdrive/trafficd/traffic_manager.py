@@ -24,6 +24,7 @@ class Traffic:
     self.shown_dead_warning = False
 
   def start(self):
+    time.sleep(5)
     self.traffic_loop()
 
   def traffic_loop(self):
