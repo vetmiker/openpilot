@@ -7,7 +7,7 @@ $Java.outerClassname("arne182");
 
 @0xca61a35dedbd6328;
 
-struct ALCAStatus { 
+struct ALCAStatus {
   # ALCA info
   alcaEnabled @0 :Bool;
   alcaDirection @1 :Int8;
@@ -33,7 +33,7 @@ struct LongitudinalPIDTuningCruise {
   deadzoneBP @4 :List(Float32);
   deadzoneV @5 :List(Float32);
   }
-  
+
 struct ThermalOnlineData {
   cpu0 @0 :UInt16;
   cpu1 @1 :UInt16;
@@ -92,6 +92,7 @@ struct CarEventArne182 @0x9b1657f34caf3ad4 {
     rightALCbsm @5;
     leftALCbsm @6;
     preventALC @7;
+    dfButtonAlert @8;
   }
 }
 
@@ -101,7 +102,7 @@ struct CarStateArne182 {
 }
 
 
-struct Arne182Status { 
+struct Arne182Status {
   rightBlindspot @0 :Bool;
   distanceToggle @1 :Float32;
   laneDepartureToggle @2 :Bool;
@@ -142,6 +143,23 @@ struct SmiskolData {
   mpcTR @0 :Float32;
 }
 
+struct DynamicFollowButton {
+  status @0 :UInt16;
+}
+
+struct IPAddress {
+ ipAddr @0 :Text; # dragonpilot
+}
+
+struct TrafficModelRaw {
+  prediction @0 :List(Float32);
+}
+
+struct TrafficModelEvent {
+  status @0 :Text;
+  confidence @1 :Float32;
+}
+
 struct EventArne182 {
   # in nanoseconds?
   logMonoTime @0 :UInt64;
@@ -155,5 +173,9 @@ struct EventArne182 {
     managerData @5:ManagerData;
     thermalonline @7:ThermalOnlineData;
     smiskolData @8 :SmiskolData;
+    dynamicFollowButton @9 :DynamicFollowButton;
+    ipAddress @10 :IPAddress;
+    trafficModelRaw @11: TrafficModelRaw;
+    trafficModelEvent @12: TrafficModelEvent;
   }
 }

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import os
 import re
-import time
+#import time
 import json
-import random
+#import random
 import ctypes
 import inspect
 import requests
@@ -12,11 +12,11 @@ import threading
 import subprocess
 
 from selfdrive.swaglog import cloudlog
-from selfdrive.loggerd.config import ROOT
+#from selfdrive.loggerd.config import ROOT
 from selfdrive.data_collection import gps_uploader
 
 from common import android
-from common.params import Params
+#from common.params import Params
 from common.api import Api
 
 fake_upload = os.getenv("FAKEUPLOAD") is not None
@@ -73,7 +73,7 @@ def is_on_wifi():
     if result is None:
       return True
     return 'WIFI' in result
-  except (AttributeError, subprocess.CalledProcessError):
+  except Exception:
     cloudlog.exception("is_on_wifi failed")
     return False
 
@@ -230,16 +230,16 @@ class Uploader():
 def uploader_fn(exit_event):
   cloudlog.info("uploader_fn")
 
-  params = Params()
-  dongle_id = params.get("DongleId").decode('utf8')
+  #params = Params()
+  #dongle_id = params.get("DongleId").decode('utf8')
 
-  if dongle_id is None:
-    cloudlog.info("uploader missing dongle_id")
-    raise Exception("uploader can't start without dongle id")
+  #if dongle_id is None:
+  #  cloudlog.info("uploader missing dongle_id")
+  #  raise Exception("uploader can't start without dongle id")
 
-  uploader = Uploader(dongle_id, ROOT)
+  #uploader = Uploader(dongle_id, ROOT)
 
-  backoff = 0.1
+  #backoff = 0.1
 
   try:
     last_gps_size = os.path.getsize("/data/openpilot/selfdrive/data_collection/gps-data")
@@ -247,11 +247,11 @@ def uploader_fn(exit_event):
     last_gps_size = None
 
   while True:
-    allow_raw_upload = (params.get("IsUploadRawEnabled") != b"0")
+    #allow_raw_upload = (params.get("IsUploadRawEnabled") != b"0")
     on_hotspot = is_on_hotspot()
     on_wifi = is_on_wifi()
     should_upload = on_wifi and not on_hotspot
-    if on_wifi and not on_hotspot:
+    if should_upload:
       try:
         if last_gps_size == os.path.getsize("/data/openpilot/selfdrive/data_collection/gps-data"):
           gps_uploader.upload_data()
@@ -263,26 +263,28 @@ def uploader_fn(exit_event):
       last_gps_size = None
     if exit_event.is_set():
       return
+    # Todo: setup own upload for traffic light analysis
+    #Don't try and upload to comma servers 
+    
+    #d = uploader.next_file_to_upload(with_raw=allow_raw_upload and should_upload)
+    #if d is None:
+    #  time.sleep(5)
+    #  continue
 
-    d = uploader.next_file_to_upload(with_raw=allow_raw_upload and should_upload)
-    if d is None:
-      time.sleep(5)
-      continue
+    #key, fn = d
 
-    key, fn = d
+    #cloudlog.event("uploader_netcheck", is_on_hotspot=on_hotspot, is_on_wifi=on_wifi)
+    #cloudlog.info("to upload %r", d)
+    #success = uploader.upload(key, fn)
+    #if success:
+    #  backoff = 0.1
+    #else:
+    #  cloudlog.info("backoff %r", backoff)
+    #  time.sleep(backoff + random.uniform(0, backoff))
+    #  backoff = min(backoff*2, 120)
+    #cloudlog.info("upload done, success=%r", success)
 
-    cloudlog.event("uploader_netcheck", is_on_hotspot=on_hotspot, is_on_wifi=on_wifi)
-    cloudlog.info("to upload %r", d)
-    success = uploader.upload(key, fn)
-    if success:
-      backoff = 0.1
-    else:
-      cloudlog.info("backoff %r", backoff)
-      time.sleep(backoff + random.uniform(0, backoff))
-      backoff = min(backoff*2, 120)
-    cloudlog.info("upload done, success=%r", success)
-
-def main(gctx=None):
+def main():
   uploader_fn(threading.Event())
 
 if __name__ == "__main__":

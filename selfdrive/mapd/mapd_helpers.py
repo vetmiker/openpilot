@@ -3,11 +3,17 @@ import json
 import numpy as np
 from datetime import datetime
 from common.basedir import BASEDIR
+from common.op_params import opParams
 from selfdrive.config import Conversions as CV
 from common.transformations.coordinates import LocalCoord, geodetic2ecef
-Traffic_Debug = False # if traffic signals do not have a direction stop for them anyway
+
 LOOKAHEAD_TIME = 10.
 MAPS_LOOKAHEAD_DISTANCE = 50 * LOOKAHEAD_TIME
+
+op_params = opParams()
+
+traffic_lights = op_params.get('traffic_lights', True)
+traffic_lights_without_direction = op_params.get('traffic_lights_without_direction', False)
 
 DEFAULT_SPEEDS_JSON_FILE = BASEDIR + "/selfdrive/mapd/default_speeds.json"
 DEFAULT_SPEEDS = {}
@@ -296,7 +302,7 @@ class Way:
 
     return max_speed
 
-  def max_speed_ahead(self, current_speed_limit, lat, lon, heading, lookahead):
+  def max_speed_ahead(self, current_speed_limit, lat, lon, heading, lookahead, traffic_status, traffic_confidence, last_not_none_signal):
     """Look ahead for a max speed"""
     if not self.way:
       return None
@@ -341,7 +347,7 @@ class Way:
             else:
               circle = circle_through_points([way.way.nodes[0].lat,way.way.nodes[0].lon,1], [way.way.nodes[1].lat,way.way.nodes[1].lon,1], [way.way.nodes[-1].lat,way.way.nodes[-1].lon,1],True)
             a = 111132.954*math.cos(float(latmax+latmin)/360*3.141592)*float(circle[2])*2
-          speed_ahead = np.sqrt(1.6075*a)
+          speed_ahead = np.sqrt(2.0*a)
           min_dist = 999.9
           for w in way_pts:
             min_dist = min(min_dist, float(np.linalg.norm(w)))
@@ -397,14 +403,24 @@ class Way:
         count = 0
         loop_must_break = False
         for n in way.way.nodes:
-          if 'highway' in n.tags and (n.tags['highway']=='stop' or n.tags['highway']=='give_way' or n.tags['highway']=='mini_roundabout' or n.tags['highway']=='traffic_signals') and way_pts[count,0] > 0:
+          if 'highway' in n.tags and (n.tags['highway']=='stop' or n.tags['highway']=='give_way' or n.tags['highway']=='mini_roundabout' or (n.tags['highway']=='traffic_signals' and traffic_lights)) and way_pts[count,0] > 0:
+            if traffic_status == 'DEAD':
+              pass
+            elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and (traffic_status == 'GREEN' or (traffic_status == 'NONE' and last_not_none_signal == 'GREEN')):
+              loop_must_break = True
+              break
+            #elif traffic_confidence >= 75 and traffic_status == 'SLOW' and n.tags['highway'] != 'motorway':
+            #  speed_ahead = 0
+            #  speed_ahead_dist = 250
+            #  loop_must_break = True
+            #  break
             if 'direction' in n.tags:
               if backwards and (n.tags['direction']=='backward' or n.tags['direction']=='both'):
                 print("backward")
                 if way_pts[count, 0] > 0:
                   speed_ahead_dist = max(0. , way_pts[count, 0] - 1.0)
                   print(speed_ahead_dist)
-                  speed_ahead = 5/3.6
+                  speed_ahead = 7/3.6
                   if n.tags['highway']=='stop':
                     speed_ahead = 0
                   loop_must_break = True
@@ -414,7 +430,7 @@ class Way:
                 if way_pts[count, 0] > 0:
                   speed_ahead_dist = max(0. , way_pts[count, 0] - 1.0)
                   print(speed_ahead_dist)
-                  speed_ahead = 5/3.6
+                  speed_ahead = 7/3.6
                   if n.tags['highway']=='stop':
                     speed_ahead = 0
                   loop_must_break = True
@@ -430,7 +446,7 @@ class Way:
                   if abs(direction) > 135:
                     speed_ahead_dist = max(0. , way_pts[count, 0] - 1.0)
                     print(speed_ahead_dist)
-                    speed_ahead = 5/3.6
+                    speed_ahead = 7/3.6
                     if n.tags['highway']=='stop':
                       speed_ahead = 0
                     loop_must_break = True
@@ -484,7 +500,7 @@ class Way:
                   speed_ahead = 15/3.6
                   loop_must_break = True
                   break
-              if way_pts[count, 0] > 0 and Traffic_Debug:
+              if way_pts[count, 0] > 0 and traffic_lights_without_direction:
                 print("no direction")
                 speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
                 print(speed_ahead_dist)
@@ -494,7 +510,7 @@ class Way:
                 loop_must_break = True
                 break
           if 'railway' in n.tags and n.tags['railway']=='level_crossing':
-            if way_pts[count, 0] > 0:
+            if (way_pts[count, 0] > 0) and (traffic_confidence >= 75 and (traffic_status == 'SLOW' or (traffic_status == 'NONE' and last_not_none_signal == 'SLOW'))):
               speed_ahead = 0
               speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
               loop_must_break = True

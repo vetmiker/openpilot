@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import os
 import json
 import time
@@ -26,6 +25,13 @@ def read_params(params_file, default_params):
     return params, False
 
 
+class KeyInfo:
+  has_allowed_types = False
+  live = False
+  has_default = False
+  has_description = False
+
+
 class opParams:
   def __init__(self):
     """
@@ -41,20 +47,30 @@ class opParams:
       self.default_params = {'camera_offset': {'default': 0.06}}
     """
 
-    self.default_params = {'camera_offset': {'default': 0.06, 'allowed_types': [float, int], 'description': 'Your camera offset to use in lane_planner.py', 'live': True},
-                           'curvature_factor': {'default': 1.0, 'allowed_types': [float, int], 'description': 'Multiplier for the curvature slowdown. Increase for less braking.', 'live': False},
-                           'awareness_factor': {'default': 10., 'allowed_types': [float, int], 'description': 'Multiplier for the awareness times', 'live': False},
-                           'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False},
-                           'osm': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use OSM for drives', 'live': False},
-                           'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
-                           'alca_nudge_required': {'default': False, 'allowed_types': [bool], 'description': "Require nudge to start ALC", 'live': False},
-                           'keep_openpilot_engaged': {'default': True, 'allowed_types': [bool], 'description': 'True is stock behavior in this fork. False lets you use the brake and cruise control stalk to disengage as usual', 'live': False},
-                           'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
+    self.default_params = {'awareness_factor': {'default': 10., 'allowed_types': [float, int], 'description': 'Multiplier for the awareness times', 'live': False},
                            'alca_min_speed': {'default': 20, 'allowed_types': [float, int], 'description': 'Speed limit to start ALC in m/s', 'live': False},
+                           'alca_nudge_required': {'default': False, 'allowed_types': [bool], 'description': "Require nudge to start ALC", 'live': False},
+                           'camera_offset': {'default': 0.06, 'allowed_types': [float, int], 'description': 'Your camera offset to use in lane_planner.py', 'live': True},
+                           'curvature_factor': {'default': 1.0, 'allowed_types': [float, int], 'description': 'Multiplier for the curvature slowdown. Increase for less braking.', 'live': False},
+                           'cloak': {'default': True, 'allowed_types': [bool], 'description': "make comma believe you are on their fork", 'live': False},
+                           'dynamic_follow': {'default': 'relaxed', 'allowed_types': [str],
+                                              'description': "Can be: ('traffic', 'relaxed', 'roadtrip'): Left to right increases in following distance.\n"
+                                                             "All profiles support dynamic follow so you'll get your preferred distance while\n"
+                                                             "retaining the smoothness and safety of dynamic follow!", 'live': True},
+                           'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
+                           'keep_openpilot_engaged': {'default': True, 'allowed_types': [bool],
+                                                      'description': 'True is stock behavior in this fork. False lets you use the brake and cruise control stalk to disengage as usual', 'live': False},
+                           'limit_rsa': {'default': False, 'allowed_types': [bool], 'description': "Switch off RSA above rsa_max_speed", 'live': False},
                            'offset_limit': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed at which apk percent offset will work in m/s', 'live': False},
-                           'dynamic_follow': {'default': 'relaxed', 'allowed_types': [str], 'description': "Can be: ('traffic', 'relaxed', 'roadtrip'): Left to right increases in following distance.\n"
-                                                                                                           "All profiles support dynamic follow so you'll get your preferred distance while\n"
-                                                                                                           "retaining the smoothness and safety of dynamic follow!", 'live': True}}
+                           'osm': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use OSM for drives', 'live': False},
+                           'rsa_max_speed': {'default': 24.5, 'allowed_types': [float, int], 'description': 'Speed limit to ignore RSA in m/s', 'live': False},
+                           'smart_speed': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use Smart Speed for drives above smart_speed_max_vego', 'live': False},
+                           'smart_speed_max_vego': {'default': 26.8, 'allowed_types': [float, int], 'description': 'Speed limit to ignore Smartspeed in m/s', 'live': False},
+                           'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
+                           'traffic_lights': {'default': True, 'allowed_types': [bool], 'description': "Should Openpilot stop for traffic lights", 'live': False},
+                           'traffic_lights_without_direction': {'default': False, 'allowed_types': [bool], 'description': "Should Openpilot stop for traffic lights without a direction specified", 'live': False},
+                           'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False}
+                           }
 
     self.params = {}
     self.params_file = "/data/op_params.json"
@@ -134,12 +150,16 @@ class opParams:
       return self.params
 
     if key in self.params:
-      if key in self.default_params and 'allowed_types' in self.default_params[key]:
+      key_info = self.get_key_info(key)
+      if key_info.has_allowed_types:
         value = self.params[key]
         allowed_types = self.default_params[key]['allowed_types']
         valid_type = type(value) in allowed_types
         if not valid_type:
-          value = self.value_from_types(allowed_types)
+          if key_info.has_default:  # if value in op_params.json is not correct type, use default
+            value = self.default_params[key]['default']
+          else:  # else use a standard value based on type (last resort to keep openpilot running)
+            value = self.value_from_types(allowed_types)
       else:
         value = self.params[key]
     else:
@@ -147,17 +167,34 @@ class opParams:
 
     return value
 
+  def get_key_info(self, key):
+    key_info = KeyInfo()
+    if key in self.default_params:
+      if 'allowed_types' in self.default_params[key]:
+        allowed_types = self.default_params[key]['allowed_types']
+        if isinstance(allowed_types, list) and len(allowed_types) > 0:
+          key_info.has_allowed_types = True
+      if 'live' in self.default_params[key] and self.default_params[key]['live'] is True:
+        key_info.live = True
+      if 'default' in self.default_params[key]:
+        key_info.has_default = True
+      if 'description' in self.default_params[key]:
+        key_info.has_description = True
+    return key_info
+
   def value_from_types(self, allowed_types):
     if list in allowed_types:
       return []
     elif float in allowed_types or int in allowed_types:
       return 0
+    elif type(None) in allowed_types:
+      return None
     elif str in allowed_types:
       return ''
-    return None
+    return None  # unknown type
 
   def update_params(self, key, force_update):
-    if force_update or (key in self.default_params and 'live' in self.default_params[key] and self.default_params[key]['live']):  # if is a live param, we want to get updates while openpilot is running
+    if force_update or self.get_key_info(key).live:  # if is a live param, we want to get updates while openpilot is running
       if not travis and time.time() - self.last_read_time >= self.read_frequency:  # make sure we aren't reading file too often
         self.params, read_status = read_params(self.params_file, self.format_default_params())
         if not read_status:
