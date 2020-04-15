@@ -206,7 +206,11 @@ class MapsdThread(LoggerThread):
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
         self.sm = messaging.SubMaster(['gpsLocationExternal'])
-        self.arne_sm = messaging_arne.SubMaster(['liveTrafficData'])
+        self.arne_sm = messaging_arne.SubMaster(['liveTrafficData','trafficModelEvent'])
+        self.last_not_none_signal = 'NONE'
+        self.last_not_none_signal_counter = 0
+        self.traffic_confidence = 0
+        self.traffic_status = 'NONE'
         self.pm = messaging.PubMaster(['liveMapData'])
         self.logger.debug("entered mapsd_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
     def run(self):
@@ -231,6 +235,17 @@ class MapsdThread(LoggerThread):
             self.logger.debug("starting new cycle in endless loop")
             self.sm.update(0)
             self.arne_sm.update(0)
+            if self.arne_sm.updated['trafficModelEvent']:
+              self.traffic_status = self.arne_sm['trafficModelEvent'].status
+              self.traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)
+              if self.traffic_status == 'GREEN' or self.traffic_status == 'SLOW':
+                self.last_not_none_signal = self.traffic_status
+                self.last_not_none_signal_counter = 0
+              elif self.traffic_status == 'NONE' and self.last_not_none_signal != 'NONE':
+                if self.last_not_none_signal_counter < 50:
+                  self.last_not_none_signal_counter = self.last_not_none_signal_counter + 1
+                else:
+                  self.last_not_none_signal = 'NONE'
             gps_ext = self.sm['gpsLocationExternal']
             traffic = self.arne_sm['liveTrafficData']
 
@@ -263,7 +278,7 @@ class MapsdThread(LoggerThread):
             fix_ok = gps.flags & 1
             self.logger.debug("fix_ok = %s" % str(fix_ok))
 
-            if gps.accuracy > 2.0 and not speedLimittrafficvalid:
+            if gps.accuracy > 2.5 and not speedLimittrafficvalid:
                 fix_ok = False
             if not fix_ok or self.sharedParams['last_query_result'] is None or not self.sharedParams['cache_valid']:
                 self.logger.debug("fix_ok %s" % fix_ok)
@@ -370,9 +385,9 @@ class MapsdThread(LoggerThread):
                 max_speed_ahead = None
                 max_speed_ahead_dist = None
                 if max_speed is not None:
-                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(max_speed, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE)
+                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(max_speed, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, self.traffic_status, self.traffic_confidence, self.last_not_none_signal)
                 else:
-                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(speed*1.1, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE)
+                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(speed*1.1, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, self.traffic_status, self.traffic_confidence, self.last_not_none_signal)
                     # TODO: anticipate T junctions and right and left hand turns based on indicator
 
                 if max_speed_ahead is not None and max_speed_ahead_dist is not None:

@@ -93,7 +93,7 @@ ALERTS = [
       "Turn Exceeds Steering Limit",
       AlertStatus.userPrompt, AlertSize.mid,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimePrompt, 1., 2., 3.),
-  
+
   Alert(
       "waitingMode",
       "WAITING...",
@@ -116,9 +116,9 @@ ALERTS = [
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, 0.1, 2., 0.2),
 
   Alert(
-      "trafficGo",
-      "TRAFFIC LIGHT - GO",
-      "No red lights ahead",
+      "trafficGreen",
+      "TRAFFIC LIGHT - GREEN",
+      "Green traffic light ahead",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOW, VisualAlert.none, AudibleAlert.none, 0., 0., 0.2),
 
@@ -202,9 +202,9 @@ ALERTS = [
   Alert(
       "startup",
       "Be ready to take over at any time",
-      "Always keep hands on wheel and eyes on road",
+      "Do not forget to PRAY!",
       AlertStatus.normal, AlertSize.mid,
-      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 5.),
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 8.),
 
   Alert(
       "startupMaster",
@@ -295,7 +295,7 @@ ALERTS = [
       "Vision Model Output Uncertain",
       AlertStatus.userPrompt, AlertSize.mid,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 3.),
-  
+
   Alert(
       "rightALCbsm",
       "Vehicle in Right Lane",
@@ -322,7 +322,7 @@ ALERTS = [
         "",
         AlertStatus.normal, AlertSize.mid,
         Priority.LOWER, VisualAlert.none, AudibleAlert.chimeWarning1, 0.2, 0., 2.),
-  
+
   # Non-entry only alerts
   Alert(
       "wrongCarModeNoEntry",
@@ -557,7 +557,7 @@ ALERTS = [
       "Reverse Gear",
       AlertStatus.critical, AlertSize.full,
       Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.chimeWarningRepeat, 2.2, 3., 4.),
-  
+
   Alert(
       "reverseGearArne",
       "REVERSING",

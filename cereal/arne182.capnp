@@ -7,7 +7,7 @@ $Java.outerClassname("arne182");
 
 @0xca61a35dedbd6328;
 
-struct ALCAStatus { 
+struct ALCAStatus {
   # ALCA info
   alcaEnabled @0 :Bool;
   alcaDirection @1 :Int8;
@@ -33,7 +33,7 @@ struct LongitudinalPIDTuningCruise {
   deadzoneBP @4 :List(Float32);
   deadzoneV @5 :List(Float32);
   }
-  
+
 struct ThermalOnlineData {
   cpu0 @0 :UInt16;
   cpu1 @1 :UInt16;
@@ -93,9 +93,6 @@ struct CarEventArne182 @0x9b1657f34caf3ad4 {
     leftALCbsm @6;
     preventALC @7;
     dfButtonAlert @8;
-    trafficGo @9;
-    trafficSlow @10;
-    trafficDead @11;
   }
 }
 
@@ -105,7 +102,7 @@ struct CarStateArne182 {
 }
 
 
-struct Arne182Status { 
+struct Arne182Status {
   rightBlindspot @0 :Bool;
   distanceToggle @1 :Float32;
   laneDepartureToggle @2 :Bool;

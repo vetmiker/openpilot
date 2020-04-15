@@ -324,7 +324,7 @@ class Planner():
         v_speedlimit_ahead = v_ego
       
       v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit, v_speedlimit_ahead])
-      if (self.mpc1.prev_lead_status and self.mpc1.v_mpc < v_ego) or (self.mpc2.prev_lead_status and self.mpc2.v_mpc < v_ego):
+      if (self.mpc1.prev_lead_status and self.mpc1.v_mpc < v_ego*0.99) or (self.mpc2.prev_lead_status and self.mpc2.v_mpc < v_ego*0.99):
         v_cruise_setpoint = v_ego
         model_speed = v_ego
       self.v_cruise, self.a_cruise = speed_smoother(self.v_acc_start, self.a_acc_start,
