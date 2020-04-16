@@ -1,6 +1,6 @@
 #include "traffic.h"
 
-#include <sched.h>
+//#include <sched.h>
 
 using namespace std;
 
@@ -75,20 +75,20 @@ zdl::DlSystem::ITensor* executeNetwork(std::unique_ptr<zdl::SNPE::SNPE>& snpe, s
     return tensorPtr;
 }
 
-int set_realtime_priority(int level) {
-#ifdef __linux__
+//int set_realtime_priority(int level) {
+//#ifdef __linux__
+//
+//  long tid = syscall(SYS_gettid);
 
-  long tid = syscall(SYS_gettid);
-
-  // should match python using chrt
-  struct sched_param sa;
-  memset(&sa, 0, sizeof(sa));
-  sa.sched_priority = level;
-  return sched_setscheduler(tid, SCHED_FIFO, &sa);
-#else
-  return -1;
-#endif
-}
+//  // should match python using chrt
+//  struct sched_param sa;
+//  memset(&sa, 0, sizeof(sa));
+//  sa.sched_priority = level;
+//  return sched_setscheduler(tid, SCHED_FIFO, &sa);
+//#else
+//  return -1;
+//#endif
+//}
 
 void initModel() {
     zdl::DlSystem::Runtime_t runt=checkRuntime();
@@ -197,7 +197,7 @@ int main(){
     signal(SIGINT, (sighandler_t)set_do_exit);
     signal(SIGTERM, (sighandler_t)set_do_exit);
     int err;
-    set_realtime_priority(2);
+    //set_realtime_priority(2);
     initModel(); // init model
 
     VisionStream stream;
