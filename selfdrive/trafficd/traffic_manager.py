@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from common.numpy_fast import clip
 import cereal.messaging_arne as messaging_arne
 import numpy as np
