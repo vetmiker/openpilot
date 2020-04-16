@@ -14,6 +14,7 @@ op_params = opParams()
 
 traffic_lights = op_params.get('traffic_lights', True)
 traffic_lights_without_direction = op_params.get('traffic_lights_without_direction', False)
+rolling_stop = op_params.get('rolling_stop', False)
 
 DEFAULT_SPEEDS_JSON_FILE = BASEDIR + "/selfdrive/mapd/default_speeds.json"
 DEFAULT_SPEEDS = {}
@@ -421,7 +422,10 @@ class Way:
                   print(speed_ahead_dist)
                   speed_ahead = 7/3.6
                   if n.tags['highway']=='stop':
-                    speed_ahead = 0
+                    if rolling_stop:
+                      speed_ahead = 2.5
+                    else:
+                      speed_ahead = 0
                   loop_must_break = True
                   break
               elif not backwards and (n.tags['direction']=='forward' or n.tags['direction']=='both'):
@@ -431,7 +435,10 @@ class Way:
                   print(speed_ahead_dist)
                   speed_ahead = 7/3.6
                   if n.tags['highway']=='stop':
-                    speed_ahead = 0
+                    if rolling_stop:
+                      speed_ahead = 2.5
+                    else:
+                      speed_ahead = 0
                   loop_must_break = True
                   break
               try:
@@ -447,7 +454,10 @@ class Way:
                     print(speed_ahead_dist)
                     speed_ahead = 7/3.6
                     if n.tags['highway']=='stop':
-                      speed_ahead = 0
+                      if rolling_stop:
+                        speed_ahead = 2.5
+                      else:
+                        speed_ahead = 0
                     loop_must_break = True
                     break
               except (KeyError, ValueError):
@@ -505,7 +515,10 @@ class Way:
                 print(speed_ahead_dist)
                 speed_ahead = 5/3.6
                 if n.tags['highway']=='stop':
-                  speed_ahead = 0
+                  if rolling_stop:
+                    speed_ahead = 2.5
+                  else:
+                    speed_ahead = 0
                 loop_must_break = True
                 break
           if 'railway' in n.tags and n.tags['railway']=='level_crossing':
