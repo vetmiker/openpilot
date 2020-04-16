@@ -179,7 +179,8 @@ static std::vector<float> getFlatVector(const VIPCBuf* buf, const bool returnBGR
 int main(){
     signal(SIGINT, (sighandler_t)set_do_exit);
     signal(SIGTERM, (sighandler_t)set_do_exit);
-
+    int err;
+    set_realtime_priority(2);
     initModel(); // init model
 
     VisionStream stream;
@@ -189,7 +190,7 @@ int main(){
     assert(traffic_lights_sock != NULL);
     while (!do_exit){  // keep traffic running in case we can't get a frame (mimicking modeld)
         VisionStreamBufs buf_info;
-        int err = visionstream_init(&stream, VISION_STREAM_YUV, true, &buf_info);
+        err = visionstream_init(&stream, VISION_STREAM_YUV, true, &buf_info);
         if (err != 0) {
             printf("trafficd: visionstream fail\n");
             usleep(100000);
