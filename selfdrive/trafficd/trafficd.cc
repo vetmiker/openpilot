@@ -193,6 +193,7 @@ int main(){
         if (err != 0) {
             printf("trafficd: visionstream fail\n");
             usleep(100000);
+            continue;
         }
 
         double loopStart;
