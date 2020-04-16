@@ -215,12 +215,12 @@ car_started_processes = [
   'camerad',
   'trafficd',
   'traffic_manager',
-  'modeld',
   'proclogd',
   'ubloxd',
   'mapd',
   'thermalonlined',
   'locationd',
+  'modeld',
 ]
 if ANDROID:
   car_started_processes += [
