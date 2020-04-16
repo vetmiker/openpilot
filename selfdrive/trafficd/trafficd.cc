@@ -1,5 +1,7 @@
 #include "traffic.h"
 
+#include <sched.h>
+
 using namespace std;
 
 std::unique_ptr<zdl::SNPE::SNPE> snpe;
@@ -71,6 +73,21 @@ zdl::DlSystem::ITensor* executeNetwork(std::unique_ptr<zdl::SNPE::SNPE>& snpe, s
     const char* name = tensorNames.at(0);  // only should the first
     auto tensorPtr = outputTensorMap.getTensor(name);
     return tensorPtr;
+}
+
+int set_realtime_priority(int level) {
+#ifdef __linux__
+
+  long tid = syscall(SYS_gettid);
+
+  // should match python using chrt
+  struct sched_param sa;
+  memset(&sa, 0, sizeof(sa));
+  sa.sched_priority = level;
+  return sched_setscheduler(tid, SCHED_FIFO, &sa);
+#else
+  return -1;
+#endif
 }
 
 void initModel() {
