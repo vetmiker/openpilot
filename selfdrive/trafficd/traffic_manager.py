@@ -86,7 +86,7 @@ class Traffic:
 
 
 def main():
-  time.sleep(5)
+  #time.sleep(5)
   traffic = Traffic()
   traffic.start()
 
