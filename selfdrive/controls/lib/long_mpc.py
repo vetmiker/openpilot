@@ -110,7 +110,7 @@ class LongitudinalMpc():
 
     # Dynamic follow modifications (the secret sauce)
     x = [-5.0, 0.0, 5.0]  # relative velocity values
-    y = [0.2, 0.0, -0.2]  # modification values
+    y = [0.3, 0.0, -0.3]  # modification values
 
     self.TR_Mod = interp(lead.vRel, x, y)
     TR += self.TR_Mod
