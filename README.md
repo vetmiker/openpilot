@@ -8,13 +8,13 @@ For a demo of this version of ArnePilot check the video below:
 Find me on Discord https://discord.gg/R5YtuVB
 
 # Installation
-`cd /data; rm -rf ArnePilot; git clone https://github.com/arne182/ArnePilot; cd ArnePilot; git checkout release4;mv openpilot openpilot.old; mv ArnePilot openpilot; reboot`
+`cd /data; rm -rf openpilot; git clone https://github.com/arne182/openpilot; git checkout release4; reboot`
 
-still have trouble ?? More info about how to install this fork can be found [here](https://medium.com/@jfrux/comma-eon-installing-a-fork-of-ArnePilot-5c2b5c134b4b).
+still have trouble ?? More info about how to install this fork can be found [here](https://medium.com/@jfrux/comma-eon-installing-a-fork-of-openpilot-5c2b5c134b4b).
 
 ## Panda flashing
 
-This is done automatically otherwise run (pkill -f boardd; cd /data/ArnePilot/panda/board; make; reboot) to change the following:
+This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/panda/board; make; reboot) to change the following:
 - allowing no disengage on brake and gas for Toyota
 - changing acceleration limits for Toyota and
 - adapting lane departure warning where it gives you a slight push back into the middle of the lane without needing to be engaged (not yet complete)
@@ -33,7 +33,7 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/ArnePilot/pa
 
 # Configuration
 
-- You can turn on or off some of the feature by editing `op_edit.py`. run the following command `python /data/ArnePilot/op_edit.py`
+- You can turn on or off some of the feature by editing `op_edit.py`. run the following command `python /data/openpilot/op_edit.py`
 
 - You can also use live tuner to edit some of the feature live. `op_tune.py` Run the following command `python /data/ArnePilot/op_tune.py`
 

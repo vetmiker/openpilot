@@ -209,18 +209,18 @@ car_started_processes = [
   'plannerd',
   'loggerd',
   'radard',
-  'dmonitoringd',
+  'trafficd',
   'calibrationd',
   'paramsd',
   'camerad',
-  'trafficd',
-  'traffic_manager',
   'modeld',
   'proclogd',
   'ubloxd',
   'mapd',
   'thermalonlined',
   'locationd',
+  'traffic_manager',
+  'dmonitoringd',
 ]
 if ANDROID:
   car_started_processes += [

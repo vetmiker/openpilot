@@ -87,6 +87,12 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.85
       tire_stiffness_factor = 0.8
       
+    elif candidate == CAR.VW_ATLAS:
+      
+      ret.mass = 1950 + STD_CARGO_KG
+      ret.wheelbase = 2.98
+      tire_stiffness_factor = 0.8
+      
     # Not sure if I should simply exit or raise an error
     else:
       raise ValueError("Unsupported car %s" % candidate)

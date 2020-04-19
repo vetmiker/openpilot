@@ -63,6 +63,7 @@ class opParams:
                            'limit_rsa': {'default': False, 'allowed_types': [bool], 'description': "Switch off RSA above rsa_max_speed", 'live': False},
                            'offset_limit': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed at which apk percent offset will work in m/s', 'live': False},
                            'osm': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use OSM for drives', 'live': False},
+                           'rolling_stop': {'default': False, 'allowed_types': [bool], 'description': 'If you do not want stop signs to go down to 0 kph enable this for 9kph slow down', 'live': False},
                            'rsa_max_speed': {'default': 24.5, 'allowed_types': [float, int], 'description': 'Speed limit to ignore RSA in m/s', 'live': False},
                            'smart_speed': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use Smart Speed for drives above smart_speed_max_vego', 'live': False},
                            'smart_speed_max_vego': {'default': 26.8, 'allowed_types': [float, int], 'description': 'Speed limit to ignore Smartspeed in m/s', 'live': False},
