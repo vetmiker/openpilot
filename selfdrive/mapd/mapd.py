@@ -121,11 +121,11 @@ class QueryThread(LoggerThread):
                     self.prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
                 
                 dist = np.linalg.norm(cur_ecef - self.prev_ecef)
-                if dist < 3000: #updated when we are 1km from the edge of the downloaded circle
+                if dist < 1500: #updated when we are 500m from the edge of the downloaded circle
                     continue
                     self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(self.prev_ecef), str(dist)))
 
-                if dist > 4000:
+                if dist > 2000:
                     query_lock = self.sharedParams.get('query_lock', None)
                     if query_lock is not None:
                         query_lock.acquire()
@@ -135,7 +135,7 @@ class QueryThread(LoggerThread):
                         self.logger.error("There is no query_lock")
 
             if last_gps is not None and last_gps.accuracy < 5.0 and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
-                q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=4000)
+                q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=2000)
                 try:
                     try:
                         new_result = api.query(q)
@@ -242,7 +242,7 @@ class MapsdThread(LoggerThread):
                 self.last_not_none_signal = self.traffic_status
                 self.last_not_none_signal_counter = 0
               elif self.traffic_confidence >= 75 and self.traffic_status == 'NONE' and self.last_not_none_signal != 'NONE':
-                if self.last_not_none_signal_counter < 30:
+                if self.last_not_none_signal_counter < 5:
                   self.last_not_none_signal_counter = self.last_not_none_signal_counter + 1
                   print("self.last_not_none_signal_counter")
                   print(self.last_not_none_signal_counter)
