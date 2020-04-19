@@ -58,11 +58,11 @@ def update_panda():
       panda_dfu.recover()
 
     time.sleep(1)
-  #try:
-  #  fw_fn = get_firmware_fn()
-  #except:
-  #  pass
-  #fw_signature = get_expected_signature(fw_fn)
+  try:
+    fw_fn = get_firmware_fn()
+  except:
+    pass
+  fw_signature = get_expected_signature(fw_fn)
 
   try:
     serial = panda.get_serial()[0].decode("utf-8")
@@ -77,7 +77,7 @@ def update_panda():
     panda_version,
     panda_signature.hex(),
     repo_version,
-    #fw_signature.hex(),
+    fw_signature.hex(),
   ))
 
   if panda.bootstub or not panda_version.startswith(repo_version):# or panda_signature != fw_signature:
