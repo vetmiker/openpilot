@@ -174,13 +174,6 @@ class CarInterface(CarInterfaceBase):
     if self.CS.steeringFault:
       events.append(create_event('steerTempUnavailable', [ET.NO_ENTRY, ET.WARNING]))
 
-    # Engagement and longitudinal control using stock ACC. Make sure OP is
-    # disengaged if stock ACC is disengaged.
-    if not ret.cruiseState.enabled:
-      events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
-    # Attempt OP engagement only on rising edge of stock ACC engagement.
-    elif not self.cruise_enabled_prev:
-      events.append(create_event('pcmEnable', [ET.ENABLE]))
     ret_arne182.events = eventsArne182
     ret.events = events
     ret.buttonEvents = buttonEvents
