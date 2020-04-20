@@ -87,6 +87,7 @@ class CarState(CarStateBase):
       ("RightSeatBelt", "BCMDoorBeltStatus", 0),
       ("TurnSignals", "BCMTurnSignals", 0),
       ("AcceleratorPedal", "AcceleratorPedal", 0),
+      ("CruiseState", "AcceleratorPedal2", 0),
       ("ACCButtons", "ASCMSteeringButton", CruiseButtons.UNPRESS),
       ("SteeringWheelAngle", "PSCMSteeringAngle", 0),
       ("FLWheelSpd", "EBCMWheelSpdFront", 0),
@@ -96,22 +97,14 @@ class CarState(CarStateBase):
       ("PRNDL", "ECMPRDNL", 0),
       ("LKADriverAppldTrq", "PSCMStatus", 0),
       ("LKATorqueDeliveredStatus", "PSCMStatus", 0),
+      ("TractionControlOn", "ESPStatus", 0),
+      ("EPBClosed", "EPBStatus", 0),
+      ("CruiseMainOn", "ECMEngineStatus", 0),
     ]
 
     if CP.carFingerprint == CAR.VOLT:
       signals += [
         ("RegenPaddle", "EBCMRegenPaddle", 0),
-      ]
-    if CP.carFingerprint in SUPERCRUISE_CARS:
-      signals += [
-        ("ACCCmdActive", "ASCMActiveCruiseControlStatus", 0)
-      ]
-    else:
-      signals += [
-        ("TractionControlOn", "ESPStatus", 0),
-        ("EPBClosed", "EPBStatus", 0),
-        ("CruiseMainOn", "ECMEngineStatus", 0),
-        ("CruiseState", "AcceleratorPedal2", 0),
       ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, [], CanBus.POWERTRAIN)
