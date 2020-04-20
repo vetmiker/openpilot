@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from cereal import car, arne182
 from selfdrive.config import Conversions as CV
-from selfdrive.controls.lib.drive_helpers import create_event, create_event_arne, EventTypes as ET
+from selfdrive.controls.lib.drive_helpers import create_event, EventTypes as ET
 from selfdrive.car.nissan.values import CAR
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
