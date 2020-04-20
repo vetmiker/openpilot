@@ -324,7 +324,7 @@ const UIScene *scene = &s->scene;
     // Draw white vision track
     track_bg = nvgLinearGradient(s->vg, vwp_w, vwp_h, vwp_w, vwp_h*.4,
       COLOR_WHITE, COLOR_WHITE_ALPHA(0));
-      nvgRGBA(255, 255, 255, 200), nvgRGBA(255, 255, 255, 50));
+      nvgRGBA(255, 255, 255, 200), nvgRGBA(255, 255, 255, 50);
   }
 
   nvgFillPaint(s->vg, track_bg);
