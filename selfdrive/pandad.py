@@ -61,7 +61,7 @@ def update_panda():
   try:
     fw_fn = get_firmware_fn()
   except:
-    pass
+    fw_fn = None
   fw_signature = get_expected_signature(fw_fn)
 
   try:
