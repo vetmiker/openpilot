@@ -372,7 +372,7 @@ class CarInterface(CarInterfaceBase):
 
     else:
       raise ValueError("unsupported car %s" % candidate)
-      
+
     ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
     ret.longitudinalTuning.kiV = [0.15, 0.10]
     ret.steerControlType = car.CarParams.SteerControlType.torque
@@ -510,10 +510,6 @@ class CarInterface(CarInterfaceBase):
       events.append(create_event('buttonEnable', [ET.ENABLE]))
     ret_arne182.events = eventsArne182
     ret.events = events
-
-    # update previous brake/gas pressed
-    self.gas_pressed_prev = ret.gasPressed
-    self.brake_pressed_prev = ret.brakePressed
 
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()

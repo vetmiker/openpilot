@@ -7,6 +7,7 @@ op_params = opParams()
 
 #CAMERA_OFFSET = 0.04  # m from center car to camera
 
+
 def compute_path_pinv(l=50):
   deg = 3
   x = np.arange(l*1.0)
@@ -17,6 +18,10 @@ def compute_path_pinv(l=50):
 
 def model_polyfit(points, path_pinv):
   return np.dot(path_pinv, [float(x) for x in points])
+
+def eval_poly(poly, x):
+  return poly[3] + poly[2]*x + poly[1]*x**2 + poly[0]*x**3
+
 
 def eval_poly(poly, x):
   return poly[3] + poly[2]*x + poly[1]*x**2 + poly[0]*x**3
