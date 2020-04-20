@@ -4,8 +4,10 @@ from cereal import car
 from common.kalman.simple_kalman import KF1D
 from common.realtime import DT_CTRL
 from selfdrive.car import gen_empty_fingerprint
-from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event
+from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne
 from selfdrive.controls.lib.vehicle_model import VehicleModel
+import cereal.messaging as messaging
+from common.op_params import opParams
 
 GearShifter = car.CarState.GearShifter
 
@@ -13,6 +15,11 @@ GearShifter = car.CarState.GearShifter
 
 class CarInterfaceBase():
   def __init__(self, CP, CarController, CarState):
+    self.waiting = False
+    self.keep_openpilot_engaged = True
+    self.sm = messaging.SubMaster(['pathPlan'])
+    self.op_params = opParams()
+    self.alca_min_speed = self.op_params.get('alca_min_speed', default=20.0)
     self.CP = CP
     self.VM = VehicleModel(CP)
 
@@ -21,6 +28,7 @@ class CarInterfaceBase():
 
     self.CS = CarState(CP)
     self.cp = self.CS.get_can_parser(CP)
+    self.cp_init = self.CS.get_can_parser_init(CP)
     self.cp_cam = self.CS.get_cam_can_parser(CP)
 
     self.CC = None
@@ -78,22 +86,34 @@ class CarInterfaceBase():
   def apply(self, c):
     raise NotImplementedError
 
-  def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1, pcm_enable=True):
-    events = []
+  def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1):
+    if cs_out.cruiseState.enabled and not self.cruise_enabled_prev:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
+      disengage_event = True
+    else:
+      disengage_event = False
 
-    if cs_out.doorOpen:
+    events = []
+    eventsArne182 = []
+
+    if cs_out.doorOpen and disengage_event:
       events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if cs_out.seatbeltUnlatched:
+    if cs_out.seatbeltUnlatched and disengage_event:
       events.append(create_event('seatbeltNotLatched', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.gearShifter != GearShifter.drive and cs_out.gearShifter not in extra_gears:
-      events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+      if cs_out.vEgo < 5:
+        eventsArne182.append(create_event_arne('wrongGearArne', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+      else:
+        events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.gearShifter == GearShifter.reverse:
-      events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+      if cs_out.vEgo < 5:
+        eventsArne182.append(create_event_arne('reverseGearArne', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+      else:
+        events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
     if not cs_out.cruiseState.available:
       events.append(create_event('wrongCarMode', [ET.NO_ENTRY, ET.USER_DISABLE]))
     if cs_out.espDisabled:
       events.append(create_event('espDisabled', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if cs_out.gasPressed:
+    if cs_out.gasPressed and disengage_event:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
 
     # TODO: move this stuff to the capnp strut
@@ -117,6 +137,11 @@ class CarInterfaceBase():
         events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
 
     return events
+    if disengage_event and ((cs_out.gasPressed and (not self.gas_pressed_prev) and cs_out.vEgo > gas_resume_speed) or \
+       (cs_out.brakePressed and (not self.brake_pressed_prev or not cs_out.standstill))):
+      events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
+
+    return events, eventsArne182
 
 class RadarInterfaceBase():
   def __init__(self, CP):

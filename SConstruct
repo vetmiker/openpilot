@@ -148,6 +148,8 @@ env = Environment(
     "#selfdrive/loggerd/include",
     "#selfdrive/modeld",
     "#cereal/messaging",
+    "#cereal/messaging_arne",
+    "#selfdrive/trafficd",
     "#cereal",
     "#opendbc/can",
   ],
@@ -204,10 +206,13 @@ SConscript(['cereal/SConscript'])
 if SHARED:
   cereal = abspath([File('cereal/libcereal_shared.so')])
   messaging = abspath([File('cereal/libmessaging_shared.so')])
+  messaging_arne = abspath([File('cereal/libmessaging_arne_shared.so')])
 else:
   cereal = [File('#cereal/libcereal.a')]
   messaging = [File('#cereal/libmessaging.a')]
+  messaging_arne = [File('#cereal/libmessaging_arne.a')]
 Export('cereal', 'messaging')
+Export('cereal', 'messaging_arne')
 
 SConscript(['selfdrive/common/SConscript'])
 Import('_common', '_visionipc', '_gpucommon', '_gpu_libs')
@@ -246,6 +251,7 @@ if arch == "aarch64":
   SConscript(['selfdrive/logcatd/SConscript'])
   SConscript(['selfdrive/sensord/SConscript'])
   SConscript(['selfdrive/clocksd/SConscript'])
+  SConscript(['selfdrive/trafficd/SConscript'])
 
 SConscript(['selfdrive/locationd/SConscript'])
 SConscript(['selfdrive/locationd/kalman/SConscript'])

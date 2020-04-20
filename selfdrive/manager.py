@@ -75,6 +75,9 @@ else:
   from common.spinner import FakeSpinner as Spinner
   from common.text_window import FakeTextWindow as TextWindow
 
+if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
+  os.system("cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer")
+
 import importlib
 import traceback
 from multiprocessing import Process
@@ -162,6 +165,9 @@ ThermalStatus = cereal.log.ThermalData.ThermalStatus
 # comment out anything you don't want to run
 managed_processes = {
   "thermald": "selfdrive.thermald.thermald",
+  "trafficd": ("selfdrive/trafficd", ["./trafficd"]),
+  "traffic_manager": "selfdrive.trafficd.traffic_manager",
+  "thermalonlined": "selfdrive.thermalonlined",
   "uploader": "selfdrive.loggerd.uploader",
   "deleter": "selfdrive.loggerd.deleter",
   "controlsd": "selfdrive.controls.controlsd",
@@ -187,6 +193,7 @@ managed_processes = {
   "updated": "selfdrive.updated",
   "dmonitoringmodeld": ("selfdrive/modeld", ["./dmonitoringmodeld"]),
   "modeld": ("selfdrive/modeld", ["./modeld"]),
+  "mapd": ("selfdrive/mapd", ["./mapd.py"]),
   "driverview": "selfdrive.controls.lib.driverview",
 }
 
@@ -229,14 +236,18 @@ car_started_processes = [
   'plannerd',
   'loggerd',
   'radard',
-  'dmonitoringd',
+  'trafficd',
   'calibrationd',
   'paramsd',
   'camerad',
   'modeld',
   'proclogd',
   'ubloxd',
+  'mapd',
+  'thermalonlined',
   'locationd',
+  'traffic_manager',
+  'dmonitoringd',
 ]
 
 if WEBCAM:
@@ -324,9 +335,10 @@ def prepare_managed_process(p):
       subprocess.check_call(["make", "-j4"], cwd=os.path.join(BASEDIR, proc[0]))
     except subprocess.CalledProcessError:
       # make clean if the build failed
-      cloudlog.warning("building %s failed, make clean" % (proc, ))
-      subprocess.check_call(["make", "clean"], cwd=os.path.join(BASEDIR, proc[0]))
-      subprocess.check_call(["make", "-j4"], cwd=os.path.join(BASEDIR, proc[0]))
+      if proc[0] != 'selfdrive/mapd':
+        cloudlog.warning("building %s failed, make clean" % (proc, ))
+        subprocess.check_call(["make", "clean"], cwd=os.path.join(BASEDIR, proc[0]))
+        subprocess.check_call(["make", "-j4"], cwd=os.path.join(BASEDIR, proc[0]))
 
 
 def join_process(process, timeout):
@@ -419,6 +431,7 @@ def manager_init(should_register=True):
 def manager_thread():
   # now loop
   thermal_sock = messaging.sub_sock('thermal')
+  gps_sock = messaging.sub_sock('gpsLocation', conflate=True)
 
   if os.getenv("GET_CPU_USAGE"):
     proc_sock = messaging.sub_sock('procLog', conflate=True)
@@ -427,13 +440,13 @@ def manager_thread():
   cloudlog.info({"environ": os.environ})
 
   # save boot log
-  subprocess.call(["./loggerd", "--bootlog"], cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
+  #subprocess.call(["./loggerd", "--bootlog"], cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
 
   params = Params()
 
   # start daemon processes
-  for p in daemon_processes:
-    start_daemon_process(p)
+  #for p in daemon_processes:
+  #  start_daemon_process(p)
 
   # start persistent processes
   for p in persistent_processes:
@@ -457,8 +470,13 @@ def manager_thread():
   first_proc = None
 
   while 1:
+    gps = messaging.recv_one_or_none(gps_sock)
     msg = messaging.recv_sock(thermal_sock, wait=True)
-
+    if gps:
+      if 47.3024876979 < gps.gpsLocation.latitude < 54.983104153 and 5.98865807458 < gps.gpsLocation.longitude < 15.0169958839:
+        logger_dead = True
+      else:
+        logger_dead = True
     # heavyweight batch processes are gated on favorable thermal conditions
     if msg.thermal.thermalStatus >= ThermalStatus.yellow:
       for p in green_temp_processes:

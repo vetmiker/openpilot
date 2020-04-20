@@ -1,9 +1,11 @@
 #!/usr/bin/env python3.7
 import os
+import re
 import json
 import copy
-import datetime
 import psutil
+import datetime
+import subprocess
 from smbus2 import SMBus
 from cereal import log
 from common.android import ANDROID, get_network_type, get_network_strength
@@ -15,19 +17,20 @@ from common.filter_simple import FirstOrderFilter
 from selfdrive.version import terms_version, training_version
 from selfdrive.swaglog import cloudlog
 import cereal.messaging as messaging
+import cereal.messaging_arne as messaging_arne
 from selfdrive.loggerd.config import get_available_percent
-from selfdrive.pandad import get_expected_signature
+from selfdrive.pandad import get_expected_version
 from selfdrive.thermald.power_monitoring import PowerMonitoring, get_battery_capacity, get_battery_status, get_battery_current, get_battery_voltage, get_usb_present
 
-FW_SIGNATURE = get_expected_signature()
+FW_SIGNATURE = get_expected_version()
 
 ThermalStatus = log.ThermalData.ThermalStatus
 NetworkType = log.ThermalData.NetworkType
 NetworkStrength = log.ThermalData.NetworkStrength
 CURRENT_TAU = 15.   # 15s time constant
 CPU_TEMP_TAU = 5.   # 5s time constant
-DAYS_NO_CONNECTIVITY_MAX = 7  # do not allow to engage after a week without internet
-DAYS_NO_CONNECTIVITY_PROMPT = 4  # send an offroad prompt after 4 days with no internet
+DAYS_NO_CONNECTIVITY_MAX = 14  # do not allow to engage after a week without internet
+DAYS_NO_CONNECTIVITY_PROMPT = 8  # send an offroad prompt after 4 days with no internet
 
 LEON = False
 last_eon_fan_val = None
@@ -183,14 +186,29 @@ def thermald_thread():
   handle_fan = None
   is_uno = False
 
+  ts_last_ip = None
+  ip_addr = '255.255.255.255'
+
+  is_uno = (read_tz(29, clip=False) < -1000)
+  if is_uno or not ANDROID:
+    handle_fan = handle_fan_uno
+  else:
+    setup_eon_fan()
+    handle_fan = handle_fan_eon
+
   params = Params()
   pm = PowerMonitoring()
-
+  arne_pm = messaging_arne.PubMaster(['ipAddress'])
   while 1:
     health = messaging.recv_sock(health_sock, wait=True)
     location = messaging.recv_sock(location_sock)
     location = location.gpsLocation if location else None
     msg = read_thermal()
+
+    # clear car params when panda gets connected
+    if health is not None and health_prev is None:
+      params.panda_disconnect()
+    health_prev = health
 
     if health is not None:
       usb_power = health.health.usbPowerMode != log.HealthData.UsbPowerMode.client
@@ -238,6 +256,20 @@ def thermald_thread():
     if is_uno:
       msg.thermal.batteryPercent = 100
       msg.thermal.batteryStatus = "Charging"
+
+    # dragonpilot ip Mod
+    # update ip every 10 seconds
+    ts = sec_since_boot()
+    if ts_last_ip is None or ts - ts_last_ip >= 10.:
+      try:
+        result = subprocess.check_output(["ifconfig", "wlan0"], encoding='utf8')  # pylint: disable=unexpected-keyword-arg
+        ip_addr = re.findall(r"inet addr:((\d+\.){3}\d+)", result)[0][0]
+      except:
+        ip_addr = 'N/A'
+      ts_last_ip = ts
+      msg2 = messaging_arne.new_message('ipAddress')
+      msg2.ipAddress.ipAddr = ip_addr
+      arne_pm.send('ipAddress', msg2)
 
     current_filter.update(msg.thermal.batteryCurrent / 1e6)
 
@@ -320,8 +352,8 @@ def thermald_thread():
     accepted_terms = params.get("HasAcceptedTerms") == terms_version
     completed_training = params.get("CompletedTrainingVersion") == training_version
 
-    panda_signature = params.get("PandaFirmware")
-    fw_version_match = (panda_signature is None) or (panda_signature == FW_SIGNATURE)   # don't show alert is no panda is connected (None)
+    panda_signature = params.get("PandaFirmware", encoding="utf8")
+    fw_version_match = (panda_signature is None) or (panda_signature.startswith(FW_SIGNATURE) )   # don't show alert is no panda is connected (None)
 
     should_start = ignition
 

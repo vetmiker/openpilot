@@ -23,7 +23,7 @@ static void set_do_exit(int sig) {
 
 int main(int argc, char **argv) {
   int err;
-  set_realtime_priority(1);
+  set_realtime_priority(4);
 
   // messaging
   Context *msg_context = Context::create();
@@ -87,6 +87,7 @@ int main(int argc, char **argv) {
 
       LOGD("dmonitoring process: %.2fms, from last %.2fms", t2-t1, t1-last);
       last = t1;
+      //usleep(100000);
     }
 
   }

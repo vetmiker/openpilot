@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from cereal import car
+from cereal import car, arne182
 from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import create_event, EventTypes as ET
 from selfdrive.car.gm.values import CAR, Ecu, ECU_FINGERPRINT, CruiseButtons, \
@@ -101,9 +101,11 @@ class CarInterface(CarInterfaceBase):
                                                                          tire_stiffness_factor=tire_stiffness_factor)
 
     ret.longitudinalTuning.kpBP = [5., 35.]
-    ret.longitudinalTuning.kpV = [2.4, 1.5]
+    #ret.longitudinalTuning.kpV = [2.4, 1.5]
+    ret.longitudinalTuning.kpV = [0.3, 0.3]
     ret.longitudinalTuning.kiBP = [0.]
-    ret.longitudinalTuning.kiV = [0.36]
+    #ret.longitudinalTuning.kiV = [0.36]
+    ret.longitudinalTuning.kiV = [0.1]
 
     ret.stoppingControl = True
     ret.startAccel = 0.8
@@ -115,6 +117,7 @@ class CarInterface(CarInterfaceBase):
 
   # returns a car.CarState
   def update(self, c, can_strings):
+    ret_arne182 = arne182.CarStateArne182.new_message()
     self.cp.update_strings(can_strings)
 
     ret = self.CS.update(self.cp)
@@ -147,32 +150,41 @@ class CarInterface(CarInterfaceBase):
 
     ret.buttonEvents = buttonEvents
 
-    events = self.create_common_events(ret, pcm_enable=False)
+    events, eventsArne182 = self.create_common_events(ret)
 
-    if ret.vEgo < self.CP.minEnableSpeed:
-      events.append(create_event('speedTooLow', [ET.NO_ENTRY]))
-    if self.CS.park_brake:
-      events.append(create_event('parkBrake', [ET.NO_ENTRY, ET.USER_DISABLE]))
-    if ret.cruiseState.standstill:
-      events.append(create_event('resumeRequired', [ET.WARNING]))
-    if self.CS.pcm_acc_status == AccState.FAULTED:
-      events.append(create_event('controlsFailed', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+    if self.CS.car_fingerprint in SUPERCRUISE_CARS:
+      if ret.cruiseState.enabled and not self.cruise_enabled_prev:
+        events.append(create_event('pcmEnable', [ET.ENABLE]))
+      if not ret.cruiseState.enabled:
+        events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
 
-    # handle button presses
-    for b in ret.buttonEvents:
-      # do enable on both accel and decel buttons
-      if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
-        events.append(create_event('buttonEnable', [ET.ENABLE]))
-      # do disable on button down
-      if b.type == ButtonType.cancel and b.pressed:
-        events.append(create_event('buttonCancel', [ET.USER_DISABLE]))
+    else:
+      # TODO: why is this only not supercruise? ignore supercruise?
+      if ret.vEgo < self.CP.minEnableSpeed:
+        events.append(create_event('speedTooLow', [ET.NO_ENTRY]))
+      if self.CS.park_brake:
+        events.append(create_event('parkBrake', [ET.NO_ENTRY, ET.USER_DISABLE]))
+      if ret.cruiseState.standstill:
+        events.append(create_event('resumeRequired', [ET.WARNING]))
+      if self.CS.pcm_acc_status == AccState.FAULTED:
+        events.append(create_event('controlsFailed', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+
+      # handle button presses
+      for b in ret.buttonEvents:
+        # do enable on both accel and decel buttons
+        if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
+          events.append(create_event('buttonEnable', [ET.ENABLE]))
+        # do disable on button down
+        if b.type == ButtonType.cancel and b.pressed:
+          events.append(create_event('buttonCancel', [ET.USER_DISABLE]))
 
     ret.events = events
+    ret_arne182.events = eventsArne182
 
     # copy back carState packet to CS
     self.CS.out = ret.as_reader()
 
-    return self.CS.out
+    return self.CS.out, ret_arne182.as_reader()
 
   def apply(self, c):
     hud_v_cruise = c.hudControl.setSpeed

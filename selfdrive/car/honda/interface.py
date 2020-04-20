@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
-from cereal import car
+from cereal import car, arne182
 from common.numpy_fast import clip, interp
 from common.realtime import DT_CTRL
 from selfdrive.swaglog import cloudlog
@@ -189,6 +189,7 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalTuning.kiBP = [0., 35.]
       ret.longitudinalTuning.kiV = [0.54, 0.36]
 
+
     elif candidate in (CAR.ACCORD, CAR.ACCORD_15, CAR.ACCORDH):
       stop_and_go = True
       if not candidate == CAR.ACCORDH: # Hybrid uses same brake msg as hatch
@@ -372,6 +373,8 @@ class CarInterface(CarInterfaceBase):
     else:
       raise ValueError("unsupported car %s" % candidate)
 
+    ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
+    ret.longitudinalTuning.kiV = [0.15, 0.10]
     ret.steerControlType = car.CarParams.SteerControlType.torque
 
     # min speed to enable ACC. if car can do stop and go, then set enabling speed
@@ -408,6 +411,7 @@ class CarInterface(CarInterfaceBase):
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
 
+    ret_arne182 = arne182.CarStateArne182.new_message()
     ret = self.CS.update(self.cp, self.cp_cam)
 
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
@@ -454,7 +458,8 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = buttonEvents
 
     # events
-    events = self.create_common_events(ret, pcm_enable=False)
+    events, eventsArne182 = self.create_common_events(ret)
+
     if self.CS.brake_error:
       events.append(create_event('brakeUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
     if self.CS.brake_hold and self.CS.CP.carFingerprint not in HONDA_BOSCH:
@@ -503,11 +508,11 @@ class CarInterface(CarInterfaceBase):
         self.last_enable_sent = cur_time
     elif enable_pressed:
       events.append(create_event('buttonEnable', [ET.ENABLE]))
-
+    ret_arne182.events = eventsArne182
     ret.events = events
 
     self.CS.out = ret.as_reader()
-    return self.CS.out
+    return self.CS.out, ret_arne182.as_reader()
 
   # pass in a car.CarControl
   # to be called @ 100hz

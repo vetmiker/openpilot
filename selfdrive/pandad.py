@@ -6,6 +6,12 @@ import time
 from selfdrive.swaglog import cloudlog
 from panda import Panda, PandaDFU, BASEDIR, build_st
 
+def get_expected_version():
+  with open(os.path.join(BASEDIR, "VERSION")) as f:
+    repo_version = f.read()
+  repo_version += "-EON" if os.path.isfile('/EON') else "-DEV"
+  return repo_version
+
 
 def get_firmware_fn():
   signed_fn = os.path.join(BASEDIR, "board", "obj", "panda.bin.signed")
@@ -22,11 +28,15 @@ def get_firmware_fn():
 def get_expected_signature(fw_fn=None):
   if fw_fn is None:
     fw_fn = get_firmware_fn()
-
-  return Panda.get_signature_from_firmware(fw_fn)
+  try:
+    return Panda.get_signature_from_firmware(fw_fn)
+  except OSError:
+    return b'None'
 
 
 def update_panda():
+  repo_version = get_expected_version()
+  
   panda = None
   panda_dfu = None
 
@@ -48,8 +58,10 @@ def update_panda():
       panda_dfu.recover()
 
     time.sleep(1)
-
-  fw_fn = get_firmware_fn()
+  try:
+    fw_fn = get_firmware_fn()
+  except:
+    pass
   fw_signature = get_expected_signature(fw_fn)
 
   try:
@@ -59,16 +71,18 @@ def update_panda():
 
   panda_version = "bootstub" if panda.bootstub else panda.get_version()
   panda_signature = b"" if panda.bootstub else panda.get_signature()
-  cloudlog.warning("Panda %s connected, version: %s, signature %s, expected %s" % (
+
+  cloudlog.warning("Panda %s connected, version: %s, signature %s, expected version: %s, signature: %s" % (
     serial,
     panda_version,
     panda_signature.hex(),
+    repo_version,
     fw_signature.hex(),
   ))
 
-  if panda.bootstub or panda_signature != fw_signature:
+  if panda.bootstub or not panda_version.startswith(repo_version):# or panda_signature != fw_signature:
     cloudlog.info("Panda firmware out of date, update required")
-    panda.flash(fw_fn)
+    panda.flash()
     cloudlog.info("Done flashing")
 
   if panda.bootstub:
@@ -82,7 +96,8 @@ def update_panda():
     raise AssertionError
 
   panda_signature = panda.get_signature()
-  if panda_signature != fw_signature:
+  version = panda.get_version()
+  if not version.startswith(repo_version):# panda_signature != fw_signature:
     cloudlog.info("Version mismatch after flashing, exiting")
     raise AssertionError
 

@@ -95,6 +95,41 @@ ALERTS = [
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimePrompt, 1., 2., 3.),
 
   Alert(
+      "waitingMode",
+      "WAITING...",
+      "Press gas/resume to gain full control!",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 0.2),
+
+  Alert(
+      "longControlDisabled",
+      "BRAKE PRESSED",
+      "Longitudinal Control Disabled",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 0.2),
+
+  Alert(
+      "trafficSlow",
+      "TRAFFIC LIGHT - SLOW DOWN",
+      "Red traffic light ahead",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, 0.1, 2., 0.2),
+
+  Alert(
+      "trafficGreen",
+      "TRAFFIC LIGHT - GREEN",
+      "Green traffic light ahead",
+      AlertStatus.normal, AlertSize.mid,
+      Priority.LOW, VisualAlert.none, AudibleAlert.none, 0., 0., 0.2),
+
+  Alert(
+      "trafficDead",
+      "TRAFFICD IS DEAD",
+      "trafficd not responding!",
+      AlertStatus.critical, AlertSize.mid,
+      Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.chimeWarning2, 2., .2, 3.),
+
+  Alert(
       "steerTempUnavailable",
       "TAKE CONTROL",
       "Steering Temporarily Unavailable",
@@ -167,9 +202,9 @@ ALERTS = [
   Alert(
       "startup",
       "Be ready to take over at any time",
-      "Always keep hands on wheel and eyes on road",
+      "Do not forget to PRAY!",
       AlertStatus.normal, AlertSize.mid,
-      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 15.),
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 8.),
 
   Alert(
       "startupMaster",
@@ -260,6 +295,33 @@ ALERTS = [
       "Vision Model Output Uncertain",
       AlertStatus.userPrompt, AlertSize.mid,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 3.),
+
+  Alert(
+      "rightALCbsm",
+      "Vehicle in Right Lane",
+      "Waiting for Lane to be clear",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.MID, VisualAlert.steerRequired, AudibleAlert.none, 0., 0.4, .3),
+
+  Alert(
+      "leftALCbsm",
+      "Vehicle in Left Lane",
+      "Waiting for Lane to be clear",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.MID, VisualAlert.steerRequired, AudibleAlert.none, 0., 0.4, .3),
+
+  Alert(
+      "preventALC",
+      "TAKE CONTROL",
+      "Lane Change Cancelled, Lane Unsafe",
+      AlertStatus.critical, AlertSize.full,
+      Priority.HIGH, VisualAlert.none, AudibleAlert.chimeWarningRepeat, .4, 3., 3.,),
+
+  Alert("dfButtonAlert",
+        "Using profile: ",
+        "",
+        AlertStatus.normal, AlertSize.mid,
+        Priority.LOWER, VisualAlert.none, AudibleAlert.chimeWarning1, 0.2, 0., 2.),
 
   # Non-entry only alerts
   Alert(
@@ -353,6 +415,13 @@ ALERTS = [
       "System Overheated",
       AlertStatus.critical, AlertSize.full,
       Priority.MID, VisualAlert.steerRequired, AudibleAlert.chimeWarningRepeat, .1, 2., 2.),
+
+  Alert(
+      "wrongGearArne",
+      "TAKE CONTROL IMMEDIATELY",
+      "Gear not yet in D",
+      AlertStatus.critical, AlertSize.full,
+      Priority.MID, VisualAlert.steerRequired, AudibleAlert.none, .1, 2., 2.),
 
   Alert(
       "wrongGear",
@@ -488,6 +557,13 @@ ALERTS = [
       "Reverse Gear",
       AlertStatus.critical, AlertSize.full,
       Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.chimeWarningRepeat, 2.2, 3., 4.),
+
+  Alert(
+      "reverseGearArne",
+      "REVERSING",
+      "Reverse Gear",
+      AlertStatus.critical, AlertSize.full,
+      Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.none, 2.2, 3., 4.),
 
   Alert(
       "cruiseDisabled",
@@ -648,6 +724,13 @@ ALERTS = [
 
   Alert(
       "reverseGearNoEntry",
+      "openpilot Unavailable",
+      "Reverse Gear",
+      AlertStatus.normal, AlertSize.mid,
+      Priority.LOW, VisualAlert.none, AudibleAlert.chimeError, .4, 2., 3.),
+
+  Alert(
+      "reverseGearArneNoEntry",
       "openpilot Unavailable",
       "Reverse Gear",
       AlertStatus.normal, AlertSize.mid,
@@ -820,5 +903,5 @@ ALERTS = [
       "TAKE CONTROL",
       "Lane Departure Detected",
       AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimePrompt, 1., 2., 3.),
+      Priority.LOW, VisualAlert.none, AudibleAlert.none, 1., 2., 2.),
 ]

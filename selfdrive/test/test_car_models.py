@@ -20,7 +20,7 @@ from selfdrive.car.hyundai.values import CAR as HYUNDAI
 from selfdrive.car.chrysler.values import CAR as CHRYSLER
 from selfdrive.car.subaru.values import CAR as SUBARU
 from selfdrive.car.volkswagen.values import CAR as VOLKSWAGEN
-from selfdrive.car.nissan.values import CAR as NISSAN
+#from selfdrive.car.nissan.values import CAR as NISSAN
 
 
 os.environ['NOCRASH'] = '1'
@@ -67,13 +67,20 @@ routes = {
     'carFingerprint': CHRYSLER.PACIFICA_2019_HYBRID,
     'enableCamera': True,
   },
-  # This pacifica was removed because the fingerprint seemed from a Volt
+  #"9f7a7e50a51fb9db|2019-01-17--18-34-21": {
+  #  'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2017,
+  #  'enableCamera': True,
+  #},
+  #"192a598e34926b1e|2019-04-04--13-27-39": {
+  #  'carFingerprint': CHRYSLER.JEEP_CHEROKEE_2019,
+  #  'enableCamera': True,
+  #},
   "f1b4c567731f4a1b|2018-04-18--11-29-37": {
     'carFingerprint': FORD.FUSION,
     'enableCamera': False,
   },
-  "f1b4c567731f4a1b|2018-04-30--10-15-35": {
-    'carFingerprint': FORD.FUSION,
+  "7ed9cdf8d0c5f43e|2018-05-17--09-31-36": {
+    'carFingerprint': GM.CADILLAC_CT6,
     'enableCamera': True,
   },
   "c950e28c26b5b168|2018-05-30--22-03-41": {
@@ -273,16 +280,16 @@ routes = {
     'enableCamera': True,
     'enableDsu': False,
   },
-    "886fcd8408d570e9|2020-01-29--05-11-22": {
-      'carFingerprint': TOYOTA.LEXUS_RX,
-      'enableCamera': True,
-      'enableDsu': True,
-    },
-    "886fcd8408d570e9|2020-01-29--02-18-55": {
-      'carFingerprint': TOYOTA.LEXUS_RX,
-      'enableCamera': True,
-      'enableDsu': False,
-    },
+  "886fcd8408d570e9|2020-01-29--05-11-22": {
+    'carFingerprint': TOYOTA.LEXUS_RX,
+    'enableCamera': True,
+    'enableDsu': True,
+  },
+  "886fcd8408d570e9|2020-01-29--02-18-55": {
+    'carFingerprint': TOYOTA.LEXUS_RX,
+    'enableCamera': True,
+    'enableDsu': False,
+  },
   "b0f5a01cf604185c|2018-02-01--21-12-28": {
     'carFingerprint': TOYOTA.LEXUS_RXH,
     'enableCamera': True,
@@ -313,31 +320,32 @@ routes = {
     'enableCamera': True,
     'enableDsu': False,
   },
-  "2e07163a1ba9a780|2019-08-25--13-15-13": {
-    'carFingerprint': TOYOTA.LEXUS_IS,
-    'enableCamera': True,
-    'enableDsu': False,
-  },
+  #"362d23d4d5bea2fa|2018-08-10--13-31-40": {
+  #  'carFingerprint': TOYOTA.HIGHLANDERH,
+  #  'enableCamera': False,
+  #  'enableDsu': False,
+  #},
+  #"2e07163a1ba9a780|2019-08-25--13-15-13": {
+  #  'carFingerprint': TOYOTA.LEXUS_IS,
+  #  'enableCamera': True,
+  #  'enableDsu': False,
+  #},
   "2e07163a1ba9a780|2019-08-29--09-35-42": {
     'carFingerprint': TOYOTA.LEXUS_IS,
     'enableCamera': False,
     'enableDsu': False,
   },
   "1dd19ceed0ee2b48|2018-12-22--17-36-49": {
-    'carFingerprint': TOYOTA.LEXUS_IS, # 300 hybrid
+    'carFingerprint': TOYOTA.LEXUS_ISH, # 300 hybrid
     'enableCamera': True,
     'enableDsu': False,
-  },
-  "76b83eb0245de90e|2019-10-20--15-42-29": {
-    'carFingerprint': VOLKSWAGEN.GOLF,
-    'enableCamera': True,
   },
   "791340bc01ed993d|2019-03-10--16-28-08": {
     'carFingerprint': SUBARU.IMPREZA,
     'enableCamera': True,
   },
-  "fbbfa6af821552b9|2020-03-03--08-09-43": {
-    'carFingerprint': NISSAN.XTRAIL,
+  "76b83eb0245de90e|2019-10-20--15-42-29": {
+    'carFingerprint': VOLKSWAGEN.GOLF,
     'enableCamera': True,
   },
   "5b7c365c50084530|2020-03-25--22-10-13": {
@@ -345,6 +353,18 @@ routes = {
     'enableCamera': True,
   },
 
+  #"tbd": {
+  #  'carFingerprint': VOLKSWAGEN.SKODA_SUPERB_B8,
+  #  'enableCamera': True,
+  #},
+  #"a589dcc642fdb10a|2020-03-28--06-56-26": {
+  #  'carFingerprint': VOLKSWAGEN.VW_TOURAN,
+  #  'enableCamera': True,
+  #},
+  #"fbbfa6af821552b9|2020-03-03--08-09-43": {
+  #  'carFingerprint': NISSAN.XTRAIL,
+  #  'enableCamera': True,
+  #},
 }
 
 passive_routes = [
@@ -354,13 +374,19 @@ forced_dashcam_routes = [
   # Ford fusion
   "f1b4c567731f4a1b|2018-04-18--11-29-37",
   "f1b4c567731f4a1b|2018-04-30--10-15-35",
+
+  # Nissan
+  #"fbbfa6af821552b9|2020-03-03--08-09-43",
 ]
 
 # TODO: add routes for these cars
+
 non_tested_cars = [
-  CHRYSLER.JEEP_CHEROKEE,
   CHRYSLER.JEEP_CHEROKEE_2019,
+  CHRYSLER.JEEP_CHEROKEE_2017,
+  CHRYSLER.JEEP_CHEROKEE_2018,
   CHRYSLER.PACIFICA_2018,
+  CHRYSLER.PACIFICA_2017,
   CHRYSLER.PACIFICA_2018_HYBRID,
   CHRYSLER.PACIFICA_2020,
   GM.CADILLAC_ATS,
@@ -383,11 +409,18 @@ non_tested_cars = [
   HYUNDAI.KIA_STINGER,
   HYUNDAI.KONA,
   HYUNDAI.KONA_EV,
+  TOYOTA.PRIUS_2019,
   TOYOTA.CAMRYH,
   TOYOTA.CHR,
   TOYOTA.CHRH,
+  TOYOTA.LEXUS_CTH,
   TOYOTA.HIGHLANDERH,
-]
+  TOYOTA.LEXUS_UXH_TSS2,
+  VOLKSWAGEN.SKODA_SUPERB_B8,
+  VOLKSWAGEN.VW_TOURAN,
+  VOLKSWAGEN.VW_ATLAS
+  ]#, CHRYSLER.PACIFICA_2019_2020_HYBRID]
+
 
 if __name__ == "__main__":
 

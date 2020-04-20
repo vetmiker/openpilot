@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from cereal import car
+from cereal import car, arne182
 from selfdrive.config import Conversions as CV
 from selfdrive.car.subaru.values import CAR
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
@@ -51,8 +51,10 @@ class CarInterface(CarInterfaceBase):
 
   # returns a car.CarState
   def update(self, c, can_strings):
+    ret_arne182 = arne182.CarStateArne182.new_message()
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
+
 
     ret = self.CS.update(self.cp, self.cp_cam)
 
@@ -65,10 +67,21 @@ class CarInterface(CarInterfaceBase):
     be.type = car.CarState.ButtonEvent.Type.accelCruise
     buttonEvents.append(be)
 
-    ret.events = self.create_common_events(ret)
+    events, eventsArne182 = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.unknown])
+    if ret.cruiseState.enabled and not self.cruise_enabled_prev:
+      events.append(create_event('pcmEnable', [ET.ENABLE]))
+    if not ret.cruiseState.enabled:
+      events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
+
+    ret.events = events
+    ret_arne182.events = eventsArne182
+
+    self.gas_pressed_prev = ret.gasPressed
+    self.brake_pressed_prev = ret.brakePressed
+    self.cruise_enabled_prev = ret.cruiseState.enabled
 
     self.CS.out = ret.as_reader()
-    return self.CS.out
+    return self.CS.out, ret_arne182.as_reader()
 
   def apply(self, c):
     can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,

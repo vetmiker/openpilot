@@ -33,10 +33,13 @@ from pathlib import Path
 import fcntl
 import threading
 from cffi import FFI
+import time
 
 from common.basedir import BASEDIR
 from common.params import Params
 from selfdrive.swaglog import cloudlog
+from common.op_params import opParams
+from common.travis_checker import travis
 
 STAGING_ROOT = "/data/safe_staging"
 
@@ -47,6 +50,8 @@ FINALIZED = os.path.join(STAGING_ROOT, "finalized")
 
 NICE_LOW_PRIORITY = ["nice", "-n", "19"]
 SHORT = os.getenv("SHORT") is not None
+
+auto_update = opParams().get('autoUpdate', True) if not travis else False
 
 # Workaround for the EON/termux build of Python having os.link removed.
 ffi = FFI()
@@ -268,7 +273,7 @@ def finalize_from_ovfs_copy():
   cloudlog.info("done finalizing overlay")
 
 
-def attempt_update():
+def attempt_update(time_offroad, need_reboot):
   cloudlog.info("attempting git update inside staging overlay")
 
   setup_git_options(OVERLAY_MERGED)
@@ -280,7 +285,8 @@ def attempt_update():
   upstream_hash = run(["git", "rev-parse", "@{u}"], OVERLAY_MERGED).rstrip()
   new_version = cur_hash != upstream_hash
 
-  git_fetch_result = len(git_fetch_output) > 0 and (git_fetch_output != "Failed to add the host to the list of known hosts (/data/data/com.termux/files/home/.ssh/known_hosts).\n")
+  git_fetch_result = len(git_fetch_output) > 0 and (
+            git_fetch_output != "Failed to add the host to the list of known hosts (/data/data/com.termux/files/home/.ssh/known_hosts).\n")
 
   cloudlog.info("comparing %s to %s" % (cur_hash, upstream_hash))
   if new_version or git_fetch_result:
@@ -310,6 +316,20 @@ def attempt_update():
     cloudlog.info("nothing new from git at this time")
 
   set_update_available_params(new_version=new_version)
+  return auto_update_reboot(time_offroad, need_reboot, new_version)
+
+
+def auto_update_reboot(time_offroad, need_reboot, new_version):
+  min_reboot_time = 10.
+  if new_version and auto_update and not os.path.isfile("/data/no_ota_updates"):
+    try:
+      if 'already up to date' not in run(NICE_LOW_PRIORITY + ["git", "pull"]).lower():
+        need_reboot = True
+    except:
+      pass
+  if time.time() - time_offroad > min_reboot_time * 60 and need_reboot:  # allow reboot x minutes after stopping openpilot or starting EON
+    os.system('reboot')
+  return need_reboot
 
 
 def main():
@@ -332,6 +352,8 @@ def main():
   except IOError:
     raise RuntimeError("couldn't get overlay lock; is another updated running?")
 
+  time_offroad = time.time()
+  need_reboot = False
   while True:
     update_failed_count += 1
     time_wrong = datetime.datetime.utcnow().year < 2019
@@ -356,9 +378,10 @@ def main():
           overlay_init_done = True
 
         if params.get("IsOffroad") == b"1":
-          attempt_update()
+          need_reboot = attempt_update(time_offroad, need_reboot)
           update_failed_count = 0
         else:
+          time_offroad = time.time()
           cloudlog.info("not running updater, openpilot running")
 
       except subprocess.CalledProcessError as e:
@@ -379,6 +402,7 @@ def main():
 
   # We've been signaled to shut down
   dismount_ovfs()
+
 
 if __name__ == "__main__":
   main()
