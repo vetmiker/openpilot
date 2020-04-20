@@ -187,7 +187,6 @@ class QueryThread(LoggerThread):
 
                 except Exception as e:
                     self.logger.error("ERROR :" + str(e))
-                    crash.capture_warning(e)
                     query_lock = self.sharedParams.get('query_lock', None)
                     query_lock.acquire()
                     self.sharedParams['last_query_result'] = None
