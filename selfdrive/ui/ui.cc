@@ -312,7 +312,7 @@ static void ui_init(UIState *s) {
                               s->health_sock,
                               s->ubloxgnss_sock,
                               s->driverstate_sock,
-                              s->dmonitoring_sock
+                              s->dmonitoring_sock,
                               s->carstate_sock,
                               s->livempc_sock,
                               s->gps_sock
