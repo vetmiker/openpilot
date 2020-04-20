@@ -79,10 +79,6 @@ routes = {
     'carFingerprint': FORD.FUSION,
     'enableCamera': False,
   },
-  "7ed9cdf8d0c5f43e|2018-05-17--09-31-36": {
-    'carFingerprint': GM.CADILLAC_CT6,
-    'enableCamera': True,
-  },
   "c950e28c26b5b168|2018-05-30--22-03-41": {
     'carFingerprint': GM.VOLT,
     'enableCamera': True,
