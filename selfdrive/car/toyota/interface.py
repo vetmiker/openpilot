@@ -352,7 +352,7 @@ class CarInterface(CarInterfaceBase):
     events, eventsArne182 = self.create_common_events(ret, extra_gears)
 
     # cruise state
-    if not self.cruise_enabled_prev:
+    if not self.CS.out.cruiseState.enabled:
       self.waiting = False
       ret.cruiseState.enabled = self.CS.pcm_acc_active
     else:
@@ -397,7 +397,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.events = events
     ret_arne182.events = eventsArne182
-    self.cruise_enabled_prev = ret.cruiseState.enabled
+
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()
 
