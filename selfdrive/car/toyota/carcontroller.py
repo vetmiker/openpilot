@@ -236,7 +236,7 @@ class CarController():
       can_sends.append(create_ui_command(self.packer, steer_alert, pcm_cancel_cmd, left_line, right_line, left_lane_depart, right_lane_depart))
 
     if frame % 100 == 0 and (Ecu.dsu in self.fake_ecus or Ecu.unknown in self.fake_ecus):
-      can_sends.append(create_fcw_command(self.packer, fcw))
+      can_sends.append(create_fcw_command(self.packer, fcw_alert))
 
     #*** static msgs ***
 
