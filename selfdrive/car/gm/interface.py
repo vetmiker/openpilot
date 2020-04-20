@@ -150,33 +150,25 @@ class CarInterface(CarInterfaceBase):
 
     ret.buttonEvents = buttonEvents
 
-    events, eventsArne182 = self.create_common_events(ret)
+    events, eventsArne182 = self.create_common_events(ret, pcm_enable=False)
 
-    if self.CS.car_fingerprint in SUPERCRUISE_CARS:
-      if ret.cruiseState.enabled and not self.cruise_enabled_prev:
-        events.append(create_event('pcmEnable', [ET.ENABLE]))
-      if not ret.cruiseState.enabled:
-        events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
+    if ret.vEgo < self.CP.minEnableSpeed:
+      events.append(create_event('speedTooLow', [ET.NO_ENTRY]))
+    if self.CS.park_brake:
+      events.append(create_event('parkBrake', [ET.NO_ENTRY, ET.USER_DISABLE]))
+    if ret.cruiseState.standstill:
+      events.append(create_event('resumeRequired', [ET.WARNING]))
+    if self.CS.pcm_acc_status == AccState.FAULTED:
+      events.append(create_event('controlsFailed', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
 
-    else:
-      # TODO: why is this only not supercruise? ignore supercruise?
-      if ret.vEgo < self.CP.minEnableSpeed:
-        events.append(create_event('speedTooLow', [ET.NO_ENTRY]))
-      if self.CS.park_brake:
-        events.append(create_event('parkBrake', [ET.NO_ENTRY, ET.USER_DISABLE]))
-      if ret.cruiseState.standstill:
-        events.append(create_event('resumeRequired', [ET.WARNING]))
-      if self.CS.pcm_acc_status == AccState.FAULTED:
-        events.append(create_event('controlsFailed', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-
-      # handle button presses
-      for b in ret.buttonEvents:
-        # do enable on both accel and decel buttons
-        if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
-          events.append(create_event('buttonEnable', [ET.ENABLE]))
-        # do disable on button down
-        if b.type == ButtonType.cancel and b.pressed:
-          events.append(create_event('buttonCancel', [ET.USER_DISABLE]))
+    # handle button presses
+    for b in ret.buttonEvents:
+      # do enable on both accel and decel buttons
+      if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
+        events.append(create_event('buttonEnable', [ET.ENABLE]))
+      # do disable on button down
+      if b.type == ButtonType.cancel and b.pressed:
+        events.append(create_event('buttonCancel', [ET.USER_DISABLE]))
 
     ret.events = events
     ret_arne182.events = eventsArne182
