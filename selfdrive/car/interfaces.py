@@ -30,7 +30,6 @@ class CarInterfaceBase():
     self.cp = self.CS.get_can_parser(CP)
     self.cp_init = self.CS.get_can_parser_init(CP)
     self.cp_cam = self.CS.get_cam_can_parser(CP)
-    self.cruise_enabled_prev = False
 
     self.CC = None
     if CarController is not None:
@@ -88,7 +87,7 @@ class CarInterfaceBase():
     raise NotImplementedError
 
   def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1, pcm_enable=True):
-    if cs_out.cruiseState.enabled and not self.cruise_enabled_prev:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
+    if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
       disengage_event = True
     else:
       disengage_event = False
@@ -138,8 +137,8 @@ class CarInterfaceBase():
         events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
 
     return events
-    if disengage_event and ((cs_out.gasPressed and (not self.gas_pressed_prev) and cs_out.vEgo > gas_resume_speed) or \
-       (cs_out.brakePressed and (not self.brake_pressed_prev or not cs_out.standstill))):
+    if disengage_event and ((cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
+       (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill))):
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     return events, eventsArne182
