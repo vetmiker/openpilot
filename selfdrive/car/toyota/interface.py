@@ -397,7 +397,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.events = events
     ret_arne182.events = eventsArne182
-
+    self.cruise_enabled_prev = ret.cruiseState.enabled
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()
 
