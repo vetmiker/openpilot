@@ -30,6 +30,7 @@ class CarInterfaceBase():
     self.cp = self.CS.get_can_parser(CP)
     self.cp_init = self.CS.get_can_parser_init(CP)
     self.cp_cam = self.CS.get_cam_can_parser(CP)
+    self.cruise_enabled_prev = False
 
     self.CC = None
     if CarController is not None:
