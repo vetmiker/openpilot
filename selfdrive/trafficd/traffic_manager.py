@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from common.numpy_fast import clip
 import cereal.messaging_arne as messaging_arne
 import numpy as np
@@ -15,7 +17,7 @@ class Traffic:
     self.recurrent_length = 1.0  # in seconds, how far back to factor into current prediction
     self.min_preds = int(round(self.recurrent_length / self.model_rate))
     self.last_pred_weight = 5.  # places nx weight on most recent prediction
-    self.trafficd_timeout = 4.0  # in seconds, how long to wait before realizing trafficd is dead
+    self.trafficd_timeout = 5.0  # in seconds, how long to wait before realizing trafficd is dead
 
     self.past_preds = []
     self.weights = np.linspace(1, self.last_pred_weight, self.min_preds)
@@ -84,6 +86,7 @@ class Traffic:
 
 
 def main():
+  #time.sleep(5)
   traffic = Traffic()
   traffic.start()
 

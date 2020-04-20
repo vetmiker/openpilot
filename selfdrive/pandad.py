@@ -58,8 +58,10 @@ def update_panda():
       panda_dfu.recover()
 
     time.sleep(1)
-
-  fw_fn = get_firmware_fn()
+  try:
+    fw_fn = get_firmware_fn()
+  except:
+    pass
   fw_signature = get_expected_signature(fw_fn)
 
   try:

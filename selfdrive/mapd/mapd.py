@@ -121,11 +121,11 @@ class QueryThread(LoggerThread):
                     self.prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
                 
                 dist = np.linalg.norm(cur_ecef - self.prev_ecef)
-                if dist < 3000: #updated when we are 1km from the edge of the downloaded circle
+                if dist < 1500: #updated when we are 500m from the edge of the downloaded circle
                     continue
                     self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(self.prev_ecef), str(dist)))
 
-                if dist > 4000:
+                if dist > 2000:
                     query_lock = self.sharedParams.get('query_lock', None)
                     if query_lock is not None:
                         query_lock.acquire()
@@ -135,7 +135,7 @@ class QueryThread(LoggerThread):
                         self.logger.error("There is no query_lock")
 
             if last_gps is not None and last_gps.accuracy < 5.0 and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
-                q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=4000)
+                q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=2000)
                 try:
                     try:
                         new_result = api.query(q)
@@ -206,7 +206,11 @@ class MapsdThread(LoggerThread):
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
         self.sm = messaging.SubMaster(['gpsLocationExternal'])
-        self.arne_sm = messaging_arne.SubMaster(['liveTrafficData'])
+        self.arne_sm = messaging_arne.SubMaster(['liveTrafficData','trafficModelEvent'])
+        self.last_not_none_signal = 'NONE'
+        self.last_not_none_signal_counter = 0
+        self.traffic_confidence = 0
+        self.traffic_status = 'NONE'
         self.pm = messaging.PubMaster(['liveMapData'])
         self.logger.debug("entered mapsd_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
     def run(self):
@@ -231,6 +235,21 @@ class MapsdThread(LoggerThread):
             self.logger.debug("starting new cycle in endless loop")
             self.sm.update(0)
             self.arne_sm.update(0)
+            if self.arne_sm.updated['trafficModelEvent']:
+              self.traffic_status = self.arne_sm['trafficModelEvent'].status
+              self.traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)
+              if self.traffic_confidence >= 75 and (self.traffic_status == 'GREEN' or self.traffic_status == 'SLOW'):
+                self.last_not_none_signal = self.traffic_status
+                self.last_not_none_signal_counter = 0
+              elif self.traffic_confidence >= 75 and self.traffic_status == 'NONE' and self.last_not_none_signal != 'NONE':
+                if self.last_not_none_signal_counter < 5:
+                  self.last_not_none_signal_counter = self.last_not_none_signal_counter + 1
+                  print("self.last_not_none_signal_counter")
+                  print(self.last_not_none_signal_counter)
+                  print("self.last_not_none_signal")
+                  print(self.last_not_none_signal)
+                else:
+                  self.last_not_none_signal = 'NONE'
             gps_ext = self.sm['gpsLocationExternal']
             traffic = self.arne_sm['liveTrafficData']
 
@@ -370,9 +389,9 @@ class MapsdThread(LoggerThread):
                 max_speed_ahead = None
                 max_speed_ahead_dist = None
                 if max_speed is not None:
-                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(max_speed, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE)
+                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(max_speed, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, self.traffic_status, self.traffic_confidence, self.last_not_none_signal)
                 else:
-                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(speed*1.1, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE)
+                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(speed*1.1, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, self.traffic_status, self.traffic_confidence, self.last_not_none_signal)
                     # TODO: anticipate T junctions and right and left hand turns based on indicator
 
                 if max_speed_ahead is not None and max_speed_ahead_dist is not None:
