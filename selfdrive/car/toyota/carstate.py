@@ -157,7 +157,9 @@ class CarState(CarStateBase):
       self.rightblindspotD2 = 10.1
 
     msg.arne182Status.leftBlindspot = self.leftblindspot
+    ret.leftBlindspot = self.leftblindspot
     msg.arne182Status.rightBlindspot = self.rightblindspot
+    ret.rightBlindspot = self.rightblindspot
     msg.arne182Status.rightBlindspotD1 = self.rightblindspotD1
     msg.arne182Status.rightBlindspotD2 = self.rightblindspotD2
     msg.arne182Status.leftBlindspotD1 = self.leftblindspotD1
