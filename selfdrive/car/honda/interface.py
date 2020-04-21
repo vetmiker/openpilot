@@ -373,8 +373,8 @@ class CarInterface(CarInterfaceBase):
     else:
       raise ValueError("unsupported car %s" % candidate)
 
-    ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
-    ret.longitudinalTuning.kiV = [0.15, 0.10]
+    #ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
+    #ret.longitudinalTuning.kiV = [0.15, 0.10]
     ret.steerControlType = car.CarParams.SteerControlType.torque
 
     # min speed to enable ACC. if car can do stop and go, then set enabling speed
