@@ -8,6 +8,7 @@ from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event,
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 import cereal.messaging as messaging
 from common.op_params import opParams
+from common.travis_checker import travis
 
 GearShifter = car.CarState.GearShifter
 
@@ -90,7 +91,10 @@ class CarInterfaceBase():
     if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
       disengage_event = True
     else:
-      disengage_event = False
+      if travis:
+        disengage_event = True
+      else:
+        disengage_event = False
 
     events = []
     eventsArne182 = []
