@@ -458,7 +458,7 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = buttonEvents
 
     # events
-    events, eventsArne182 = self.create_common_events(ret)
+    events, ret_arne182.events = self.create_common_events(ret)
 
     if self.CS.brake_error:
       events.append(create_event('brakeUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
@@ -508,7 +508,7 @@ class CarInterface(CarInterfaceBase):
         self.last_enable_sent = cur_time
     elif enable_pressed:
       events.append(create_event('buttonEnable', [ET.ENABLE]))
-    ret_arne182.events = eventsArne182
+
     ret.events = events
 
     self.CS.out = ret.as_reader()
