@@ -125,8 +125,8 @@ class CarInterfaceBase():
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0.
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
-    if (cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
-       (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
+    if disengage_event and ((cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
+       (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill))):
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     # we engage when pcm is active (rising edge)
@@ -135,10 +135,6 @@ class CarInterfaceBase():
         events.append(create_event('pcmEnable', [ET.ENABLE]))
       elif not cs_out.cruiseState.enabled:
         events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
-
-    if disengage_event and ((cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
-       (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill))):
-      events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     return events, eventsArne182
 
