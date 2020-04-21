@@ -347,10 +347,8 @@ class CarInterface(CarInterfaceBase):
 
     # gear except P, R
     extra_gears = [GearShifter.neutral, GearShifter.eco, GearShifter.manumatic, GearShifter.drive, GearShifter.sport, GearShifter.low, GearShifter.brake, GearShifter.unknown]
-
-    # events
-    events, eventsArne182 = self.create_common_events(ret, extra_gears)
-
+    
+    longControlDisabled = False
     # cruise state
     if not self.CS.out.cruiseState.enabled:
       self.waiting = False
@@ -359,13 +357,17 @@ class CarInterface(CarInterfaceBase):
       if self.keep_openpilot_engaged:
         ret.cruiseState.enabled = bool(self.CS.main_on)
       if not self.CS.pcm_acc_active:
-        eventsArne182.append(create_event_arne('longControlDisabled', [ET.WARNING]))
+        longControlDisabled = True
         ret.brakePressed = True
         self.waiting = False
     if ret.vEgo < 1 or not self.keep_openpilot_engaged:
       ret.cruiseState.enabled = self.CS.pcm_acc_active
-    ret.cruiseState.available = bool(self.CS.main_on)
-    ret.cruiseState.speedOffset = 0.
+      
+    # events
+    events, eventsArne182 = self.create_common_events(ret, extra_gears)
+    
+    if longControlDisabled:
+      eventsArne182.append(create_event_arne('longControlDisabled', [ET.WARNING]))
 
     ret.buttonEvents = []
 
