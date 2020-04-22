@@ -35,13 +35,9 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 
 - You can turn on or off some of the feature by editing `op_edit.py`. run the following command `python /data/openpilot/op_edit.py`
 
-- You can also use live tuner to edit some of the feature live. `op_tune.py` Run the following command `python /data/ArnePilot/op_tune.py`
-
 # Todo
 
 - [ ] Auto Lane change from Boggyver on release2 and release3 branch. (only used in released 3 and below)
-
-- [ ] Traffic light detection from Littlemountainman
 
 - [ ] Phantom: control open pilot via app like summon ( only on release 3 and below.)
 
@@ -79,8 +75,10 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 This aims to provide a smoother driving experience in stop and go traffic (under 20 mph) by modifying the maximum gas that can be applied based on your current velocity and the relative velocity of the lead car. It'll also of course increase the maximum gas when the lead is accelerating to help you get up to speed quicker than stock. And smoother; this eliminates the jerking you get from stock ArnePilot with comma pedal. It tries to coast if the lead is only moving slowly, it doesn't use maximum gas as soon as the lead inches forward :). When you are above 20 mph, relative velocity and the following distance is taken into consideration.
 - ALC w/ BSM : (Automatic Lane Change with Blind spot monitoring) you can now change lane automataclly. It will wait 1 sec before applying ALC. If the BSM detacts objects it will stop the lane change and will take you back in your original lane. Also, it will notify the user on the eon
 - Added ability to turn on and off RSA at certain speed. `python /data/ArnePilot/op_edit.py`
-- Easily view the EON's IP Address.Just look at the sidebar right under wifi singal strength's. 
-- Battery has percentage instead of the battery icon. 
+- Easily view the EON's IP Address.Just look at the sidebar right under wifi singal strength's.
+- Battery has percentage instead of the battery icon.
+- [WIP] Traffic light detection from Littlemountainman, shane and brain.
+
 
 # Licensing
 

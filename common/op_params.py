@@ -53,6 +53,7 @@ class opParams:
                            'camera_offset': {'default': 0.06, 'allowed_types': [float, int], 'description': 'Your camera offset to use in lane_planner.py', 'live': True},
                            'curvature_factor': {'default': 1.0, 'allowed_types': [float, int], 'description': 'Multiplier for the curvature slowdown. Increase for less braking.', 'live': False},
                            'cloak': {'default': True, 'allowed_types': [bool], 'description': "make comma believe you are on their fork", 'live': False},
+                           'default_brake_distance': {'default': 250.0, 'allowed_types': [float, int], 'description': 'Distance in m to start braking for mapped speeds.', 'live': False},
                            'dynamic_follow': {'default': 'relaxed', 'allowed_types': [str],
                                               'description': "Can be: ('traffic', 'relaxed', 'roadtrip'): Left to right increases in following distance.\n"
                                                              "All profiles support dynamic follow so you'll get your preferred distance while\n"
