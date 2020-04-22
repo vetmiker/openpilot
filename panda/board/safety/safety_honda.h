@@ -121,7 +121,7 @@ static int honda_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if (is_user_brake_msg) {
       bool brake_pressed = honda_alt_brake_msg ? (GET_BYTE((to_push), 0) & 0x10) : (GET_BYTE((to_push), 6) & 0x20);
       if (brake_pressed && (!brake_pressed_prev || honda_moving)) {
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
       brake_pressed_prev = brake_pressed;
     }
@@ -218,14 +218,14 @@ static int honda_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
     honda_brake = (GET_BYTE(to_send, 0) << 2) + ((GET_BYTE(to_send, 1) >> 6) & 0x3);
     if (!current_controls_allowed) {
       if (honda_brake != 0) {
-        tx = 0;
+        tx = 1;
       }
     }
     if (honda_brake > 255) {
-      tx = 0;
+      tx = 1;
     }
     if (honda_fwd_brake) {
-      tx = 0;
+      tx = 1;
     }
   }
 
