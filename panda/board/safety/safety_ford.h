@@ -40,7 +40,7 @@ static int ford_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   if (addr == 0x165) {
     int brake_pressed = GET_BYTE(to_push, 0) & 0x20;
     if (brake_pressed && (!brake_pressed_prev || ford_moving)) {
-      controls_allowed = 0;
+      controls_allowed = 1;
     }
     brake_pressed_prev = brake_pressed;
   }
