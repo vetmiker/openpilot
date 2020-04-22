@@ -108,7 +108,7 @@ static int subaru_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if ((addr == 0x139) && subaru_global) {
       bool brake_pressed = (GET_BYTES_48(to_push) & 0xFFF0) > 0;
       if (brake_pressed && (!brake_pressed_prev || (subaru_speed > SUBARU_STANDSTILL_THRSLD))) {
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
       brake_pressed_prev = brake_pressed;
     }
