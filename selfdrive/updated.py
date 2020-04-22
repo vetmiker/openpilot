@@ -128,7 +128,7 @@ def set_update_available_params(new_version=False):
       params.put("ReleaseNotes", r + b"\n")
     except Exception:
       params.put("ReleaseNotes", "")
-    params.put("UpdateAvailable", "1")
+    params.put("UpdateAvailable", "0")
 
 
 def dismount_ovfs():
