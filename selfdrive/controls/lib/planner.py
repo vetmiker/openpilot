@@ -15,6 +15,7 @@ from selfdrive.controls.lib.speed_smoother import speed_smoother
 from selfdrive.controls.lib.longcontrol import LongCtrlState, MIN_CAN_SPEED
 from selfdrive.controls.lib.fcw import FCWChecker
 from selfdrive.controls.lib.long_mpc import LongitudinalMpc
+from selfdrive.controls.lib.long_mpc_model import LongitudinalMpcModel
 from common.travis_checker import travis
 from common.op_params import opParams
 op_params = opParams()
@@ -105,6 +106,7 @@ class Planner():
 
     self.mpc1 = LongitudinalMpc(1)
     self.mpc2 = LongitudinalMpc(2)
+    self.mpc_model = LongitudinalMpcModel()
 
     self.v_acc_start = 0.0
     self.a_acc_start = 0.0
@@ -114,8 +116,6 @@ class Planner():
     self.a_acc = 0.0
     self.v_cruise = 0.0
     self.a_cruise = 0.0
-    self.v_model = 0.0
-    self.a_model = 0.0
     self.osm = True
 
     self.longitudinalPlanSource = 'cruise'
@@ -145,7 +145,11 @@ class Planner():
         solutions['mpc1'] = self.mpc1.v_mpc
       if self.mpc2.prev_lead_status and lead2_check:
         solutions['mpc2'] = self.mpc2.v_mpc
-      solutions['model'] = self.v_model
+      if self.mpc_model.valid:
+        if self.mpc_model.v_mpc > 13.0: 
+          solutions['model'] = NO_CURVATURE_SPEED
+        else:
+          solutions['model'] = self.mpc_model.v_mpc + 5.0
       solutions['cruise'] = self.v_cruise
 
       slowest = min(solutions, key=solutions.get)
@@ -162,14 +166,15 @@ class Planner():
         self.v_acc = self.v_cruise
         self.a_acc = self.a_cruise
       elif slowest == 'model':
-        self.v_acc = self.v_model
-        self.a_acc = self.a_model
+        self.v_acc = self.mpc_model.v_mpc + 5.0
+        self.a_acc = self.mpc_model.a_mpc
 
     self.v_acc_future = v_cruise_setpoint
     if lead1_check:
-      self.v_acc_future = min([self.mpc1.v_mpc_future, self.v_acc_future])
+      self.v_acc_future = min([self.mpc1.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + 5.0])
     if lead2_check:
-      self.v_acc_future = min([self.mpc2.v_mpc_future, self.v_acc_future])
+      self.v_acc_future = min([self.mpc2.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + 5.0])
+    
 
   def update(self, sm, pm, CP, VM, PP, arne_sm):
     """Gets called when new radarState is available"""
@@ -218,23 +223,6 @@ class Planner():
     following = False if self.longitudinalPlanSource=='cruise' else (lead_1.status and lead_1.dRel < 40.0)
      
 
-    if len(sm['model'].path.poly):
-      path = list(sm['model'].path.poly)
-
-      # Curvature of polynomial https://en.wikipedia.org/wiki/Curvature#Curvature_of_the_graph_of_a_function
-      # y = a x^3 + b x^2 + c x + d, y' = 3 a x^2 + 2 b x + c, y'' = 6 a x + 2 b
-      # k = y'' / (1 + y'^2)^1.5
-      # TODO: compute max speed without using a list of points and without numpy
-      y_p = 3 * path[0] * self.path_x**2 + 2 * path[1] * self.path_x + path[2]
-      y_pp = 6 * path[0] * self.path_x + 2 * path[1]
-      curv = y_pp / (1. + y_p**2)**1.5 / curvature_factor
-
-      a_y_max = 2.975 - v_ego * 0.0375  # ~1.85 @ 75mph, ~2.6 @ 25mph
-      v_curvature = np.sqrt(a_y_max / np.clip(np.abs(curv), 1e-4, None))
-      model_speed = np.min(v_curvature)
-      model_speed = max(20.0 * CV.MPH_TO_MS, model_speed) # Don't slow down below 20mph
-    else:
-      model_speed = MAX_SPEED
     if gas_button_status == 1:
       speed_ahead_distance = 150
     elif gas_button_status == 2:
@@ -333,12 +321,6 @@ class Planner():
                                                     jerk_limits[1], jerk_limits[0],
                                                     LON_MPC_STEP)
 
-      self.v_model, self.a_model = speed_smoother(self.v_acc_start, self.a_acc_start,
-                                                    model_speed,
-                                                    2*accel_limits[1], accel_limits[0],
-                                                    2*jerk_limits[1], jerk_limits[0],
-                                                    LON_MPC_STEP)
-
       # cruise speed can't be negative even is user is distracted
       self.v_cruise = max(self.v_cruise, 0.)
     else:
@@ -355,9 +337,14 @@ class Planner():
 
     self.mpc1.set_cur_state(self.v_acc_start, self.a_acc_start)
     self.mpc2.set_cur_state(self.v_acc_start, self.a_acc_start)
+    self.mpc_model.set_cur_state(self.v_acc_start, self.a_acc_start)
 
     self.mpc1.update(pm, sm['carState'], lead_1, v_cruise_setpoint)
     self.mpc2.update(pm, sm['carState'], lead_2, v_cruise_setpoint)
+    self.mpc_model.update(sm['carState'].vEgo, sm['carState'].vEgo,
+                          sm['model'].longitudinal.distances,
+                          sm['model'].longitudinal.speeds,
+                          sm['model'].longitudinal.accelerations)
 
     self.choose_solution(v_cruise_setpoint, enabled, lead_1, lead_2, sm['carState'].steeringAngle)
 
