@@ -145,7 +145,7 @@ ALERTS = [
 
   Alert(
       "preDriverDistracted",
-      "KEEP EYES ON ROAD: Driver Appears Distracted",
+      "KEEP EYES ON ROAD: Driver Distracted",
       "",
       AlertStatus.normal, AlertSize.small,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, .0, .1, .1, alert_rate=0.75),
@@ -222,7 +222,7 @@ ALERTS = [
 
   Alert(
       "startupNoCar",
-      "Dashcam mode with unsupported car",
+      "Dashcam mode for unsupported car",
       "Always keep hands on wheel and eyes on road",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 15.),
@@ -334,7 +334,7 @@ ALERTS = [
   Alert(
       "dataNeededNoEntry",
       "openpilot Unavailable",
-      "Data Needed for Calibration. Upload Drive, Try Again",
+      "Calibration Needs Data. Upload Drive, Try Again",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOW, VisualAlert.none, AudibleAlert.chimeError, .4, 0., 3.),
 
@@ -579,6 +579,14 @@ ALERTS = [
       AlertStatus.critical, AlertSize.full,
       Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.chimeWarningRepeat, 2.2, 3., 4.),
 
+  Alert(
+      "relayMalfunction",
+      "TAKE CONTROL IMMEDIATELY",
+      "Harness Malfunction",
+      AlertStatus.critical, AlertSize.full,
+      Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.chimeWarningRepeat, 2.2, 3., 4.),
+
+
   # not loud cancellations (user is in control)
   Alert(
       "noTarget",
@@ -591,6 +599,13 @@ ALERTS = [
       "speedTooLow",
       "openpilot Canceled",
       "Speed too low",
+      AlertStatus.normal, AlertSize.mid,
+      Priority.HIGH, VisualAlert.none, AudibleAlert.chimeDisengage, .4, 2., 3.),
+
+  Alert(
+      "speedTooHigh",
+      "Speed Too High",
+      "Slow down to resume operation",
       AlertStatus.normal, AlertSize.mid,
       Priority.HIGH, VisualAlert.none, AudibleAlert.chimeDisengage, .4, 2., 3.),
 
@@ -612,7 +627,7 @@ ALERTS = [
   Alert(
       "calibrationInvalidNoEntry",
       "openpilot Unavailable",
-      "Calibration Invalid: Reposition Device and Recalibrate",
+      "Calibration Invalid: Reposition Device & Recalibrate",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOW, VisualAlert.none, AudibleAlert.chimeError, .4, 2., 3.),
 
@@ -770,6 +785,20 @@ ALERTS = [
       AlertStatus.normal, AlertSize.mid,
       Priority.LOW, VisualAlert.none, AudibleAlert.chimeDisengage, .4, 2., 3.),
 
+  Alert(
+      "speedTooHighNoEntry",
+      "Speed Too High",
+      "Slow down to engage",
+      AlertStatus.normal, AlertSize.mid,
+      Priority.LOW, VisualAlert.none, AudibleAlert.chimeError, .4, 2., 3.),
+
+  Alert(
+      "relayMalfunctionNoEntry",
+      "openpilot Unavailable",
+      "Harness Malfunction",
+      AlertStatus.normal, AlertSize.mid,
+      Priority.LOW, VisualAlert.none, AudibleAlert.chimeError, .4, 2., 3.),
+
   # permanent alerts
   Alert(
       "steerUnavailablePermanent",
@@ -803,6 +832,13 @@ ALERTS = [
       "invalidGiraffeToyotaPermanent",
       "Unsupported Giraffe Configuration",
       "Visit comma.ai/tg",
+      AlertStatus.normal, AlertSize.mid,
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
+
+  Alert(
+      "invalidLkasSettingPermanent",
+      "Stock LKAS is turned on",
+      "Turn off stock LKAS to engage",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
 
@@ -849,13 +885,19 @@ ALERTS = [
       Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
 
   Alert(
+      "relayMalfunctionPermanent",
+      "Harness Malfunction",
+      "Please Check Hardware",
+      AlertStatus.normal, AlertSize.mid,
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., .2),
+
+  Alert(
       "vehicleModelInvalid",
       "Vehicle Parameter Identification Failed",
       "",
       AlertStatus.normal, AlertSize.small,
       Priority.LOWEST, VisualAlert.steerRequired, AudibleAlert.none, .0, .0, .1),
 
-  # offroad alerts
   Alert(
       "ldwPermanent",
       "TAKE CONTROL",

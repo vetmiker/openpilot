@@ -67,7 +67,7 @@ class CarState(CarStateBase):
       ret.gasPressed = ret.gas > 15
     else:
       ret.gas = cp.vl["GAS_PEDAL"]['GAS_PEDAL']
-      ret.gasPressed = ret.gas > 1e-5
+      ret.gasPressed = cp.vl["PCM_CRUISE"]['GAS_RELEASED'] == 0
 
     ret.wheelSpeeds.fl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FL'] * CV.KPH_TO_MS
     ret.wheelSpeeds.fr = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FR'] * CV.KPH_TO_MS
@@ -102,14 +102,14 @@ class CarState(CarStateBase):
       self.econ_on = 0
     if self.CP.carFingerprint in [CAR.COROLLAH_TSS2, CAR.LEXUS_ESH_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_UXH_TSS2, CAR.CHRH]:
       self.econ_on = cp.vl["GEAR_PACKET2"]['ECON_ON']
-     
+
     try:
       self.sport_on = cp.vl["GEAR_PACKET"]['SPORT_ON']
     except:
       self.sport_on = 0
     if self.CP.carFingerprint in [CAR.COROLLAH_TSS2, CAR.LEXUS_ESH_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_UXH_TSS2, CAR.CHRH]:
       self.sport_on = cp.vl["GEAR_PACKET2"]['SPORT_ON']
-     
+
     if self.sport_on == 1:
       self.gasbuttonstatus = 1
     if self.econ_on == 1:
@@ -155,9 +155,11 @@ class CarState(CarStateBase):
       self.rightblindspot = cp.vl["BSM"]['R_ADJACENT'] == 1
       self.rightblindspotD1 = 10.1
       self.rightblindspotD2 = 10.1
-   
+
     msg.arne182Status.leftBlindspot = self.leftblindspot
+    ret.leftBlindspot = self.leftblindspot
     msg.arne182Status.rightBlindspot = self.rightblindspot
+    ret.rightBlindspot = self.rightblindspot
     msg.arne182Status.rightBlindspotD1 = self.rightblindspotD1
     msg.arne182Status.rightBlindspotD2 = self.rightblindspotD2
     msg.arne182Status.leftBlindspotD1 = self.leftblindspotD1
@@ -179,7 +181,7 @@ class CarState(CarStateBase):
 
     if self.CP.carFingerprint == CAR.LEXUS_IS:
       self.main_on = cp.vl["DSU_CRUISE"]['MAIN_ON'] != 0
-      ret.cruiseState.speed = cp.vl["DSU_CRUISE"]['SET_SPEED'] 
+      ret.cruiseState.speed = cp.vl["DSU_CRUISE"]['SET_SPEED']
       self.low_speed_lockout = False
     else:
       self.main_on = cp.vl["PCM_CRUISE_2"]['MAIN_ON'] != 0
@@ -302,9 +304,9 @@ class CarState(CarStateBase):
         dat.liveTrafficData.speedLimitValid = False
       if not travis:
         self.arne_pm.send('liveTrafficData', dat)
-        
+
     return ret
-  
+
   @staticmethod
   def get_can_parser_init(CP):
 
@@ -330,6 +332,7 @@ class CarState(CarStateBase):
       ("STEER_RATE", "STEER_ANGLE_SENSOR", 0),
       ("CRUISE_ACTIVE", "PCM_CRUISE", 0),
       ("CRUISE_STATE", "PCM_CRUISE", 0),
+      ("GAS_RELEASED", "PCM_CRUISE", 1),
       ("STEER_TORQUE_DRIVER", "STEER_TORQUE_SENSOR", 0),
       ("STEER_TORQUE_EPS", "STEER_TORQUE_SENSOR", 0),
       ("STEER_ANGLE", "STEER_TORQUE_SENSOR", 0),
@@ -373,6 +376,10 @@ class CarState(CarStateBase):
       signals.append(("INTERCEPTOR_GAS2", "GAS_SENSOR", 0))
       checks.append(("GAS_SENSOR", 50))
 
+    if CP.carFingerprint in TSS2_CAR:
+      signals += [("L_ADJACENT", "BSM", 0)]
+      signals += [("R_ADJACENT", "BSM", 0)]
+
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
 
   @staticmethod
@@ -398,6 +405,7 @@ class CarState(CarStateBase):
       ("STEER_RATE", "STEER_ANGLE_SENSOR", 0),
       ("CRUISE_ACTIVE", "PCM_CRUISE", 0),
       ("CRUISE_STATE", "PCM_CRUISE", 0),
+      ("GAS_RELEASED", "PCM_CRUISE", 1),
       ("STEER_TORQUE_DRIVER", "STEER_TORQUE_SENSOR", 0),
       ("STEER_TORQUE_EPS", "STEER_TORQUE_SENSOR", 0),
       ("STEER_ANGLE", "STEER_TORQUE_SENSOR", 0),
@@ -451,7 +459,7 @@ class CarState(CarStateBase):
     if CP.carFingerprint in TSS2_CAR:
       signals += [("L_ADJACENT", "BSM", 0)]
       signals += [("R_ADJACENT", "BSM", 0)]
-    
+
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
 
   @staticmethod
@@ -476,5 +484,5 @@ class CarState(CarStateBase):
     # use steering message to check if panda is connected to frc
     checks = [("STEERING_LKA", 42)]
 
-       
+
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)

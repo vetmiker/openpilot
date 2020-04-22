@@ -6,6 +6,8 @@ libs = [messaging_arne, common, 'OpenCL', 'SNPE', 'capnp', 'zmq', 'kj', 'yuv', g
 
 if arch == "aarch64":
   libs += ['gsl', 'CB', 'gnustl_shared']
+elif arch == "larch64":
+  libs += ['gsl', 'CB', 'symphony-cpu', 'pthread']
 else:
   libs += ['symphony-cpu', 'pthread']
 
@@ -16,4 +18,4 @@ else:
     lenv['CFLAGS'].append("-DUSE_TF_MODEL")
     lenv['CXXFLAGS'].append("-DUSE_TF_MODEL")
 
-lenv.Program(target='trafficd', source=["trafficd.cc"], LIBS=libs)
+lenv.Program(target='_trafficd', source=["trafficd.cc"], LIBS=libs)

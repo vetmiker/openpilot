@@ -372,9 +372,9 @@ class CarInterface(CarInterfaceBase):
 
     else:
       raise ValueError("unsupported car %s" % candidate)
-      
-    ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
-    ret.longitudinalTuning.kiV = [0.15, 0.10]
+
+    #ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
+    #ret.longitudinalTuning.kiV = [0.15, 0.10]
     ret.steerControlType = car.CarParams.SteerControlType.torque
 
     # min speed to enable ACC. if car can do stop and go, then set enabling speed
@@ -458,7 +458,7 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = buttonEvents
 
     # events
-    events, eventsArne182 = self.create_common_events(ret)
+    events, ret_arne182.events = self.create_common_events(ret, pcm_enable=False)
 
     if self.CS.brake_error:
       events.append(create_event('brakeUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
@@ -508,12 +508,8 @@ class CarInterface(CarInterfaceBase):
         self.last_enable_sent = cur_time
     elif enable_pressed:
       events.append(create_event('buttonEnable', [ET.ENABLE]))
-    ret_arne182.events = eventsArne182
-    ret.events = events
 
-    # update previous brake/gas pressed
-    self.gas_pressed_prev = ret.gasPressed
-    self.brake_pressed_prev = ret.brakePressed
+    ret.events = events
 
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()
