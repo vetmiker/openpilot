@@ -23,6 +23,7 @@ osm = op_params.get('osm', True)
 smart_speed = op_params.get('smart_speed', True)
 smart_speed_max_vego = op_params.get('smart_speed_max_vego', default=26.8)
 offset_limit = op_params.get('offset_limit', default=0.0)
+default_brake_distance = op_params.get('default_brake_distance', default=250.0)
 
 if not travis:
   curvature_factor = opParams().get('curvature_factor', default=1.0)
@@ -222,13 +223,13 @@ class Planner():
     
     following = False if self.longitudinalPlanSource=='cruise' else (lead_1.status and lead_1.dRel < 40.0)
      
-
     if gas_button_status == 1:
       speed_ahead_distance = 150
     elif gas_button_status == 2:
       speed_ahead_distance = 350
     else:
-      speed_ahead_distance = 250
+      speed_ahead_distance = default_brake_distance
+      
     v_speedlimit = NO_CURVATURE_SPEED
     v_curvature_map = NO_CURVATURE_SPEED
     v_speedlimit_ahead = NO_CURVATURE_SPEED
