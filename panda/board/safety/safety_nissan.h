@@ -93,7 +93,7 @@ static int nissan_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       }
 
       if (brake_pressed && (!brake_pressed_prev || (nissan_speed > 0.))) {
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
       brake_pressed_prev = brake_pressed;
     }
