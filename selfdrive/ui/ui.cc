@@ -632,6 +632,7 @@ void handle_message(UIState *s, Message * msg) {
   } else if (eventd.which == cereal_Event_carState) {
     struct cereal_CarState datad;
     cereal_read_CarState(&datad, eventd.carState);
+    s->scene.gear = datad.gearShifter;
     s->scene.brakeLights = datad.brakeLights;
     if(s->scene.leftBlinker!=datad.leftBlinker || s->scene.rightBlinker!=datad.rightBlinker)
       s->scene.blinker_blinkingrate = 100;
@@ -1191,7 +1192,12 @@ int main(int argc, char* argv[]) {
       // always process events offroad
       check_messages(s);
     } else {
-      set_awake(s, true);
+      // blank screen on reverse gear
+      if (s->scene.gear == 4) {
+        set_awake(s, false);
+      } else {
+        set_awake(s, true);
+      }
       // Car started, fetch a new rgb image from ipc
       if (s->vision_connected){
         ui_update(s);
