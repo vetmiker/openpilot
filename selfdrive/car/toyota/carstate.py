@@ -32,6 +32,7 @@ class CarState(CarStateBase):
     self.angle_offset = 0.
     self.pcm_acc_active = False
     self.main_on = False
+    self.gas_pressed = False
     self.v_cruise_pcmlast = 0.0
     self.setspeedoffset = 34.0
     self.setspeedcounter = 0
@@ -68,7 +69,7 @@ class CarState(CarStateBase):
     else:
       ret.gas = cp.vl["GAS_PEDAL"]['GAS_PEDAL']
       ret.gasPressed = cp.vl["PCM_CRUISE"]['GAS_RELEASED'] == 0
-
+    
     ret.wheelSpeeds.fl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FL'] * CV.KPH_TO_MS
     ret.wheelSpeeds.fr = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FR'] * CV.KPH_TO_MS
     ret.wheelSpeeds.rl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_RL'] * CV.KPH_TO_MS
@@ -304,7 +305,13 @@ class CarState(CarStateBase):
         dat.liveTrafficData.speedLimitValid = False
       if not travis:
         self.arne_pm.send('liveTrafficData', dat)
-
+    if (self.gas_pressed and not ret.gasPressed):
+      dat = messaging_arne.new_message('liveTrafficData')
+      dat.liveTrafficData.speedLimitValid = True
+      dat.liveTrafficData.speedLimit = ret.vEgo * 3.6
+      if not travis:
+        self.arne_pm.send('liveTrafficData', dat)
+    self.gas_pressed = ret.gasPressed
     return ret
 
   @staticmethod
