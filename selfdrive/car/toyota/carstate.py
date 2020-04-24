@@ -283,7 +283,7 @@ class CarState(CarStateBase):
     self.tsgn4 = cp_cam.vl["RSA2"]['TSGN4']
     self.splsgn4 = cp_cam.vl["RSA2"]['SPLSGN4']
     self.noovertake = self.tsgn1 == 65 or self.tsgn2 == 65 or self.tsgn3 == 65 or self.tsgn4 == 65 or self.tsgn1 == 66 or self.tsgn2 == 66 or self.tsgn3 == 66 or self.tsgn4 == 66
-    if self.spdval1 > 0 or self.spdval2 > 0:
+    if (self.spdval1 > 0 or self.spdval2 > 0) and not (self.spdval1 == 35 and self.tsgn1 == 1):
       dat = messaging_arne.new_message('liveTrafficData')
       if self.spdval1 > 0:
         dat.liveTrafficData.speedLimitValid = True
