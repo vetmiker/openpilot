@@ -31,6 +31,7 @@ class CarState(CarStateBase):
     self.needs_angle_offset = CP.carFingerprint not in TSS2_CAR
     self.angle_offset = 0.
     self.pcm_acc_active = False
+    self.engaged_when_gas_was_pressed = False
     self.main_on = False
     self.gas_pressed = False
     self.v_cruise_pcmlast = 0.0
@@ -305,7 +306,9 @@ class CarState(CarStateBase):
         dat.liveTrafficData.speedLimitValid = False
       if not travis:
         self.arne_pm.send('liveTrafficData', dat)
-    if (self.gas_pressed and not ret.gasPressed):
+    if ret.gasPressed and not self.gas_pressed:
+      self.engaged_when_gas_was_pressed = self.pcm_acc_active
+    if (self.gas_pressed and not ret.gasPressed) and self.engaged_when_gas_was_pressed:
       dat = messaging_arne.new_message('liveTrafficData')
       dat.liveTrafficData.speedLimitValid = True
       dat.liveTrafficData.speedLimit = ret.vEgo * 3.6
