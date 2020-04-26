@@ -15,7 +15,7 @@ class CAR:
   RAV4H = "TOYOTA RAV4 HYBRID 2017"
   RAV4 = "TOYOTA RAV4 2017"
   COROLLA = "TOYOTA COROLLA 2017"
-  LEXUS_RX = "LEXUS RX 350 2016"
+  LEXUS_RX = "LEXUS RX 350 2017"
   LEXUS_RXH = "LEXUS RX HYBRID 2017"
   LEXUS_RX_TSS2 = "LEXUS RX350 2020"
   CHR = "TOYOTA C-HR 2018"
@@ -846,6 +846,26 @@ FW_VERSIONS = {
       b'8646F4801200\x00\x00\x00\x00',
       b'8646F4802200\x00\x00\x00\x00',
       b'8646F4809000\x00\x00\x00\x00',
+    ],
+  },
+  CAR.LEXUS_RX: {
+    (Ecu.engine, 0x700, None): [
+      b'\x01896630E41200\x00\x00\x00\x00',
+    ],
+    (Ecu.esp, 0x7b0, None): [
+      b'F152648473\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.dsu, 0x791, None): [
+      b'881514810500\x00\x00\x00\x00',
+    ],
+    (Ecu.eps, 0x7a1, None): [
+      b'8965B0E012\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.fwdRadar, 0x750, 0xf): [
+      b'8821F4701100\x00\x00\x00\x00',
+    ],
+    (Ecu.fwdCamera, 0x750, 0x6d): [
+      b'8646F4802001\x00\x00\x00\x00',
     ],
   },
 }
