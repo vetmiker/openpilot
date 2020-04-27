@@ -241,7 +241,7 @@ class MapsdThread(LoggerThread):
                 self.last_not_none_signal = self.traffic_status
                 self.last_not_none_signal_counter = 0
               elif self.traffic_confidence >= 75 and self.traffic_status == 'NONE' and self.last_not_none_signal != 'NONE':
-                if self.last_not_none_signal_counter < 5:
+                if self.last_not_none_signal_counter < 50:
                   self.last_not_none_signal_counter = self.last_not_none_signal_counter + 1
                   print("self.last_not_none_signal_counter")
                   print(self.last_not_none_signal_counter)

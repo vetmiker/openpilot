@@ -31,7 +31,9 @@ class CarState(CarStateBase):
     self.needs_angle_offset = CP.carFingerprint not in TSS2_CAR
     self.angle_offset = 0.
     self.pcm_acc_active = False
+    self.engaged_when_gas_was_pressed = False
     self.main_on = False
+    self.gas_pressed = False
     self.v_cruise_pcmlast = 0.0
     self.setspeedoffset = 34.0
     self.setspeedcounter = 0
@@ -68,7 +70,7 @@ class CarState(CarStateBase):
     else:
       ret.gas = cp.vl["GAS_PEDAL"]['GAS_PEDAL']
       ret.gasPressed = cp.vl["PCM_CRUISE"]['GAS_RELEASED'] == 0
-
+    
     ret.wheelSpeeds.fl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FL'] * CV.KPH_TO_MS
     ret.wheelSpeeds.fr = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FR'] * CV.KPH_TO_MS
     ret.wheelSpeeds.rl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_RL'] * CV.KPH_TO_MS
@@ -283,7 +285,7 @@ class CarState(CarStateBase):
     self.tsgn4 = cp_cam.vl["RSA2"]['TSGN4']
     self.splsgn4 = cp_cam.vl["RSA2"]['SPLSGN4']
     self.noovertake = self.tsgn1 == 65 or self.tsgn2 == 65 or self.tsgn3 == 65 or self.tsgn4 == 65 or self.tsgn1 == 66 or self.tsgn2 == 66 or self.tsgn3 == 66 or self.tsgn4 == 66
-    if self.spdval1 > 0 or self.spdval2 > 0:
+    if (self.spdval1 > 0 or self.spdval2 > 0) and not (self.spdval1 == 35 and self.tsgn1 == 1):
       dat = messaging_arne.new_message('liveTrafficData')
       if self.spdval1 > 0:
         dat.liveTrafficData.speedLimitValid = True
@@ -304,7 +306,15 @@ class CarState(CarStateBase):
         dat.liveTrafficData.speedLimitValid = False
       if not travis:
         self.arne_pm.send('liveTrafficData', dat)
-
+    if ret.gasPressed and not self.gas_pressed:
+      self.engaged_when_gas_was_pressed = self.pcm_acc_active
+    if (self.gas_pressed and not ret.gasPressed) and self.engaged_when_gas_was_pressed:
+      dat = messaging_arne.new_message('liveTrafficData')
+      dat.liveTrafficData.speedLimitValid = True
+      dat.liveTrafficData.speedLimit = ret.vEgo * 3.6
+      if not travis:
+        self.arne_pm.send('liveTrafficData', dat)
+    self.gas_pressed = ret.gasPressed
     return ret
 
   @staticmethod
