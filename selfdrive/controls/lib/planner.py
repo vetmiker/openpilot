@@ -150,7 +150,7 @@ class Planner():
         if self.mpc_model.v_mpc > 13.0: 
           solutions['model'] = NO_CURVATURE_SPEED
         else:
-          solutions['model'] = self.mpc_model.v_mpc + 2.5
+          solutions['model'] = self.mpc_model.v_mpc + 5.0
       solutions['cruise'] = self.v_cruise
 
       slowest = min(solutions, key=solutions.get)
@@ -167,14 +167,14 @@ class Planner():
         self.v_acc = self.v_cruise
         self.a_acc = self.a_cruise
       elif slowest == 'model':
-        self.v_acc = self.mpc_model.v_mpc + 2.5
+        self.v_acc = self.mpc_model.v_mpc + 5.0
         self.a_acc = self.mpc_model.a_mpc
 
     self.v_acc_future = v_cruise_setpoint
     if lead1_check:
-      self.v_acc_future = min([self.mpc1.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + 2.5])
+      self.v_acc_future = min([self.mpc1.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + 5.0])
     if lead2_check:
-      self.v_acc_future = min([self.mpc2.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + 2.5])
+      self.v_acc_future = min([self.mpc2.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + 5.0])
     
 
   def update(self, sm, pm, CP, VM, PP, arne_sm):
