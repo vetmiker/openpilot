@@ -53,6 +53,7 @@ class CarState(CarStateBase):
     self.Angle_Speed = [255,160,100,80,70,60,55,50,40,33,27,17,12]
     self.smartspeed = 0
     self.rsa_ignored_speed = 0
+    self.spdval1 = 0
     if not travis:
       self.arne_pm = messaging_arne.PubMaster(['liveTrafficData', 'arne182Status'])
       self.arne_sm = messaging_arne.SubMaster(['latControl'])
