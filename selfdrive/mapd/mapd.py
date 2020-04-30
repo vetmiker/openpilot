@@ -158,7 +158,7 @@ class QueryThread(LoggerThread):
                 try:
                     if self.is_connected_to_local():
                         api = overpy.Overpass(url=self.OVERPASS_API_LOCAL)
-                        self.distance_to_edge = 1000
+                        self.distance_to_edge = 750
                     elif self.is_connected_to_internet():
                         api = overpy.Overpass(url=self.OVERPASS_API_URL)
                         self.logger.error("Using origional Server")
