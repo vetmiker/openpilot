@@ -123,16 +123,7 @@ class QueryThread(LoggerThread):
                 continue
             else:
                 start = time.time()
-            if self.is_connected_to_local():
-                api = overpy.Overpass(url=self.OVERPASS_API_LOCAL)
-            elif self.is_connected_to_internet():
-                api = overpy.Overpass(url=self.OVERPASS_API_URL)
-                self.logger.error("Using origional Server")
-            elif self.is_connected_to_internet2():
-                api = overpy.Overpass(url=self.OVERPASS_API_URL2)
-                self.logger.error("Using backup Server")
-            else:
-                continue
+
             self.logger.debug("Starting after sleeping for 1 second ...")
             last_gps = self.sharedParams.get('last_gps', None)
             self.logger.debug("last_gps = %s" % str(last_gps))
@@ -164,6 +155,16 @@ class QueryThread(LoggerThread):
             if last_gps is not None and last_gps.accuracy < 5.0:
                 q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=2000)
                 try:
+                    if self.is_connected_to_local():
+                        api = overpy.Overpass(url=self.OVERPASS_API_LOCAL)
+                    elif self.is_connected_to_internet():
+                        api = overpy.Overpass(url=self.OVERPASS_API_URL)
+                        self.logger.error("Using origional Server")
+                    elif self.is_connected_to_internet2():
+                        api = overpy.Overpass(url=self.OVERPASS_API_URL2)
+                        self.logger.error("Using backup Server")
+                    else:
+                        continue
                     new_result = api.query(q)
                     self.logger.debug("new_result = %s" % str(new_result))
                     # Build kd-tree
