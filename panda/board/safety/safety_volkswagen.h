@@ -194,7 +194,7 @@ static int volkswagen_mqb_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if (addr == MSG_ESP_05) {
       bool brake_pressed = (GET_BYTE(to_push, 3) & 0x4) >> 2;
       if (brake_pressed && (!brake_pressed_prev || volkswagen_moving)) {
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
       brake_pressed_prev = brake_pressed;
     }

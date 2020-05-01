@@ -85,7 +85,7 @@ static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       // even when pedal is not pressed
       bool brake_pressed = GET_BYTE(to_push, 1) >= 10;
       if (brake_pressed && (!brake_pressed_prev || gm_moving)) {
-         controls_allowed = 0;
+         controls_allowed = 1;
       }
       brake_pressed_prev = brake_pressed;
     }
@@ -153,11 +153,11 @@ static int gm_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
     brake = (0x1000 - brake) & 0xFFF;
     if (!current_controls_allowed) {
       if (brake != 0) {
-        tx = 0;
+        tx = 1;
       }
     }
     if (brake > GM_MAX_BRAKE) {
-      tx = 0;
+      tx = 1;
     }
   }
 

@@ -4,6 +4,7 @@ import math
 from cereal import car
 from common.numpy_fast import mean
 import cereal.messaging_arne as messaging_arne
+import cereal.messaging as messaging
 from opendbc.can.can_define import CANDefine
 from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
@@ -31,7 +32,9 @@ class CarState(CarStateBase):
     self.needs_angle_offset = CP.carFingerprint not in TSS2_CAR
     self.angle_offset = 0.
     self.pcm_acc_active = False
+    self.engaged_when_gas_was_pressed = False
     self.main_on = False
+    self.gas_pressed = False
     self.v_cruise_pcmlast = 0.0
     self.setspeedoffset = 34.0
     self.setspeedcounter = 0
@@ -48,9 +51,13 @@ class CarState(CarStateBase):
     self.Angle_counter = 0
     self.Angle = [0, 5, 10, 15,20,25,30,35,60,100,180,270,500]
     self.Angle_Speed = [255,160,100,80,70,60,55,50,40,33,27,17,12]
+    self.smartspeed = 0
+    self.rsa_ignored_speed = 0
+    self.spdval1 = 0
     if not travis:
       self.arne_pm = messaging_arne.PubMaster(['liveTrafficData', 'arne182Status'])
       self.arne_sm = messaging_arne.SubMaster(['latControl'])
+      self.sm = messaging.SubMaster(['liveMapData'])
 
 
   def update(self, cp, cp_cam, frame):
@@ -68,7 +75,7 @@ class CarState(CarStateBase):
     else:
       ret.gas = cp.vl["GAS_PEDAL"]['GAS_PEDAL']
       ret.gasPressed = cp.vl["PCM_CRUISE"]['GAS_RELEASED'] == 0
-
+    
     ret.wheelSpeeds.fl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FL'] * CV.KPH_TO_MS
     ret.wheelSpeeds.fr = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_FR'] * CV.KPH_TO_MS
     ret.wheelSpeeds.rl = cp.vl["WHEEL_SPEEDS"]['WHEEL_SPEED_RL'] * CV.KPH_TO_MS
@@ -165,8 +172,11 @@ class CarState(CarStateBase):
     msg.arne182Status.leftBlindspotD1 = self.leftblindspotD1
     msg.arne182Status.leftBlindspotD2 = self.leftblindspotD2
     msg.arne182Status.gasbuttonstatus = self.gasbuttonstatus
+    
     if not travis:
       self.arne_sm.update(0)
+      self.sm.update(0)
+      self.smartspeed = self.sm['liveMapData'].speedLimit
       self.arne_pm.send('arne182Status', msg)
     self.left_blinker_on = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 1
     self.right_blinker_on = cp.vl["STEERING_LEVERS"]['TURN_SIGNALS'] == 2
@@ -271,6 +281,8 @@ class CarState(CarStateBase):
     self.leftline = cp_cam.vl["LKAS_HUD"]['LEFT_LINE']
 
     self.tsgn1 = cp_cam.vl["RSA1"]['TSGN1']
+    if self.spdval1 != cp_cam.vl["RSA1"]['SPDVAL1']:
+      self.rsa_ignored_speed = 0
     self.spdval1 = cp_cam.vl["RSA1"]['SPDVAL1']
 
     self.splsgn1 = cp_cam.vl["RSA1"]['SPLSGN1']
@@ -283,7 +295,7 @@ class CarState(CarStateBase):
     self.tsgn4 = cp_cam.vl["RSA2"]['TSGN4']
     self.splsgn4 = cp_cam.vl["RSA2"]['SPLSGN4']
     self.noovertake = self.tsgn1 == 65 or self.tsgn2 == 65 or self.tsgn3 == 65 or self.tsgn4 == 65 or self.tsgn1 == 66 or self.tsgn2 == 66 or self.tsgn3 == 66 or self.tsgn4 == 66
-    if self.spdval1 > 0 or self.spdval2 > 0:
+    if (self.spdval1 > 0 or self.spdval2 > 0) and not (self.spdval1 == 35 and self.tsgn1 == 1) and self.rsa_ignored_speed != self.spdval1:
       dat = messaging_arne.new_message('liveTrafficData')
       if self.spdval1 > 0:
         dat.liveTrafficData.speedLimitValid = True
@@ -304,7 +316,16 @@ class CarState(CarStateBase):
         dat.liveTrafficData.speedLimitValid = False
       if not travis:
         self.arne_pm.send('liveTrafficData', dat)
-
+    if ret.gasPressed and not self.gas_pressed:
+      self.engaged_when_gas_was_pressed = self.pcm_acc_active
+    if (self.gas_pressed and not ret.gasPressed) and self.engaged_when_gas_was_pressed and ret.vEgo > self.smartspeed:
+      self.rsa_ignored_speed = self.spdval1
+      dat = messaging_arne.new_message('liveTrafficData')
+      dat.liveTrafficData.speedLimitValid = True
+      dat.liveTrafficData.speedLimit = ret.vEgo * 3.6
+      if not travis:
+        self.arne_pm.send('liveTrafficData', dat)
+    self.gas_pressed = ret.gasPressed
     return ret
 
   @staticmethod

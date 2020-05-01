@@ -54,6 +54,8 @@ class QueryThread(LoggerThread):
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
         # memorize some parameters
+        self.OVERPASS_API_LOCAL = "http://192.168.43.1:12345/api/interpreter"
+        self.distance_to_edge = 500
         self.OVERPASS_API_URL = "https://z.overpass-api.de/api/interpreter"
         self.OVERPASS_API_URL2 = "https://lz4.overpass-api.de/api/interpreter"
         self.OVERPASS_HEADERS = {
@@ -61,8 +63,17 @@ class QueryThread(LoggerThread):
             'Accept-Encoding': 'gzip'
         }
         self.prev_ecef = None
+        
+    def is_connected_to_local(self, timeout=1.0):
+        try:
+            requests.get(self.OVERPASS_API_LOCAL, timeout=timeout)
+            self.logger.debug("connection local active")
+            return True
+        except:
+            self.logger.error("No local server available.")
+            return False 
 
-    def is_connected_to_internet(self, timeout=5):
+    def is_connected_to_internet(self, timeout=1.0):
         try:
             requests.get(self.OVERPASS_API_URL, timeout=timeout)
             self.logger.debug("connection 1 active")
@@ -71,7 +82,7 @@ class QueryThread(LoggerThread):
             self.logger.error("No internet connection available.")
             return False 
 
-    def is_connected_to_internet2(self, timeout=5):
+    def is_connected_to_internet2(self, timeout=1.0):
         try:
             requests.get(self.OVERPASS_API_URL2, timeout=timeout)
             self.logger.debug("connection 2 active")
@@ -102,10 +113,18 @@ class QueryThread(LoggerThread):
 
     def run(self):
         self.logger.debug("run method started for thread %s" % self.name)
-        api = overpy.Overpass(url=self.OVERPASS_API_URL)
+        
         # for now we follow old logic, will be optimized later
+        start = time.time()
         while True:
-            time.sleep(1)
+            if time.time() - start > 2.0:
+                print("Mapd QueryThread lagging by: %s" % str(time.time() - start - 1.0))
+            if time.time() - start < 1.0:
+                time.sleep(0.1)
+                continue
+            else:
+                start = time.time()
+
             self.logger.debug("Starting after sleeping for 1 second ...")
             last_gps = self.sharedParams.get('last_gps', None)
             self.logger.debug("last_gps = %s" % str(last_gps))
@@ -121,7 +140,7 @@ class QueryThread(LoggerThread):
                     self.prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
                 
                 dist = np.linalg.norm(cur_ecef - self.prev_ecef)
-                if dist < 1500: #updated when we are 500m from the edge of the downloaded circle
+                if dist < 2000 - self.distance_to_edge: #updated when we are 500m from the edge of the downloaded circle
                     continue
                     self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(self.prev_ecef), str(dist)))
 
@@ -134,16 +153,24 @@ class QueryThread(LoggerThread):
                     else:
                         self.logger.error("There is no query_lock")
 
-            if last_gps is not None and last_gps.accuracy < 5.0 and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
+            if last_gps is not None and last_gps.accuracy < 5.0:
                 q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=2000)
                 try:
-                    try:
-                        new_result = api.query(q)
-                        self.logger.debug("new_result = %s" % str(new_result))
-                    except:
-                        api2 = overpy.Overpass(url=self.OVERPASS_API_URL2)
+                    if self.is_connected_to_local():
+                        api = overpy.Overpass(url=self.OVERPASS_API_LOCAL)
+                        self.distance_to_edge = 750
+                    elif self.is_connected_to_internet():
+                        api = overpy.Overpass(url=self.OVERPASS_API_URL)
+                        self.logger.error("Using origional Server")
+                        self.distance_to_edge = 500
+                    elif self.is_connected_to_internet2():
+                        api = overpy.Overpass(url=self.OVERPASS_API_URL2)
                         self.logger.error("Using backup Server")
-                        new_result = api2.query(q)
+                        self.distance_to_edge = 500
+                    else:
+                        continue
+                    new_result = api.query(q)
+                    self.logger.debug("new_result = %s" % str(new_result))
                     # Build kd-tree
                     nodes = []
                     real_nodes = []
@@ -228,9 +255,15 @@ class MapsdThread(LoggerThread):
 
         max_speed_prev = 0
         speedLimittrafficvalid = False
-
+        start = time.time()
         while True:
-            time.sleep(0.1)
+            if time.time() - start > 0.2:
+                print("Mapd MapsdThread lagging by: %s" % str(time.time() - start - 0.1))
+            if time.time() - start < 0.1:
+                time.sleep(0.01)
+                continue
+            else:
+                start = time.time()
             self.logger.debug("starting new cycle in endless loop")
             self.sm.update(0)
             self.arne_sm.update(0)
@@ -241,7 +274,7 @@ class MapsdThread(LoggerThread):
                 self.last_not_none_signal = self.traffic_status
                 self.last_not_none_signal_counter = 0
               elif self.traffic_confidence >= 75 and self.traffic_status == 'NONE' and self.last_not_none_signal != 'NONE':
-                if self.last_not_none_signal_counter < 5:
+                if self.last_not_none_signal_counter < 50:
                   self.last_not_none_signal_counter = self.last_not_none_signal_counter + 1
                   print("self.last_not_none_signal_counter")
                   print(self.last_not_none_signal_counter)

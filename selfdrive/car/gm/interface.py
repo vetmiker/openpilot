@@ -151,6 +151,8 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = buttonEvents
 
     events, eventsArne182 = self.create_common_events(ret, pcm_enable=False)
+    if ret.brakePressed:
+      events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     if ret.vEgo < self.CP.minEnableSpeed:
       events.append(create_event('speedTooLow', [ET.NO_ENTRY]))
