@@ -74,7 +74,7 @@ bool loopback_can = false;
 cereal::HealthData::HwType hw_type = cereal::HealthData::HwType::UNKNOWN;
 bool is_pigeon = false;
 float hours;
-read_param_float(&hours, "DisablePowerDownTime");
+void read_param_float(&hours, "DisablePowerDownTime");
 
 const uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;  // turn off charge after 30 hrs
 const float VBATT_START_CHARGING = 11.5;
