@@ -6,7 +6,6 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sched.h>
-#include <string.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -56,6 +55,15 @@ struct __attribute__((packed)) timestamp_t {
     uint8_t second;
 };
 
+static void read_param_float(float* param, const char* param_name) {
+  char *s;
+  const int result = read_db_value(NULL, param_name, &s, NULL);
+  if (result == 0) {
+    *param = strtod(s, NULL);
+    free(s);
+  }
+}
+    
 libusb_context *ctx = NULL;
 libusb_device_handle *dev_handle = NULL;
 pthread_mutex_t usb_lock;
@@ -65,7 +73,10 @@ bool fake_send = false;
 bool loopback_can = false;
 cereal::HealthData::HwType hw_type = cereal::HealthData::HwType::UNKNOWN;
 bool is_pigeon = false;
-const uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * 30;  // turn off charge after 30 hrs
+float hours;
+read_param_float(&hours, "DisablePowerDownTime");
+
+const uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;  // turn off charge after 30 hrs
 const float VBATT_START_CHARGING = 11.5;
 const float VBATT_PAUSE_CHARGING = 10.5;
 float voltage_f = 12.5;  // filtered voltage
