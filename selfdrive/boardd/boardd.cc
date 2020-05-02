@@ -41,6 +41,15 @@
 #define NIBBLE_TO_HEX(n) ((n) < 10 ? (n) + '0' : ((n) - 10) + 'a')
 #define VOLTAGE_K 0.091  // LPF gain for 5s tau (dt/tau / (dt/tau + 1))
 
+static void read_param_float(float* param, const char* param_name) {
+  char *s;
+  const int result = read_db_value(NULL, param_name, &s, NULL);
+  if (result == 0) {
+    *param = strtod(s, NULL);
+    free(s);
+  }
+}
+
 namespace {
 
 volatile sig_atomic_t do_exit = 0;
@@ -55,15 +64,7 @@ struct __attribute__((packed)) timestamp_t {
     uint8_t second;
 };
 
-static void read_param_float(float* param, const char* param_name) {
-  char *s;
-  const int result = read_db_value(NULL, param_name, &s, NULL);
-  if (result == 0) {
-    *param = strtod(s, NULL);
-    free(s);
-  }
-}
-    
+   
 libusb_context *ctx = NULL;
 libusb_device_handle *dev_handle = NULL;
 pthread_mutex_t usb_lock;
@@ -74,7 +75,7 @@ bool loopback_can = false;
 cereal::HealthData::HwType hw_type = cereal::HealthData::HwType::UNKNOWN;
 bool is_pigeon = false;
 float hours;
-void read_param_float(&hours, "DisablePowerDownTime");
+read_param_float(&hours, "DisablePowerDownTime");
 
 const uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;  // turn off charge after 30 hrs
 const float VBATT_START_CHARGING = 11.5;
