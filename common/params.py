@@ -63,6 +63,7 @@ keys = {
   "CompletedTrainingVersion": [TxType.PERSISTENT],
   "ControlsParams": [TxType.PERSISTENT],
   "DisablePowerDown": [TxType.PERSISTENT],
+  "DisablePowerDownTime": [TxType.PERSISTENT],
   "DoUninstall": [TxType.CLEAR_ON_MANAGER_START],
   "DongleId": [TxType.PERSISTENT],
   "GitBranch": [TxType.PERSISTENT],
