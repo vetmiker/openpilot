@@ -41,15 +41,6 @@
 #define NIBBLE_TO_HEX(n) ((n) < 10 ? (n) + '0' : ((n) - 10) + 'a')
 #define VOLTAGE_K 0.091  // LPF gain for 5s tau (dt/tau / (dt/tau + 1))
 
-static void read_param_float(float* param, const char* param_name) {
-  char *s;
-  const int result = read_db_value(NULL, param_name, &s, NULL);
-  if (result == 0) {
-    *param = strtod(s, NULL);
-    free(s);
-  }
-}
-
 namespace {
 
 volatile sig_atomic_t do_exit = 0;
@@ -74,8 +65,13 @@ bool fake_send = false;
 bool loopback_can = false;
 cereal::HealthData::HwType hw_type = cereal::HealthData::HwType::UNKNOWN;
 bool is_pigeon = false;
-float hours;
-static void read_param_float(&hours, "DisablePowerDownTime");
+float hours = 30;
+char *s;
+const int result = read_db_value(NULL, "DisablePowerDownTime", &s, NULL);
+if (result == 0) {
+  hours = strtod(s, NULL);
+  free(s);
+} 
 
 const uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;  // turn off charge after 30 hrs
 const float VBATT_START_CHARGING = 11.5;
