@@ -68,10 +68,9 @@ bool is_pigeon = false;
 float hours = 30;
 char *s;
 const int result = read_db_value(NULL, "DisablePowerDownTime", &s, NULL);
-if (result == 0) {
-  hours = strtod(s, NULL);
-  free(s);
-} 
+hours = strtod(s, NULL);
+free(s);
+
 
 const uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;  // turn off charge after 30 hrs
 const float VBATT_START_CHARGING = 11.5;
