@@ -579,7 +579,7 @@ def main():
     ("VisionRadarToggle", "0"),
     ("LaneChangeEnabled", "1"),
     ("IsDriverViewEnabled", "0"),
-    ("DisablePowerDownTime, "30"),
+    ("DisablePowerDownTime", "30"),
   ]
 
   # set unset params
