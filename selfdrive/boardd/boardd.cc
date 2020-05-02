@@ -691,7 +691,6 @@ void *can_health_thread(void *crap) {
     hours = strtod(s, NULL);
   }
   free(s);
-  free(result);
   // run at 2hz
   while (!do_exit) {
     can_health(publisher, hours);
