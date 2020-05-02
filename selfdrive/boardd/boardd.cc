@@ -65,14 +65,8 @@ bool fake_send = false;
 bool loopback_can = false;
 cereal::HealthData::HwType hw_type = cereal::HealthData::HwType::UNKNOWN;
 bool is_pigeon = false;
-float hours = 30;
-//char *s;
-//const int result = read_db_value(NULL, "DisablePowerDownTime", &s, NULL);
-//hours = strtod(s, NULL);
-//free(s);
 
 
-const uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;  // turn off charge after 30 hrs
 const float VBATT_START_CHARGING = 11.5;
 const float VBATT_PAUSE_CHARGING = 10.5;
 float voltage_f = 12.5;  // filtered voltage
@@ -358,7 +352,7 @@ void can_recv(PubSocket *publisher) {
   publisher->send((char*)bytes.begin(), bytes.size());
 }
 
-void can_health(PubSocket *publisher) {
+void can_health(PubSocket *publisher, float hours) {
   int cnt;
   int err;
 
@@ -433,6 +427,7 @@ void can_health(PubSocket *publisher) {
 
 #ifndef __x86_64__
   bool cdp_mode = health.usb_power_mode == (uint8_t)(cereal::HealthData::UsbPowerMode::CDP);
+  uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;  // turn off charge after 30 hrs or DisablePowerDownTime Param
   bool no_ignition_exp = no_ignition_cnt > NO_IGNITION_CNT_MAX;
   if ((no_ignition_exp || (voltage_f < VBATT_PAUSE_CHARGING)) && cdp_mode && !ignition) {
     char *disable_power_down = NULL;
@@ -689,10 +684,17 @@ void *can_health_thread(void *crap) {
   Context * c = Context::create();
   PubSocket * publisher = PubSocket::create(c, "health");
   assert(publisher != NULL);
-
+  float hours = 30;
+  char *s;
+  const int result = read_db_value(NULL, "DisablePowerDownTime", &s, NULL);
+  if (result == 0) {
+    hours = strtod(s, NULL);
+  }
+  free(s);
+  free(result);
   // run at 2hz
   while (!do_exit) {
-    can_health(publisher);
+    can_health(publisher, hours);
     usleep(500*1000);
   }
   return NULL;
