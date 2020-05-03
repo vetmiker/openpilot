@@ -27,7 +27,7 @@ from selfdrive.controls.lib.alertmanager import AlertManager
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 from selfdrive.controls.lib.planner import LON_MPC_STEP
 from selfdrive.locationd.calibration_helpers import Calibration, Filter
-from common.travis_checker import travis
+#from common.travis_checker import travis
 from common.op_params import opParams
 from selfdrive.controls.df_alert_manager import DfAlertManager
 
@@ -624,7 +624,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
   params.put("CarParams", cp_bytes)
   put_nonblocking("CarParamsCache", cp_bytes)
   put_nonblocking("LongitudinalControl", "1" if CP.openpilotLongitudinalControl else "0")
-  if CP.carName == 'honda' and not travis:
+  if CP.openpilotLongitudinalControl and CP.safetyModel in [car.CarParams.SafetyModel.hondaBoschGiraffe, car.CarParams.SafetyModel.hondaBoschHarness]:
     disable_radar(can_sock, pm.sock['sendcan'], 1 if has_relay else 0, timeout=1, retry=10)
 
   CC = car.CarControl.new_message()
