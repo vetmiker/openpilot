@@ -16,6 +16,9 @@ A_ACC_MAX = max(_A_CRUISE_MAX_V_FOLLOWING)
 
 ButtonType = car.CarState.ButtonEvent.Type
 
+ALT_BRAKE_FLAG = 1
+BOSCH_LONG_FLAG = 2
+
 def compute_gb_honda_bosch(accel, speed):
   return float(accel) / 3.5
 
@@ -134,6 +137,8 @@ class CarInterface(CarInterfaceBase):
       ret.openpilotLongitudinalControl = params.get("VisionRadarToggle", encoding='utf8') == "1"
       ret.enableCruise = not ret.openpilotLongitudinalControl
       ret.communityFeature = ret.openpilotLongitudinalControl
+      if ret.openpilotLongitudinalControl:
+        ret.safetyParam |= BOSCH_LONG_FLAG
     else:
       ret.safetyModel = car.CarParams.SafetyModel.hondaNidec
       ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS, ECU_FINGERPRINT, candidate, Ecu.fwdCamera) or has_relay
@@ -203,7 +208,7 @@ class CarInterface(CarInterfaceBase):
     elif candidate in (CAR.ACCORD, CAR.ACCORD_15, CAR.ACCORDH):
       stop_and_go = True
       if not candidate == CAR.ACCORDH: # Hybrid uses same brake msg as hatch
-        ret.safetyParam = 1  # Accord and CRV 5G use an alternate user brake msg
+        ret.safetyParam |= ALT_BRAKE_FLAG # Accord and CRV 5G use an alternate user brake msg
       ret.mass = 3279. * CV.LB_TO_KG + STD_CARGO_KG
       ret.wheelbase = 2.83
       ret.centerToFront = ret.wheelbase * 0.39
@@ -246,7 +251,7 @@ class CarInterface(CarInterfaceBase):
 
     elif candidate == CAR.CRV_5G:
       stop_and_go = True
-      ret.safetyParam = 1  # Accord and CRV 5G use an alternate user brake msg
+      ret.safetyParam |= ALT_BRAKE_FLAG # Accord and CRV 5G use an alternate user brake msg
       ret.mass = 3410. * CV.LB_TO_KG + STD_CARGO_KG
       ret.wheelbase = 2.66
       ret.centerToFront = ret.wheelbase * 0.41
@@ -268,7 +273,7 @@ class CarInterface(CarInterfaceBase):
 
     elif candidate == CAR.CRV_HYBRID:
       stop_and_go = True
-      ret.safetyParam = 1  # Accord and CRV 5G use an alternate user brake msg
+      ret.safetyParam |= ALT_BRAKE_FLAG # Accord and CRV 5G use an alternate user brake msg
       ret.mass = 1667. + STD_CARGO_KG # mean of 4 models in kg
       ret.wheelbase = 2.66
       ret.centerToFront = ret.wheelbase * 0.41
