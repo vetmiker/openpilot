@@ -7,8 +7,10 @@
 //      brake rising edge
 //      brake > 0mph
 const AddrBus HONDA_N_TX_MSGS[] = {{0xE4, 0}, {0x194, 0}, {0x1FA, 0}, {0x200, 0}, {0x30C, 0}, {0x33D, 0}};
-const AddrBus HONDA_BG_TX_MSGS[] = {{0xE4, 2}, {0x296, 0}, {0x33D, 2}};  // Bosch Giraffe
-const AddrBus HONDA_BH_TX_MSGS[] = {{0xE4, 0}, {0x296, 1}, {0x33D, 0}};  // Bosch Harness
+const AddrBus HONDA_BG_TX_MSGS[] = {{0xE4, 2}, {0xE5, 2}, {0x296, 0}, {0x33D, 2}};  // Bosch Giraffe
+const AddrBus HONDA_BH_TX_MSGS[] = {{0xE4, 0}, {0xE5, 0}, {0x296, 1}, {0x33D, 0}};  // Bosch Harness
+const AddrBus HONDA_BG_LONG_TX_MSGS[] = {{0xE4, 0}, {0x1DF, 0}, {0x1EF, 0}, {0x1FA, 0}, {0x30C, 0}, {0x33D, 0}, {0x39F, 0}, {0x18DAB0F1, 0}};  // Bosch Giraffe w/ gas and brakes
+const AddrBus HONDA_BH_LONG_TX_MSGS[] = {{0xE4, 1}, {0x1DF, 1}, {0x1EF, 1}, {0x1FA, 1}, {0x30C, 1}, {0x33D, 1}, {0x39F, 1}, {0x18DAB0F1, 1}};  // Bosch Harness w/ gas and brakes
 
 // Roughly calculated using the offsets in openpilot +5%:
 // In openpilot: ((gas1_norm + gas2_norm)/2) > 15
@@ -18,12 +20,16 @@ const AddrBus HONDA_BH_TX_MSGS[] = {{0xE4, 0}, {0x296, 1}, {0x33D, 0}};  // Bosc
 // In this safety: ((gas1 + (gas2/2))/2) > THRESHOLD
 const int HONDA_GAS_INTERCEPTOR_THRESHOLD = 344;
 #define HONDA_GET_INTERCEPTOR(msg) (((GET_BYTE((msg), 0) << 8) + GET_BYTE((msg), 1) + ((GET_BYTE((msg), 2) << 8) + GET_BYTE((msg), 3)) / 2 ) / 2) // avg between 2 tracks
+const int HONDA_BOSCH_NO_GAS_VALUE = -30000; // value sent when not requesting gas
+const int HONDA_BOSCH_GAS_MAX = 2000;
+const int HONDA_BOSCH_ACCEL_MIN = -350; // max braking == -3.5m/s2
 
 // Nidec and Bosch giraffe have pt on bus 0
 AddrCheckStruct honda_rx_checks[] = {
   {.addr = {0x1A6, 0x296}, .bus = 0, .check_checksum = true, .max_counter = 3U, .expected_timestep = 40000U},
   {.addr = {       0x158}, .bus = 0, .check_checksum = true, .max_counter = 3U, .expected_timestep = 10000U},
   {.addr = {       0x17C}, .bus = 0, .check_checksum = true, .max_counter = 3U, .expected_timestep = 10000U},
+  {.addr = {       0x1BE}, .bus = 0, .check_checksum = true, .max_counter = 3U, .expected_timestep = 10000U},
 };
 const int HONDA_RX_CHECKS_LEN = sizeof(honda_rx_checks) / sizeof(honda_rx_checks[0]);
 
@@ -32,13 +38,18 @@ AddrCheckStruct honda_bh_rx_checks[] = {
   {.addr = {0x296}, .bus = 1, .check_checksum = true, .max_counter = 3U, .expected_timestep = 40000U},
   {.addr = {0x158}, .bus = 1, .check_checksum = true, .max_counter = 3U, .expected_timestep = 10000U},
   {.addr = {0x17C}, .bus = 1, .check_checksum = true, .max_counter = 3U, .expected_timestep = 10000U},
+  {.addr = {0x1BE}, .bus = 1, .check_checksum = true, .max_counter = 3U, .expected_timestep = 10000U},
 };
-const int HONDA_BH_RX_CHECKS_LEN = sizeof(honda_bh_rx_checks) / sizeof(honda_bh_rx_checks[0]);
+  const int HONDA_BH_RX_CHECKS_LEN = sizeof(honda_bh_rx_checks) / sizeof(honda_bh_rx_checks[0]);
+
+const uint16_t HONDA_PARAM_ALT_BRAKE = 1;
+const uint16_t HONDA_PARAM_BOSCH_LONG = 2;
 
 int honda_brake = 0;
 bool honda_moving = false;
 bool honda_alt_brake_msg = false;
 bool honda_fwd_brake = false;
+bool honda_bosch_long = false;
 enum {HONDA_N_HW, HONDA_BG_HW, HONDA_BH_HW} honda_hw = HONDA_N_HW;
 
 
@@ -192,10 +203,14 @@ static int honda_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
   int addr = GET_ADDR(to_send);
   int bus = GET_BUS(to_send);
 
-  if (honda_hw == HONDA_BG_HW) {
+  if ((honda_hw == HONDA_BG_HW) && !honda_bosch_long) {
     tx = msg_allowed(addr, bus, HONDA_BG_TX_MSGS, sizeof(HONDA_BG_TX_MSGS)/sizeof(HONDA_BG_TX_MSGS[0]));
-  } else if (honda_hw == HONDA_BH_HW) {
+  } else if ((honda_hw == HONDA_BG_HW) && honda_bosch_long) {
+    tx = msg_allowed(addr, bus, HONDA_BG_LONG_TX_MSGS, sizeof(HONDA_BG_LONG_TX_MSGS)/sizeof(HONDA_BG_LONG_TX_MSGS[0]));
+  } else if ((honda_hw == HONDA_BH_HW) && !honda_bosch_long) {
     tx = msg_allowed(addr, bus, HONDA_BH_TX_MSGS, sizeof(HONDA_BH_TX_MSGS)/sizeof(HONDA_BH_TX_MSGS[0]));
+  } else if ((honda_hw == HONDA_BH_HW) && honda_bosch_long) {
+    tx = msg_allowed(addr, bus, HONDA_BH_LONG_TX_MSGS, sizeof(HONDA_BH_LONG_TX_MSGS)/sizeof(HONDA_BH_LONG_TX_MSGS[0]));
   } else {
     tx = msg_allowed(addr, bus, HONDA_N_TX_MSGS, sizeof(HONDA_N_TX_MSGS)/sizeof(HONDA_N_TX_MSGS[0]));
   }
@@ -212,9 +227,10 @@ static int honda_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
     pedal_pressed = pedal_pressed || gas_pressed_prev || (gas_interceptor_prev > HONDA_GAS_INTERCEPTOR_THRESHOLD);
   }
   bool current_controls_allowed = controls_allowed && !(pedal_pressed);
+  int bus_pt = (honda_hw == HONDA_BH_HW)? 1 : 0;
 
-  // BRAKE: safety check
-  if ((addr == 0x1FA) && (bus == 0)) {
+  // BRAKE: safety check (nidec)
+  if ((addr == 0x1FA) && (bus == bus_pt)) {
     honda_brake = (GET_BYTE(to_send, 0) << 2) + ((GET_BYTE(to_send, 1) >> 6) & 0x3);
     if (!current_controls_allowed) {
       if (honda_brake != 0) {
@@ -225,6 +241,31 @@ static int honda_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
       tx = 1;
     }
     if (honda_fwd_brake) {
+      tx = 1;
+    }
+  }
+  
+  // BRAKE/GAS: safety check (bosch)
+  if ((addr == 0x1DF) && (bus == bus_pt)) {
+    int accel = (GET_BYTE(to_send, 3) << 3) + ((GET_BYTE(to_send, 4) >> 5) & 0x7);
+    accel = to_signed(accel, 11);
+    if (!current_controls_allowed) {
+      if (accel != 0) {
+        tx = 1;
+      }
+    }
+    if (accel < HONDA_BOSCH_ACCEL_MIN) {
+      tx = 1;
+    }
+
+    int gas = (GET_BYTE(to_send, 0) << 8) | GET_BYTE(to_send, 1);
+    gas = to_signed(gas, 16);
+    if (!current_controls_allowed) {
+      if (gas != HONDA_BOSCH_NO_GAS_VALUE) {
+        tx = 1;
+      }
+    }
+    if (gas > HONDA_BOSCH_GAS_MAX) {
       tx = 1;
     }
   }
@@ -239,7 +280,7 @@ static int honda_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
     }
   }
 
-  // GAS: safety check
+  // GAS: safety check (interceptor)
   if (addr == 0x200) {
     if (!current_controls_allowed) {
       if (GET_BYTE(to_send, 0) || GET_BYTE(to_send, 1)) {
@@ -268,6 +309,7 @@ static void honda_nidec_init(int16_t param) {
   relay_malfunction_reset();
   honda_hw = HONDA_N_HW;
   honda_alt_brake_msg = false;
+  honda_bosch_long = false;
 }
 
 static void honda_bosch_giraffe_init(int16_t param) {
@@ -275,7 +317,9 @@ static void honda_bosch_giraffe_init(int16_t param) {
   relay_malfunction_reset();
   honda_hw = HONDA_BG_HW;
   // Checking for alternate brake override from safety parameter
-  honda_alt_brake_msg = (param == 1) ? true : false;
+  honda_alt_brake_msg = get_int16_flag(param, HONDA_PARAM_ALT_BRAKE);
+  // radar disabled so allow gas/brakes
+  honda_bosch_long = get_int16_flag(param, HONDA_PARAM_BOSCH_LONG);
 }
 
 static void honda_bosch_harness_init(int16_t param) {
@@ -283,7 +327,9 @@ static void honda_bosch_harness_init(int16_t param) {
   relay_malfunction_reset();
   honda_hw = HONDA_BH_HW;
   // Checking for alternate brake override from safety parameter
-  honda_alt_brake_msg = (param == 1) ? true : false;
+  honda_alt_brake_msg = get_int16_flag(param, HONDA_PARAM_ALT_BRAKE);
+  // radar disabled so allow gas/brakes
+  honda_bosch_long = get_int16_flag(param, HONDA_PARAM_BOSCH_LONG);
 }
 
 static int honda_nidec_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
