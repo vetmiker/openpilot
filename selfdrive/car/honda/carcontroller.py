@@ -150,11 +150,22 @@ class CarController():
       elif accel > 0 and CS.out.vEgo < 0.3:
         starting = 1
       apply_accel = interp(accel, BOSCH_ACCEL_LOOKUP_BP, BOSCH_ACCEL_LOOKUP_V)
+      if CS.out.brakePressed:
+        apply_accel = min(apply_accel, 0.0)
+      if CS.out.gasPressed:
+        apply_accel = max(apply_accel, 0.0)
       apply_gas = interp(accel, BOSCH_GAS_LOOKUP_BP, BOSCH_GAS_LOOKUP_V)
+      if CS.out.brakePressed:
+        apply_gas = 0.0
     else:
       apply_gas = clip(actuators.gas, 0., 1.)
+      if CS.out.brakePressed:
+        apply_gas = 0.0
       apply_brake = int(clip(self.brake_last * P.BRAKE_MAX, 0, P.BRAKE_MAX - 1))
-
+      if CS.out.gasPressed:
+        apply_brake = int(0)
+      
+      
     # steer torque is converted back to CAN reference (positive when steering right)
     apply_steer = int(interp(-actuators.steer * P.STEER_MAX, P.STEER_LOOKUP_BP, P.STEER_LOOKUP_V))
 
