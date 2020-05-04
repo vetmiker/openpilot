@@ -270,11 +270,11 @@ class MapsdThread(LoggerThread):
             if self.arne_sm.updated['trafficModelEvent']:
               self.traffic_status = self.arne_sm['trafficModelEvent'].status
               self.traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)
-              if self.traffic_confidence >= 75 and (self.traffic_status == 'GREEN' or self.traffic_status == 'SLOW'):
+              if self.traffic_confidence >= 50 and (self.traffic_status == 'GREEN' or self.traffic_status == 'SLOW'):
                 self.last_not_none_signal = self.traffic_status
                 self.last_not_none_signal_counter = 0
-              elif self.traffic_confidence >= 75 and self.traffic_status == 'NONE' and self.last_not_none_signal != 'NONE':
-                if self.last_not_none_signal_counter < 50:
+              elif self.traffic_confidence >= 50 and self.traffic_status == 'NONE' and self.last_not_none_signal != 'NONE':
+                if self.last_not_none_signal_counter < 25:
                   self.last_not_none_signal_counter = self.last_not_none_signal_counter + 1
                   print("self.last_not_none_signal_counter")
                   print(self.last_not_none_signal_counter)
