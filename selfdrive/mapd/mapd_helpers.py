@@ -407,7 +407,7 @@ class Way:
           if 'highway' in n.tags and (n.tags['highway']=='stop' or n.tags['highway']=='give_way' or n.tags['highway']=='mini_roundabout' or (n.tags['highway']=='traffic_signals' and traffic_lights)) and way_pts[count,0] > 0:
             if traffic_status == 'DEAD':
               pass
-            elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and (traffic_status == 'GREEN' or (traffic_status == 'NONE' and not last_not_none_signal == 'SLOW')):
+            elif traffic_confidence >= 50 and n.tags['highway']=='traffic_signals' and (traffic_status == 'GREEN' or (traffic_status == 'NONE' and not last_not_none_signal == 'SLOW')):
               break
             #elif traffic_confidence >= 75 and traffic_status == 'SLOW' and n.tags['highway'] != 'motorway':
             #  speed_ahead = 0
@@ -522,7 +522,7 @@ class Way:
                 loop_must_break = True
                 break
           if 'railway' in n.tags and n.tags['railway']=='level_crossing':
-            if (way_pts[count, 0] > 0) and (traffic_confidence >= 75 and (traffic_status == 'SLOW' or (traffic_status == 'NONE' and last_not_none_signal == 'SLOW'))):
+            if (way_pts[count, 0] > 0) and (traffic_confidence >= 50 and (traffic_status == 'SLOW' or (traffic_status == 'NONE' and last_not_none_signal == 'SLOW'))):
               speed_ahead = 0
               speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
               loop_must_break = True
