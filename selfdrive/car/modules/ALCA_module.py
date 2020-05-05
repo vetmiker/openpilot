@@ -44,7 +44,7 @@ v1.0 - fixed angle move
 from common.numpy_fast import clip
 
 
-import selfdrive.messaging as messaging
+import cereal.messaging_arne as messaging
 import numpy as np
 from cereal import arne182
 
