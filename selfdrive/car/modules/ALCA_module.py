@@ -41,9 +41,9 @@ v2.0 - detection of lane crossing
 v1.0 - fixed angle move
 """
 
-from common.numpy_fast import interp,clip
-from selfdrive.controls.lib.pid import PIController
-from common.realtime import sec_since_boot
+from common.numpy_fast import clip
+
+
 import selfdrive.messaging as messaging
 import numpy as np
 from cereal import arne182
@@ -426,7 +426,7 @@ class ALCAModelParser():
       # should be + if we move in the same direction and - if opposite
       # it will increase or decrease the turn angle by cos(angle)
       turn_mult = max (0, self.ALCA_direction * (d2-d1)/abs(d2-d1))
-    d0 = (d2 + d1) / 2.0 - np.polyval(p_poly,distance_estimate)
+    #d0 = (d2 + d1) / 2.0 - np.polyval(p_poly,distance_estimate)
     ltm = left_to_move  * (1 +  cos * turn_mult)
     #compute offsets
     self.ALCA_OFFSET_C1 = 0.
