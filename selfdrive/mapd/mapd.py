@@ -255,7 +255,7 @@ class MapsdThread(LoggerThread):
             else:
                 start = time.time()
             self.logger.debug("starting new cycle in endless loop")
-
+            query_lock = self.sharedParams.get('query_lock', None)
             query_lock.acquire()
             gps = self.sharedParams['last_gps']
             traffic_status = self.sharedParams['traffic_status']
