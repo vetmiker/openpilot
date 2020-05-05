@@ -73,6 +73,7 @@ class ALCAController():
     self.frame = 0
     self.CC = carcontroller  # added to start, will see if we need it actually
     # variables for lane change
+    self.prev_turn_signal_stalk_state = False
     self.angle_offset = 0. #added when one needs to compensate for missalignment
     self.alcaEnabled = alcaEnabled
     self.laneChange_over_the_line = 0 # did we cross the line?
@@ -129,6 +130,12 @@ class ALCAController():
 
 
   def update(self,enabled,CS,actuators,alcaStateData,frame):
+    if CS.out.leftBlinker and not CS.out.rightBlinker:
+      self.turn_signal_stalk_state = 1
+    if CS.out.rightBlinker and not CS.out.leftBlinker:
+      self.turn_signal_stalk_state = 2
+    if not CS.out.rightBlinker and not CS.out.leftBlinker:
+      self.turn_signal_stalk_state = 0
     cl_min_v = CS.CL_MIN_V
     cl_max_a = CS.CL_MAX_A
     self.frame = frame
@@ -146,7 +153,7 @@ class ALCAController():
     # Basic highway lane change logic
     turn_signal_needed = 0 # send 1 for left, 2 for right 0 for not needed
 
-    if CS.turn_signal_stalk_state == 0 and \
+    if self.turn_signal_stalk_state == 0 and \
     (self.laneChange_enabled == 4):
         self.debug_alca("ALCA reset: resetting 4 -> 1")
         self.laneChange_enabled =1
@@ -154,7 +161,7 @@ class ALCAController():
         self.laneChange_direction =0
         #CS.UE.custom_alert_message(-1,"",0)
 
-    if CS.turn_signal_stalk_state == 0 and \
+    if self.turn_signal_stalk_state == 0 and \
       (self.laneChange_enabled > 1):
       # no blinkers on but we are still changing lane, so we need to send blinker command
       if self.laneChange_direction == -1:
@@ -162,13 +169,13 @@ class ALCAController():
       elif self.laneChange_direction == 1:
         turn_signal_needed = 2
 
-    if ((CS.v_ego < cl_min_v) or (abs(actuators.steerAngle) >= cl_max_a) or (abs(CS.angle_steers)>= cl_max_a)  or (not enabled)): 
+    if ((CS.out.vEgo < cl_min_v) or (abs(actuators.steerAngle) >= cl_max_a) or (abs(CS.out.steeringAngle)>= cl_max_a)  or (not enabled)): 
       CS.alcastate = 9
     else:
       CS.alcastate = 1
 
     if self.alcaEnabled and enabled and (self.laneChange_enabled > 1) and \
-      ((CS.v_ego < cl_min_v) or (abs(actuators.steerAngle) >= cl_max_a) or (abs(CS.angle_steers) >=cl_max_a)):
+      ((CS.out.vEgo < cl_min_v) or (abs(actuators.steerAngle) >= cl_max_a) or (abs(CS.out.steeringAngle) >=cl_max_a)):
       # something is not right, the speed or angle is limitting
       self.debug_alca("ALCA Unavailable (2)")
       #CS.UE.custom_alert_message(3,"Auto Lane Change Unavailable!",200,3)
@@ -176,10 +183,10 @@ class ALCAController():
       self.stop_ALCA(CS, False)
       return 0, False
 
-    if self.alcaEnabled and enabled and CS.prev_turn_signal_stalk_state == 0 and CS.turn_signal_stalk_state > 0 and \
-      (CS.v_ego >= cl_min_v) and (abs(actuators.steerAngle) < cl_max_a) and (self.laneChange_enabled == 1):
+    if self.alcaEnabled and enabled and self.prev_turn_signal_stalk_state == 0 and self.turn_signal_stalk_state > 0 and \
+      (CS.out.vEgo >= cl_min_v) and (abs(actuators.steerAngle) < cl_max_a) and (self.laneChange_enabled == 1):
       # start blinker, speed and angle is within limits, let's go
-      laneChange_direction = -1 if CS.turn_signal_stalk_state == 1 else 1 # left -1, right 1
+      laneChange_direction = -1 if self.turn_signal_stalk_state == 1 else 1 # left -1, right 1
       self.debug_alca("ALCA blinker on detected")
 
       #CS.UE.custom_alert_message(2,"Auto Lane Change Engaged!",100)
@@ -199,7 +206,7 @@ class ALCAController():
 
     # lane change in progress
     if self.laneChange_enabled > 1:
-      if (CS.steer_override or (CS.v_ego < cl_min_v)):
+      if (CS.out.steeringPressed or (CS.out.vEgo < cl_min_v)):
         #CS.UE.custom_alert_message(4,"Auto Lane Change Canceled! (u)",200,3)
         self.debug_alca("ALCA canceled: steer override")
         self.laneChange_cancelled = True
@@ -243,6 +250,7 @@ class ALCAController():
           return 0, False
 
     self.send_status(CS)
+    self.prev_turn_signal_stalk_state = self.turn_signal_stalk_state
     return turn_signal_needed, self.laneChange_enabled > 1
 
 class ALCAModelParser():
