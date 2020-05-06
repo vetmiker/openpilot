@@ -463,7 +463,7 @@ class MessagedArneThread(LoggerThread):
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
         self.arne_sm = messaging_arne.SubMaster(['liveTrafficData','trafficModelEvent'])
-        self.logger.debug("entered messageArned_thread, ... %s" % str(self.arne_sm)))
+        self.logger.debug("entered messageArned_thread, ... %s" % str(self.arne_sm))
     def run(self):
         self.logger.debug("Entered run method for thread :" + str(self.name))
         last_not_none_signal = 'NONE'
