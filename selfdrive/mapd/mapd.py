@@ -425,14 +425,45 @@ class MapsdThread(LoggerThread):
             self.logger.debug("Sending ... liveMapData ... %s", str(dat))
             self.pm.send('liveMapData', dat)
             
-class MessagedThread(LoggerThread):
+class MessagedGPSThread(LoggerThread):
     def __init__(self, threadID, name, sharedParams={}):
         # invoke parent constructor 
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
         self.sm = messaging.SubMaster(['gpsLocationExternal'])
+        self.logger.debug("entered messagedGPS_thread, ... %s" % (str(self.sm)))
+    def run(self):
+        self.logger.debug("Entered run method for thread :" + str(self.name))
+        gps = None
+        start = time.time()
+        while True:
+            if time.time() - start > 0.11:
+                print("Mapd MessagedGPSThread lagging by: %s" % str(time.time() - start - 0.1))
+            if time.time() - start < 0.1:
+                time.sleep(0.01)
+                continue
+            else:
+                start = time.time()
+            self.logger.debug("starting new cycle in endless loop")
+            self.sm.update(0)
+            if self.sm.updated['gpsLocationExternal']:
+                gps = self.sm['gpsLocationExternal']
+                self.save_gps_data(gps)
+            
+            query_lock = self.sharedParams.get('query_lock', None)
+            
+            query_lock.acquire()
+            self.sharedParams['last_gps'] = gps
+            query_lock.release()
+            self.logger.debug("setting last_gps to %s" % str(gps))
+
+class MessagedArneThread(LoggerThread):
+    def __init__(self, threadID, name, sharedParams={}):
+        # invoke parent constructor 
+        LoggerThread.__init__(self, threadID, name)
+        self.sharedParams = sharedParams
         self.arne_sm = messaging_arne.SubMaster(['liveTrafficData','trafficModelEvent'])
-        self.logger.debug("entered messaged_thread, ... %s, %s" % (str(self.sm), str(self.arne_sm)))
+        self.logger.debug("entered messageArned_thread, ... %s" % str(self.arne_sm)))
     def run(self):
         self.logger.debug("Entered run method for thread :" + str(self.name))
         last_not_none_signal = 'NONE'
@@ -444,11 +475,10 @@ class MessagedThread(LoggerThread):
         speedLimittrafficAdvisoryvalid = False
         speedLimittrafficvalid = False
         speedLimittrafficAdvisory = 0
-        gps = None
         start = time.time()
         while True:
-            if time.time() - start > 0.2:
-                print("Mapd MessagedThread lagging by: %s" % str(time.time() - start - 0.1))
+            if time.time() - start > 0.15:
+                print("Mapd MessagedArneThread lagging by: %s" % str(time.time() - start - 0.1))
             if time.time() - start < 0.1:
                 time.sleep(0.01)
                 continue
@@ -485,15 +515,10 @@ class MessagedThread(LoggerThread):
                 speedLimittrafficAdvisoryvalid = True
             else:
                 speedLimittrafficAdvisoryvalid = False
-            self.sm.update(0)
-            if self.sm.updated['gpsLocationExternal']:
-                gps = self.sm['gpsLocationExternal']
-                self.save_gps_data(gps)
             
             query_lock = self.sharedParams.get('query_lock', None)
             
             query_lock.acquire()
-            self.sharedParams['last_gps'] = gps
             self.sharedParams['traffic_status'] = traffic_status
             self.sharedParams['traffic_confidence'] = traffic_confidence
             self.sharedParams['last_not_none_signal'] = last_not_none_signal
@@ -502,8 +527,7 @@ class MessagedThread(LoggerThread):
             self.sharedParams['speedLimittrafficAdvisory'] = speedLimittrafficAdvisory
             self.sharedParams['speedLimittrafficAdvisoryvalid'] = speedLimittrafficAdvisoryvalid
             query_lock.release()
-            self.logger.debug("setting last_gps to %s" % str(gps))
-            
+
 def main():
     params = Params()
     dongle_id = params.get("DongleId")
@@ -532,11 +556,13 @@ def main():
 
     qt = QueryThread(1, "QueryThread", sharedParams=sharedParams)
     mt = MapsdThread(2, "MapsdThread", sharedParams=sharedParams)
-    mg = MessagedThread(3, "MessagedThread", sharedParams=sharedParams)
-
+    mggps = MessagedGPSThread(3, "MessagedGPSThread", sharedParams=sharedParams)
+    mgarne = MessagedArneThread(4, "MessagedArneThread", sharedParams=sharedParams)
+    
     qt.start()
     mt.start()
-    mg.start()
+    mggps.start()
+    mgarne.start()
     
 if __name__ == "__main__":
     main()
