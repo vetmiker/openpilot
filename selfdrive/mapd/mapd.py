@@ -232,7 +232,7 @@ class MapsdThread(LoggerThread):
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
         self.pm = messaging.PubMaster(['liveMapData'])
-        self.logger.debug("entered mapsd_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
+        self.logger.debug("entered mapsd_thread, ... %s" % ( str(self.pm)))
     def run(self):
         self.logger.debug("Entered run method for thread :" + str(self.name))
         cur_way = None
