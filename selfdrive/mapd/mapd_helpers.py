@@ -186,7 +186,7 @@ class Way:
     if query_results is None:
       return None
     else:
-      if prev_way.on_way(lat, lon, heading):
+      if prev_way is not None and prev_way.on_way(lat, lon, heading):
         return prev_way
       results, tree, real_nodes, node_to_way, location_info = query_results
 
