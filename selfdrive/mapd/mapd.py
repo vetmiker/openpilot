@@ -443,7 +443,7 @@ class MessagedGPSThread(LoggerThread):
         gps = None
         start = time.time()
         while True:
-            if time.time() - start > 0.11:
+            if time.time() - start > 0.2:
                 print("Mapd MessagedGPSThread lagging by: %s" % str(time.time() - start - 0.1))
             if time.time() - start < 0.1:
                 time.sleep(0.01)
@@ -482,7 +482,7 @@ class MessagedArneThread(LoggerThread):
         speedLimittrafficAdvisory = 0
         start = time.time()
         while True:
-            if time.time() - start > 0.15:
+            if time.time() - start > 0.2:
                 print("Mapd MessagedArneThread lagging by: %s" % str(time.time() - start - 0.1))
             if time.time() - start < 0.1:
                 time.sleep(0.01)
