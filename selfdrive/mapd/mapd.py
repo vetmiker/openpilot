@@ -388,7 +388,10 @@ class MapsdThread(LoggerThread):
                     dat.liveMapData.speedLimitAheadDistance = float(max_speed_ahead_dist)
                 if max_speed is not None:
                     if abs(max_speed - max_speed_prev) > 0.1:
-                        speedLimittrafficvalid = False
+                        query_lock = self.sharedParams.get('query_lock', None)
+                        query_lock.acquire()
+                        self.sharedParams['speedLimittrafficvalid'] = False
+                        query_lock.release()
                         max_speed_prev = max_speed
                 advisory_max_speed = cur_way.advisory_max_speed()
                 if speedLimittrafficAdvisoryvalid:
@@ -415,7 +418,10 @@ class MapsdThread(LoggerThread):
                     dat.liveMapData.speedLimit = speedLimittraffic / 3.6
                     map_valid = False
                 else:
-                    speedLimittrafficvalid = False
+                    query_lock = self.sharedParams.get('query_lock', None)
+                    query_lock.acquire()
+                    self.sharedParams['speedLimittrafficvalid'] = False
+                    query_lock.release()
             else:
                 if max_speed is not None and map_valid:
                     dat.liveMapData.speedLimitValid = True
@@ -501,7 +507,10 @@ class MessagedArneThread(LoggerThread):
                   #print(self.last_not_none_signal)
                 else:
                   last_not_none_signal = 'NONE'
-
+            query_lock = self.sharedParams.get('query_lock', None)
+            query_lock.acquire()
+            speedLimittrafficvalid = self.sharedParams['speedLimittrafficvalid']
+            query_lock.release()
             traffic = self.arne_sm['liveTrafficData']
             if traffic.speedLimitValid:
                 speedLimittraffic = traffic.speedLimit
@@ -515,8 +524,6 @@ class MessagedArneThread(LoggerThread):
                 speedLimittrafficAdvisoryvalid = True
             else:
                 speedLimittrafficAdvisoryvalid = False
-            
-            query_lock = self.sharedParams.get('query_lock', None)
             
             query_lock.acquire()
             self.sharedParams['traffic_status'] = traffic_status
