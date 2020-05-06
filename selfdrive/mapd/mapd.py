@@ -428,7 +428,7 @@ class MessagedThread(LoggerThread):
         self.sharedParams = sharedParams
         self.sm = messaging.SubMaster(['gpsLocationExternal'])
         self.arne_sm = messaging_arne.SubMaster(['liveTrafficData','trafficModelEvent'])
-        self.logger.debug("entered messaged_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
+        self.logger.debug("entered messaged_thread, ... %s, %s" % (str(self.sm), str(self.arne_sm)))
     def run(self):
         self.logger.debug("Entered run method for thread :" + str(self.name))
         last_not_none_signal = 'NONE'
