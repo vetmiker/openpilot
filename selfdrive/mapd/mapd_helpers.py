@@ -186,6 +186,8 @@ class Way:
     if query_results is None:
       return None
     else:
+      if on_way = prev_way.on_way(lat, lon, heading):
+        return prev_way
       results, tree, real_nodes, node_to_way, location_info = query_results
 
     cur_pos = geodetic2ecef((lat, lon, 0))
