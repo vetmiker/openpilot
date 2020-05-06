@@ -128,10 +128,13 @@ class QueryThread(LoggerThread):
             self.logger.debug("Starting after sleeping for 1 second ...")
             last_gps = self.sharedParams.get('last_gps', None)
             self.logger.debug("last_gps = %s" % str(last_gps))
+            
             if last_gps is not None:
                 fix_ok = last_gps.flags & 1
                 if not fix_ok:
                     continue
+            else:
+                continue
 
             last_query_pos = self.sharedParams.get('last_query_pos', None)
             if last_query_pos is not None:
@@ -266,7 +269,8 @@ class MapsdThread(LoggerThread):
             speedLimittrafficAdvisory = self.sharedParams['speedLimittrafficAdvisory']
             speedLimittrafficAdvisoryvalid = self.sharedParams['speedLimittrafficAdvisoryvalid']
             query_lock.release()
-
+            if gps is None:
+                continue
             fix_ok = gps.flags & 1
             self.logger.debug("fix_ok = %s" % str(fix_ok))
 
@@ -437,6 +441,10 @@ class MessagedThread(LoggerThread):
         traffic_status = 'NONE'
         speedLimittraffic = 0
         speedLimittraffic_prev = 0
+        speedLimittrafficAdvisoryvalid = False
+        speedLimittrafficvalid = False
+        speedLimittrafficAdvisory = 0
+        gps = None
         start = time.time()
         while True:
             if time.time() - start > 0.2:
@@ -481,8 +489,7 @@ class MessagedThread(LoggerThread):
             if self.sm.updated['gpsLocationExternal']:
                 gps = self.sm['gpsLocationExternal']
                 self.save_gps_data(gps)
-            else:
-                continue
+            
             query_lock = self.sharedParams.get('query_lock', None)
             
             query_lock.acquire()
