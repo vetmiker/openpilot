@@ -521,7 +521,7 @@ def main():
                     'last_query_pos' : last_query_pos, 'cache_valid' : cache_valid, 'traffic_status' : traffic_status, \
                     'traffic_confidence' : traffic_confidence, 'last_not_none_signal' : last_not_none_signal, \
                     'speedLimittraffic' : speedLimittraffic, 'speedLimittrafficvalid' : speedLimittrafficvalid, \
-                    'speedLimittrafficAdvisory' : speedLimittrafficAdvisory, 'speedLimittrafficAdvisoryvalid', speedLimittrafficAdvisoryvalid}
+                    'speedLimittrafficAdvisory' : speedLimittrafficAdvisory, 'speedLimittrafficAdvisoryvalid' : speedLimittrafficAdvisoryvalid}
 
     qt = QueryThread(1, "QueryThread", sharedParams=sharedParams)
     mt = MapsdThread(2, "MapsdThread", sharedParams=sharedParams)
