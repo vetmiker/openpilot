@@ -412,7 +412,7 @@ class MapsdThread(LoggerThread):
                     dat.liveMapData.roadCurvatureX = [float(x) for x in dists]
                     dat.liveMapData.roadCurvature = [float(x) for x in curvature]
 
-            if speedLimittrafficvalid:
+            if self.sharedParams['speedLimittrafficvalid']:
                 if speedLimittraffic > 0.1:
                     dat.liveMapData.speedLimitValid = True
                     dat.liveMapData.speedLimit = speedLimittraffic / 3.6
@@ -479,7 +479,6 @@ class MessagedArneThread(LoggerThread):
         speedLimittraffic = 0
         speedLimittraffic_prev = 0
         speedLimittrafficAdvisoryvalid = False
-        speedLimittrafficvalid = False
         speedLimittrafficAdvisory = 0
         start = time.time()
         while True:
