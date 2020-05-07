@@ -189,7 +189,7 @@ class Way:
     if query_results is None:
       return None
     else:
-      if prev_way is not None and prev_way.on_way(lat, lon):
+      if prev_way is not None and prev_way.on_way(lat, lon, heading):
         return prev_way
       results, tree, real_nodes, node_to_way, location_info = query_results
 
@@ -223,7 +223,7 @@ class Way:
 
       points = way.points_in_car_frame(lat, lon, heading, True)
 
-      on_way = way.on_way(lat, lon)
+      on_way = way.on_way(lat, lon, heading, points)
       if not on_way:
         continue
 
@@ -568,16 +568,18 @@ class Way:
       adv_speed = parse_speed_unit(adv_speed)
     return adv_speed
 
-  def on_way(self, lat, lon):
+  def on_way(self, lat, lon, heading, points = None):
+    maybe = False
     factor = max(111132.954*math.cos(float(lat)/180*3.141592), 111132.954 - 559.822 * math.cos( 2 * float(lat)/180*3.141592) + 1.175 * math.cos( 4 * float(lat)/180*3.141592))
     for n in range(len(self.way.nodes)-1):
       if factor * distance(lat,lon,float(self.way.nodes[n].lat),float(self.way.nodes[n].lon),float(self.way.nodes[n+1].lat),float(self.way.nodes[n+1].lon)) < 5.0:
-        return True
-    return False
-    #if points is None:
-    #  points = self.points_in_car_frame(lat, lon, heading, True)
-    #x = points[:, 0]
-    #return np.min(x) <= 0. and np.max(x) > 0.
+        maybe = True 
+    if not maybe:
+      return False
+    if points is None:
+      points = self.points_in_car_frame(lat, lon, heading, True)
+    x = points[:, 0]
+    return np.min(x) <= 0. and np.max(x) > 0.
 
   def closest_point(self, lat, lon, heading, points=None):
     if points is None:
