@@ -19,7 +19,7 @@
 #define POSE_IDX META_IDX + OTHER_META_SIZE + DESIRE_PRED_SIZE
 #define OUTPUT_SIZE  POSE_IDX + POSE_SIZE
 #ifdef TEMPORAL
-  #define TEMPORAL_SIZE 1024
+  #define TEMPORAL_SIZE 512
 #else
   #define TEMPORAL_SIZE 0
 #endif
@@ -31,10 +31,10 @@ Eigen::Matrix<float, MODEL_PATH_DISTANCE, POLYFIT_DEGREE - 1> vander;
 void model_init(ModelState* s, cl_device_id device_id, cl_context context, int temporal) {
   frame_init(&s->frame, MODEL_WIDTH, MODEL_HEIGHT, device_id, context);
   s->input_frames = (float*)calloc(MODEL_FRAME_SIZE * 2, sizeof(float));
-  
+
   const int output_size = OUTPUT_SIZE + TEMPORAL_SIZE;
   s->output = (float*)calloc(output_size, sizeof(float));
-  
+
   s->m = new DefaultRunModel("../../models/supercombo.dlc", s->output, output_size, USE_GPU_RUNTIME);
 
 #ifdef TEMPORAL
@@ -175,7 +175,7 @@ void fill_path(cereal::ModelData::PathData::Builder path, const float * data, bo
     if (i < 5 || i < valid_len) {
       stds_arr[i] = softplus(data[MODEL_PATH_DISTANCE + i]);
     } else {
-      stds_arr[i] = 1.0e3; 
+      stds_arr[i] = 1.0e3;
     }
   }
   if (has_prob) {
@@ -203,7 +203,7 @@ void fill_path(cereal::ModelData::PathData::Builder path, const float * data, bo
 void fill_lead(cereal::ModelData::LeadData::Builder lead, const float * data, int mdn_max_idx, int t_offset) {
   const double x_scale = 10.0;
   const double y_scale = 10.0;
- 
+
   lead.setProb(sigmoid(data[LEAD_MDN_N*MDN_GROUP_SIZE + t_offset]));
   lead.setDist(x_scale * data[mdn_max_idx*MDN_GROUP_SIZE]);
   lead.setStd(x_scale * softplus(data[mdn_max_idx*MDN_GROUP_SIZE + MDN_VALS]));
@@ -250,7 +250,7 @@ void model_publish(PubSocket *sock, uint32_t frame_id,
     capnp::MallocMessageBuilder msg;
     cereal::Event::Builder event = msg.initRoot<cereal::Event>();
     event.setLogMonoTime(nanos_since_boot());
-  
+
     auto framed = event.initModel();
     framed.setFrameId(frame_id);
     framed.setTimestampEof(timestamp_eof);
@@ -325,7 +325,7 @@ void posenet_publish(PubSocket *sock, uint32_t frame_id,
   posenetd.setTransStd(trans_std_vs);
   kj::ArrayPtr<const float> rot_std_vs(&rot_std_arr[0], 3);
   posenetd.setRotStd(rot_std_vs);
-  
+
   posenetd.setTimestampEof(timestamp_eof);
   posenetd.setFrameId(frame_id);
 

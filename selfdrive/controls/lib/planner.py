@@ -221,7 +221,7 @@ class Planner():
 
     enabled = (long_control_state == LongCtrlState.pid) or (long_control_state == LongCtrlState.stopping)
     
-    following = False if self.longitudinalPlanSource=='cruise' else (lead_1.status and lead_1.dRel < 40.0)
+    following = (lead_1.status and lead_1.dRel < 40.0 and lead_1.vRel < 0.0) or (lead_2.status and lead_2.dRel < 40.0 and lead_2.vRel < 0.0)
      
     if gas_button_status == 1:
       speed_ahead_distance = 150
@@ -313,8 +313,8 @@ class Planner():
         v_speedlimit_ahead = v_ego
       
       v_cruise_setpoint = min([v_cruise_setpoint, v_curvature_map, v_speedlimit, v_speedlimit_ahead])
-      if (self.mpc1.prev_lead_status and self.mpc1.v_mpc < v_ego*0.99) or (self.mpc2.prev_lead_status and self.mpc2.v_mpc < v_ego*0.99):
-        v_cruise_setpoint = v_ego
+      #if (self.mpc1.prev_lead_status and self.mpc1.v_mpc < v_ego*0.99) or (self.mpc2.prev_lead_status and self.mpc2.v_mpc < v_ego*0.99):
+      #  v_cruise_setpoint = v_ego
         
       self.v_cruise, self.a_cruise = speed_smoother(self.v_acc_start, self.a_acc_start,
                                                     v_cruise_setpoint,

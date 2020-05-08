@@ -54,6 +54,8 @@ class QueryThread(LoggerThread):
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
         # memorize some parameters
+        self.OVERPASS_API_LOCAL = "http://192.168.43.1:12345/api/interpreter"
+        self.distance_to_edge = 500
         self.OVERPASS_API_URL = "https://z.overpass-api.de/api/interpreter"
         self.OVERPASS_API_URL2 = "https://lz4.overpass-api.de/api/interpreter"
         self.OVERPASS_HEADERS = {
@@ -61,8 +63,17 @@ class QueryThread(LoggerThread):
             'Accept-Encoding': 'gzip'
         }
         self.prev_ecef = None
+        
+    def is_connected_to_local(self, timeout=1.0):
+        try:
+            requests.get(self.OVERPASS_API_LOCAL, timeout=timeout)
+            self.logger.debug("connection local active")
+            return True
+        except:
+            self.logger.error("No local server available.")
+            return False 
 
-    def is_connected_to_internet(self, timeout=5):
+    def is_connected_to_internet(self, timeout=1.0):
         try:
             requests.get(self.OVERPASS_API_URL, timeout=timeout)
             self.logger.debug("connection 1 active")
@@ -71,7 +82,7 @@ class QueryThread(LoggerThread):
             self.logger.error("No internet connection available.")
             return False 
 
-    def is_connected_to_internet2(self, timeout=5):
+    def is_connected_to_internet2(self, timeout=1.0):
         try:
             requests.get(self.OVERPASS_API_URL2, timeout=timeout)
             self.logger.debug("connection 2 active")
@@ -102,17 +113,28 @@ class QueryThread(LoggerThread):
 
     def run(self):
         self.logger.debug("run method started for thread %s" % self.name)
-        api = overpy.Overpass(url=self.OVERPASS_API_URL)
+        
         # for now we follow old logic, will be optimized later
+        start = time.time()
         while True:
-            time.sleep(1)
+            if time.time() - start > 2.0:
+                print("Mapd QueryThread lagging by: %s" % str(time.time() - start - 1.0))
+            if time.time() - start < 1.0:
+                time.sleep(0.1)
+                continue
+            else:
+                start = time.time()
+
             self.logger.debug("Starting after sleeping for 1 second ...")
             last_gps = self.sharedParams.get('last_gps', None)
             self.logger.debug("last_gps = %s" % str(last_gps))
+            
             if last_gps is not None:
                 fix_ok = last_gps.flags & 1
                 if not fix_ok:
                     continue
+            else:
+                continue
 
             last_query_pos = self.sharedParams.get('last_query_pos', None)
             if last_query_pos is not None:
@@ -121,7 +143,7 @@ class QueryThread(LoggerThread):
                     self.prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
                 
                 dist = np.linalg.norm(cur_ecef - self.prev_ecef)
-                if dist < 1500: #updated when we are 500m from the edge of the downloaded circle
+                if dist < 2000 - self.distance_to_edge: #updated when we are 500m from the edge of the downloaded circle
                     continue
                     self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(self.prev_ecef), str(dist)))
 
@@ -134,16 +156,24 @@ class QueryThread(LoggerThread):
                     else:
                         self.logger.error("There is no query_lock")
 
-            if last_gps is not None and last_gps.accuracy < 5.0 and (self.is_connected_to_internet() or self.is_connected_to_internet2()):
+            if last_gps is not None and last_gps.accuracy < 5.0:
                 q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=2000)
                 try:
-                    try:
-                        new_result = api.query(q)
-                        self.logger.debug("new_result = %s" % str(new_result))
-                    except:
-                        api2 = overpy.Overpass(url=self.OVERPASS_API_URL2)
+                    if self.is_connected_to_local():
+                        api = overpy.Overpass(url=self.OVERPASS_API_LOCAL)
+                        self.distance_to_edge = 750
+                    elif self.is_connected_to_internet():
+                        api = overpy.Overpass(url=self.OVERPASS_API_URL)
+                        self.logger.error("Using origional Server")
+                        self.distance_to_edge = 500
+                    elif self.is_connected_to_internet2():
+                        api = overpy.Overpass(url=self.OVERPASS_API_URL2)
                         self.logger.error("Using backup Server")
-                        new_result = api2.query(q)
+                        self.distance_to_edge = 500
+                    else:
+                        continue
+                    new_result = api.query(q)
+                    self.logger.debug("new_result = %s" % str(new_result))
                     # Build kd-tree
                     nodes = []
                     real_nodes = []
@@ -204,14 +234,8 @@ class MapsdThread(LoggerThread):
         # invoke parent constructor 
         LoggerThread.__init__(self, threadID, name)
         self.sharedParams = sharedParams
-        self.sm = messaging.SubMaster(['gpsLocationExternal'])
-        self.arne_sm = messaging_arne.SubMaster(['liveTrafficData','trafficModelEvent'])
-        self.last_not_none_signal = 'NONE'
-        self.last_not_none_signal_counter = 0
-        self.traffic_confidence = 0
-        self.traffic_status = 'NONE'
         self.pm = messaging.PubMaster(['liveMapData'])
-        self.logger.debug("entered mapsd_thread, ... %s, %s, %s" % (str(self.sm), str(self.arne_sm), str(self.pm)))
+        self.logger.debug("entered mapsd_thread, ... %s" % ( str(self.pm)))
     def run(self):
         self.logger.debug("Entered run method for thread :" + str(self.name))
         cur_way = None
@@ -220,64 +244,33 @@ class MapsdThread(LoggerThread):
         upcoming_curvature = 0.
         dist_to_turn = 0.
         road_points = None
-        speedLimittraffic = 0
-        speedLimittraffic_prev = 0
         max_speed = None
         max_speed_ahead = None
         max_speed_ahead_dist = None
-
         max_speed_prev = 0
-        speedLimittrafficvalid = False
-
+        start = time.time()
         while True:
-            time.sleep(0.1)
-            self.logger.debug("starting new cycle in endless loop")
-            self.sm.update(0)
-            self.arne_sm.update(0)
-            if self.arne_sm.updated['trafficModelEvent']:
-              self.traffic_status = self.arne_sm['trafficModelEvent'].status
-              self.traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)
-              if self.traffic_confidence >= 75 and (self.traffic_status == 'GREEN' or self.traffic_status == 'SLOW'):
-                self.last_not_none_signal = self.traffic_status
-                self.last_not_none_signal_counter = 0
-              elif self.traffic_confidence >= 75 and self.traffic_status == 'NONE' and self.last_not_none_signal != 'NONE':
-                if self.last_not_none_signal_counter < 50:
-                  self.last_not_none_signal_counter = self.last_not_none_signal_counter + 1
-                  print("self.last_not_none_signal_counter")
-                  print(self.last_not_none_signal_counter)
-                  print("self.last_not_none_signal")
-                  print(self.last_not_none_signal)
-                else:
-                  self.last_not_none_signal = 'NONE'
-            gps_ext = self.sm['gpsLocationExternal']
-            traffic = self.arne_sm['liveTrafficData']
-
-            self.logger.debug("got gps_ext = %s" % str(gps_ext))
-            if traffic.speedLimitValid:
-                speedLimittraffic = traffic.speedLimit
-                if abs(speedLimittraffic_prev - speedLimittraffic) > 0.1:
-                    speedLimittrafficvalid = True
-                    speedLimittraffic_prev = speedLimittraffic
-            else:
-                speedLimittrafficvalid = False
-            if traffic.speedAdvisoryValid:
-                speedLimittrafficAdvisory = traffic.speedAdvisory
-                speedLimittrafficAdvisoryvalid = True
-            else:
-                speedLimittrafficAdvisoryvalid = False
-
-            if self.sm.updated['gpsLocationExternal']:
-                gps = gps_ext
-                self.save_gps_data(gps)
-            else:
+            if time.time() - start > 0.2:
+                print("Mapd MapsdThread lagging by: %s" % str(time.time() - start - 0.1))
+            if time.time() - start < 0.1:
+                time.sleep(0.01)
                 continue
+            else:
+                start = time.time()
+            self.logger.debug("starting new cycle in endless loop")
             query_lock = self.sharedParams.get('query_lock', None)
-            
             query_lock.acquire()
-            self.sharedParams['last_gps'] = gps
+            gps = self.sharedParams['last_gps']
+            traffic_status = self.sharedParams['traffic_status']
+            traffic_confidence = self.sharedParams['traffic_confidence']
+            last_not_none_signal = self.sharedParams['last_not_none_signal']
+            speedLimittraffic = self.sharedParams['speedLimittraffic']
+            speedLimittrafficvalid = self.sharedParams['speedLimittrafficvalid']
+            speedLimittrafficAdvisory = self.sharedParams['speedLimittrafficAdvisory']
+            speedLimittrafficAdvisoryvalid = self.sharedParams['speedLimittrafficAdvisoryvalid']
             query_lock.release()
-            self.logger.debug("setting last_gps to %s" % str(gps))
-
+            if gps is None:
+                continue
             fix_ok = gps.flags & 1
             self.logger.debug("fix_ok = %s" % str(fix_ok))
 
@@ -362,12 +355,8 @@ class MapsdThread(LoggerThread):
 
                         if len(curvature):
                             curvature = np.nan_to_num(curvature)
-
-
                             upcoming_curvature = np.amax(curvature)
                             dist_to_turn =np.amin(dists[np.logical_and(curvature >= upcoming_curvature, curvature <= upcoming_curvature)])
-
-
                         else:
                             upcoming_curvature = 0.
                             dist_to_turn = 999
@@ -388,9 +377,9 @@ class MapsdThread(LoggerThread):
                 max_speed_ahead = None
                 max_speed_ahead_dist = None
                 if max_speed is not None:
-                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(max_speed, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, self.traffic_status, self.traffic_confidence, self.last_not_none_signal)
+                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(max_speed, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, traffic_status, traffic_confidence, last_not_none_signal)
                 else:
-                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(speed*1.1, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, self.traffic_status, self.traffic_confidence, self.last_not_none_signal)
+                    max_speed_ahead, max_speed_ahead_dist = cur_way.max_speed_ahead(speed*1.1, lat, lon, heading, MAPS_LOOKAHEAD_DISTANCE, traffic_status, traffic_confidence, last_not_none_signal)
                     # TODO: anticipate T junctions and right and left hand turns based on indicator
 
                 if max_speed_ahead is not None and max_speed_ahead_dist is not None:
@@ -399,7 +388,10 @@ class MapsdThread(LoggerThread):
                     dat.liveMapData.speedLimitAheadDistance = float(max_speed_ahead_dist)
                 if max_speed is not None:
                     if abs(max_speed - max_speed_prev) > 0.1:
-                        speedLimittrafficvalid = False
+                        query_lock = self.sharedParams.get('query_lock', None)
+                        query_lock.acquire()
+                        self.sharedParams['speedLimittrafficvalid'] = False
+                        query_lock.release()
                         max_speed_prev = max_speed
                 advisory_max_speed = cur_way.advisory_max_speed()
                 if speedLimittrafficAdvisoryvalid:
@@ -420,13 +412,16 @@ class MapsdThread(LoggerThread):
                     dat.liveMapData.roadCurvatureX = [float(x) for x in dists]
                     dat.liveMapData.roadCurvature = [float(x) for x in curvature]
 
-            if speedLimittrafficvalid:
+            if self.sharedParams['speedLimittrafficvalid']:
                 if speedLimittraffic > 0.1:
                     dat.liveMapData.speedLimitValid = True
                     dat.liveMapData.speedLimit = speedLimittraffic / 3.6
                     map_valid = False
                 else:
-                    speedLimittrafficvalid = False
+                    query_lock = self.sharedParams.get('query_lock', None)
+                    query_lock.acquire()
+                    self.sharedParams['speedLimittrafficvalid'] = False
+                    query_lock.release()
             else:
                 if max_speed is not None and map_valid:
                     dat.liveMapData.speedLimitValid = True
@@ -435,6 +430,109 @@ class MapsdThread(LoggerThread):
             dat.liveMapData.mapValid = map_valid
             self.logger.debug("Sending ... liveMapData ... %s", str(dat))
             self.pm.send('liveMapData', dat)
+            
+class MessagedGPSThread(LoggerThread):
+    def __init__(self, threadID, name, sharedParams={}):
+        # invoke parent constructor 
+        LoggerThread.__init__(self, threadID, name)
+        self.sharedParams = sharedParams
+        self.sm = messaging.SubMaster(['gpsLocationExternal'])
+        self.logger.debug("entered messagedGPS_thread, ... %s" % (str(self.sm)))
+    def run(self):
+        self.logger.debug("Entered run method for thread :" + str(self.name))
+        gps = None
+        start = time.time()
+        while True:
+            if time.time() - start > 0.2:
+                print("Mapd MessagedGPSThread lagging by: %s" % str(time.time() - start - 0.1))
+            if time.time() - start < 0.1:
+                time.sleep(0.01)
+                continue
+            else:
+                start = time.time()
+            self.logger.debug("starting new cycle in endless loop")
+            self.sm.update(0)
+            if self.sm.updated['gpsLocationExternal']:
+                gps = self.sm['gpsLocationExternal']
+                self.save_gps_data(gps)
+            
+            query_lock = self.sharedParams.get('query_lock', None)
+            
+            query_lock.acquire()
+            self.sharedParams['last_gps'] = gps
+            query_lock.release()
+            self.logger.debug("setting last_gps to %s" % str(gps))
+
+class MessagedArneThread(LoggerThread):
+    def __init__(self, threadID, name, sharedParams={}):
+        # invoke parent constructor 
+        LoggerThread.__init__(self, threadID, name)
+        self.sharedParams = sharedParams
+        self.arne_sm = messaging_arne.SubMaster(['liveTrafficData','trafficModelEvent'])
+        self.logger.debug("entered messageArned_thread, ... %s" % str(self.arne_sm))
+    def run(self):
+        self.logger.debug("Entered run method for thread :" + str(self.name))
+        last_not_none_signal = 'NONE'
+        last_not_none_signal_counter = 0
+        traffic_confidence = 0
+        traffic_status = 'NONE'
+        speedLimittraffic = 0
+        speedLimittraffic_prev = 0
+        speedLimittrafficAdvisoryvalid = False
+        speedLimittrafficAdvisory = 0
+        start = time.time()
+        while True:
+            if time.time() - start > 0.2:
+                print("Mapd MessagedArneThread lagging by: %s" % str(time.time() - start - 0.1))
+            if time.time() - start < 0.1:
+                time.sleep(0.01)
+                continue
+            else:
+                start = time.time()
+            self.logger.debug("starting new cycle in endless loop")
+            self.arne_sm.update(0)
+            if self.arne_sm.updated['trafficModelEvent']:
+              traffic_status = self.arne_sm['trafficModelEvent'].status
+              traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)
+              if traffic_confidence >= 50 and (traffic_status == 'GREEN' or traffic_status == 'SLOW'):
+                last_not_none_signal = traffic_status
+                last_not_none_signal_counter = 0
+              elif traffic_confidence >= 50 and traffic_status == 'NONE' and last_not_none_signal != 'NONE':
+                if last_not_none_signal_counter < 25:
+                  last_not_none_signal_counter = last_not_none_signal_counter + 1
+                  #print("self.last_not_none_signal_counter")
+                  #print(self.last_not_none_signal_counter)
+                  #print("self.last_not_none_signal")
+                  #print(self.last_not_none_signal)
+                else:
+                  last_not_none_signal = 'NONE'
+            query_lock = self.sharedParams.get('query_lock', None)
+            query_lock.acquire()
+            speedLimittrafficvalid = self.sharedParams['speedLimittrafficvalid']
+            query_lock.release()
+            traffic = self.arne_sm['liveTrafficData']
+            if traffic.speedLimitValid:
+                speedLimittraffic = traffic.speedLimit
+                if abs(speedLimittraffic_prev - speedLimittraffic) > 0.1:
+                    speedLimittrafficvalid = True
+                    speedLimittraffic_prev = speedLimittraffic
+            else:
+                speedLimittrafficvalid = False
+            if traffic.speedAdvisoryValid:
+                speedLimittrafficAdvisory = traffic.speedAdvisory
+                speedLimittrafficAdvisoryvalid = True
+            else:
+                speedLimittrafficAdvisoryvalid = False
+            
+            query_lock.acquire()
+            self.sharedParams['traffic_status'] = traffic_status
+            self.sharedParams['traffic_confidence'] = traffic_confidence
+            self.sharedParams['last_not_none_signal'] = last_not_none_signal
+            self.sharedParams['speedLimittraffic'] = speedLimittraffic
+            self.sharedParams['speedLimittrafficvalid'] = speedLimittrafficvalid
+            self.sharedParams['speedLimittrafficAdvisory'] = speedLimittrafficAdvisory
+            self.sharedParams['speedLimittrafficAdvisoryvalid'] = speedLimittrafficAdvisoryvalid
+            query_lock.release()
 
 def main():
     params = Params()
@@ -449,15 +547,28 @@ def main():
     last_query_result = None
     last_query_pos = None
     cache_valid = False
-
+    traffic_status = 'None'
+    traffic_confidence = 100
+    last_not_none_signal = 'None'
+    speedLimittraffic = 0
+    speedLimittrafficvalid = False
+    speedLimittrafficAdvisory = 0
+    speedLimittrafficAdvisoryvalid = False
     sharedParams = {'last_gps' : last_gps, 'query_lock' : query_lock, 'last_query_result' : last_query_result, \
-            'last_query_pos' : last_query_pos, 'cache_valid' : cache_valid}
+                    'last_query_pos' : last_query_pos, 'cache_valid' : cache_valid, 'traffic_status' : traffic_status, \
+                    'traffic_confidence' : traffic_confidence, 'last_not_none_signal' : last_not_none_signal, \
+                    'speedLimittraffic' : speedLimittraffic, 'speedLimittrafficvalid' : speedLimittrafficvalid, \
+                    'speedLimittrafficAdvisory' : speedLimittrafficAdvisory, 'speedLimittrafficAdvisoryvalid' : speedLimittrafficAdvisoryvalid}
 
     qt = QueryThread(1, "QueryThread", sharedParams=sharedParams)
     mt = MapsdThread(2, "MapsdThread", sharedParams=sharedParams)
-
+    mggps = MessagedGPSThread(3, "MessagedGPSThread", sharedParams=sharedParams)
+    mgarne = MessagedArneThread(4, "MessagedArneThread", sharedParams=sharedParams)
+    
     qt.start()
     mt.start()
+    mggps.start()
+    mgarne.start()
     
 if __name__ == "__main__":
     main()

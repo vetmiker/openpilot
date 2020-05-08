@@ -79,7 +79,7 @@ def get_can_signals(CP):
       ("GEARBOX", 100),
     ]
 
-  if CP.radarOffCan:
+  if CP.carFingerprint in HONDA_BOSCH:
     # Civic is only bosch to use the same brake message as other hondas.
     if CP.carFingerprint not in (CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CRV_HYBRID, CAR.INSIGHT):
       signals += [("BRAKE_PRESSED", "BRAKE_MODULE", 0)]
@@ -90,6 +90,10 @@ def get_can_signals(CP):
                 ("EPB_STATE", "EPB_STATUS", 0),
                 ("CRUISE_SPEED", "ACC_HUD", 0)]
     checks += [("GAS_PEDAL_2", 100)]
+    if CP.openpilotLongitudinalControl:
+      signals += [("BRAKE_ERROR_1", "STANDSTILL", 1),
+                  ("BRAKE_ERROR_2", "STANDSTILL", 1)]
+      checks += [("STANDSTILL", 50)]
   else:
     # Nidec signals.
     signals += [("BRAKE_ERROR_1", "STANDSTILL", 1),
@@ -163,6 +167,7 @@ class CarState(CarStateBase):
     self.cruise_setting = 0
     self.v_cruise_pcm_prev = 0
     self.cruise_mode = 0
+    self.pcm_acc_active = False
 
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
@@ -195,7 +200,7 @@ class CarState(CarStateBase):
     # LOW_SPEED_LOCKOUT is not worth a warning
     self.steer_warning = steer_status not in ['NORMAL', 'LOW_SPEED_LOCKOUT', 'NO_TORQUE_ALERT_2']
 
-    if self.CP.radarOffCan:
+    if not self.CP.openpilotLongitudinalControl:
       self.brake_error = 0
     else:
       self.brake_error = cp.vl["STANDSTILL"]['BRAKE_ERROR_1'] or cp.vl["STANDSTILL"]['BRAKE_ERROR_2']
@@ -258,7 +263,7 @@ class CarState(CarStateBase):
 
     self.brake_switch = cp.vl["POWERTRAIN_DATA"]['BRAKE_SWITCH'] != 0
 
-    if self.CP.radarOffCan:
+    if self.CP.carFingerprint in HONDA_BOSCH:
       self.cruise_mode = cp.vl["ACC_HUD"]['CRUISE_CONTROL_LABEL']
       ret.cruiseState.standstill = cp.vl["ACC_HUD"]['CRUISE_SPEED'] == 252.
       ret.cruiseState.speedOffset = calc_cruise_offset(0, ret.vEgo)
@@ -269,6 +274,8 @@ class CarState(CarStateBase):
         self.brake_switch_prev = self.brake_switch
         self.brake_switch_ts = cp.ts["POWERTRAIN_DATA"]['BRAKE_SWITCH']
       else:
+        # TODO: should anything use CS.brake_switch outside this file?
+        self.brake_switch = cp.vl["BRAKE_MODULE"]['BRAKE_PRESSED'] != 0
         ret.brakePressed = cp.vl["BRAKE_MODULE"]['BRAKE_PRESSED'] != 0
       # On set, cruise set speed pulses between 254~255 and the set speed prev is set to avoid this.
       ret.cruiseState.speed = self.v_cruise_pcm_prev if cp.vl["ACC_HUD"]['CRUISE_SPEED'] > 160.0 else cp.vl["ACC_HUD"]['CRUISE_SPEED'] * CV.KPH_TO_MS
@@ -285,8 +292,15 @@ class CarState(CarStateBase):
       self.brake_switch_ts = cp.ts["POWERTRAIN_DATA"]['BRAKE_SWITCH']
 
     ret.brake = cp.vl["VSA_STATUS"]['USER_BRAKE']
-    ret.cruiseState.enabled = cp.vl["POWERTRAIN_DATA"]['ACC_STATUS'] != 0
     ret.cruiseState.available = bool(main_on) and self.cruise_mode == 0
+    if not self.pcm_acc_active and cp.vl["POWERTRAIN_DATA"]['ACC_STATUS'] != 0:
+      self.pcm_acc_active = True
+    if not ret.cruiseState.available:
+      self.pcm_acc_active = False
+    if self.pcm_acc_active:
+      ret.cruiseState.enabled = ret.cruiseState.available
+    else:
+      ret.cruiseState.enabled = cp.vl["POWERTRAIN_DATA"]['ACC_STATUS'] != 0
 
     # Gets rid of Pedal Grinding noise when brake is pressed at slow speeds for some models
     if self.CP.carFingerprint in (CAR.PILOT, CAR.PILOT_2019, CAR.RIDGELINE):

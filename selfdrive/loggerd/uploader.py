@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 import re
-#import time
+import time
 import json
 #import random
 import ctypes
@@ -252,6 +252,7 @@ def uploader_fn(exit_event):
     last_gps_size = None
 
   while True:
+    time.sleep(10.0)
     #allow_raw_upload = (params.get("IsUploadRawEnabled") != b"0")
     on_hotspot = is_on_hotspot()
     on_wifi = is_on_wifi()

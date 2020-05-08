@@ -48,7 +48,7 @@ class opParams:
     """
 
     self.default_params = {'awareness_factor': {'default': 10., 'allowed_types': [float, int], 'description': 'Multiplier for the awareness times', 'live': False},
-                           'alca_min_speed': {'default': 20, 'allowed_types': [float, int], 'description': 'Speed limit to start ALC in m/s', 'live': False},
+                           'alca_min_speed': {'default': 20, 'allowed_types': [float, int], 'description': 'Speed limit to start ALC in MPH', 'live': False},
                            'alca_nudge_required': {'default': False, 'allowed_types': [bool], 'description': "Require nudge to start ALC", 'live': False},
                            'camera_offset': {'default': 0.06, 'allowed_types': [float, int], 'description': 'Your camera offset to use in lane_planner.py', 'live': True},
                            'curvature_factor': {'default': 1.0, 'allowed_types': [float, int], 'description': 'Multiplier for the curvature slowdown. Increase for less braking.', 'live': False},
@@ -69,6 +69,7 @@ class opParams:
                            'smart_speed': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use Smart Speed for drives above smart_speed_max_vego', 'live': False},
                            'smart_speed_max_vego': {'default': 26.8, 'allowed_types': [float, int], 'description': 'Speed limit to ignore Smartspeed in m/s', 'live': False},
                            'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
+                           'traffic_light_alerts': {'default': False, 'allowed_types': [bool], 'description': "Switch off the traffic light alerts", 'live': False},
                            'traffic_lights': {'default': True, 'allowed_types': [bool], 'description': "Should Openpilot stop for traffic lights", 'live': False},
                            'traffic_lights_without_direction': {'default': False, 'allowed_types': [bool], 'description': "Should Openpilot stop for traffic lights without a direction specified", 'live': False},
                            'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False}
