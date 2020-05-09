@@ -64,7 +64,7 @@ class QueryThread(LoggerThread):
         }
         self.prev_ecef = None
         
-    def is_connected_to_local(self, timeout=1.0):
+    def is_connected_to_local(self, timeout=2.0):
         try:
             requests.get(self.OVERPASS_API_LOCAL, timeout=timeout)
             self.logger.debug("connection local active")
