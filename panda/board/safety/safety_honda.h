@@ -110,7 +110,7 @@ static int honda_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       int button = (GET_BYTE(to_push, 0) & 0xE0) >> 5;
       switch (button) {
         case 2:  // cancel
-          controls_allowed = 1;
+          controls_allowed = 0;
           break;
         case 3:  // set
         case 4:  // resume
@@ -304,7 +304,7 @@ static int honda_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
 
 static void honda_nidec_init(int16_t param) {
   UNUSED(param);
-  controls_allowed = false;
+  controls_allowed = true;
   relay_malfunction_reset();
   honda_hw = HONDA_N_HW;
   honda_alt_brake_msg = false;
@@ -312,7 +312,7 @@ static void honda_nidec_init(int16_t param) {
 }
 
 static void honda_bosch_giraffe_init(int16_t param) {
-  controls_allowed = false;
+  controls_allowed = true;
   relay_malfunction_reset();
   honda_hw = HONDA_BG_HW;
   // Checking for alternate brake override from safety parameter
@@ -322,7 +322,7 @@ static void honda_bosch_giraffe_init(int16_t param) {
 }
 
 static void honda_bosch_harness_init(int16_t param) {
-  controls_allowed = false;
+  controls_allowed = true;
   relay_malfunction_reset();
   honda_hw = HONDA_BH_HW;
   // Checking for alternate brake override from safety parameter
