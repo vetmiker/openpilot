@@ -144,7 +144,7 @@ static int honda_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       int gas_interceptor = HONDA_GET_INTERCEPTOR(to_push);
       if (!unsafe_allow_gas && (gas_interceptor > HONDA_GAS_INTERCEPTOR_THRESHOLD) &&
           (gas_interceptor_prev <= HONDA_GAS_INTERCEPTOR_THRESHOLD)) {
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
       gas_interceptor_prev = gas_interceptor;
     }
@@ -154,7 +154,7 @@ static int honda_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       if (addr == 0x17C) {
         bool gas_pressed = GET_BYTE(to_push, 0) != 0;
         if (!unsafe_allow_gas && gas_pressed && !gas_pressed_prev) {
-          controls_allowed = 0;
+          controls_allowed = 1;
         }
         gas_pressed_prev = gas_pressed;
       }
