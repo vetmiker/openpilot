@@ -75,6 +75,7 @@ void fault_recovered(uint32_t fault) {
 #define GET_BYTE(msg, b) (((int)(b) > 3) ? (((msg)->RDHR >> (8U * ((unsigned int)(b) % 4U))) & 0XFFU) : (((msg)->RDLR >> (8U * (unsigned int)(b))) & 0xFFU))
 #define GET_BYTES_04(msg) ((msg)->RDLR)
 #define GET_BYTES_48(msg) ((msg)->RDHR)
+#define GET_FLAG(value, mask) (((__typeof__(mask))param & mask) == mask)
 
 #define UNUSED(x) (void)(x)
 
@@ -249,6 +250,11 @@ bool get_honda_moving(void){
 void set_honda_alt_brake_msg(bool c){
   honda_alt_brake_msg = c;
 }
+
+void set_honda_bosch_long(bool c){
+  honda_bosch_long = c;
+}
+
 
 int get_honda_hw(void) {
   return honda_hw;
