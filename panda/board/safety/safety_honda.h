@@ -110,7 +110,7 @@ static int honda_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       int button = (GET_BYTE(to_push, 0) & 0xE0) >> 5;
       switch (button) {
         case 2:  // cancel
-          controls_allowed = 0;
+          controls_allowed = 1;
           break;
         case 3:  // set
         case 4:  // resume
