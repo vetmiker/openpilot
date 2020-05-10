@@ -60,6 +60,7 @@ void init_tests_honda(void);
 bool get_honda_moving(void);
 void set_honda_fwd_brake(bool);
 void set_honda_alt_brake_msg(bool);
+void set_honda_bosch_long(bool c);
 int get_honda_hw(void);
 
 void init_tests_gm(void);
