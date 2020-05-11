@@ -55,7 +55,7 @@ class QueryThread(LoggerThread):
         self.sharedParams = sharedParams
         # memorize some parameters
         self.OVERPASS_API_LOCAL = "http://192.168.43.1:12345/api/interpreter"
-        self.distance_to_edge = 1000
+        self.distance_to_edge = 500
         self.OVERPASS_API_URL = "https://z.overpass-api.de/api/interpreter"
         self.OVERPASS_API_URL2 = "https://lz4.overpass-api.de/api/interpreter"
         self.OVERPASS_HEADERS = {
@@ -143,11 +143,11 @@ class QueryThread(LoggerThread):
                     self.prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
                 
                 dist = np.linalg.norm(cur_ecef - self.prev_ecef)
-                if dist < 4000 - self.distance_to_edge: #updated when we are 500m from the edge of the downloaded circle
+                if dist < 2000 - self.distance_to_edge: #updated when we are 500m from the edge of the downloaded circle
                     continue
                     self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(self.prev_ecef), str(dist)))
 
-                if dist > 4000:
+                if dist > 2000:
                     query_lock = self.sharedParams.get('query_lock', None)
                     if query_lock is not None:
                         query_lock.acquire()
@@ -161,15 +161,15 @@ class QueryThread(LoggerThread):
                 try:
                     if self.is_connected_to_local():
                         api = overpy.Overpass(url=self.OVERPASS_API_LOCAL)
-                        self.distance_to_edge = 1500
+                        self.distance_to_edge = 750
                     elif self.is_connected_to_internet():
                         api = overpy.Overpass(url=self.OVERPASS_API_URL)
                         self.logger.error("Using origional Server")
-                        self.distance_to_edge = 1000
+                        self.distance_to_edge = 500
                     elif self.is_connected_to_internet2():
                         api = overpy.Overpass(url=self.OVERPASS_API_URL2)
                         self.logger.error("Using backup Server")
-                        self.distance_to_edge = 1000
+                        self.distance_to_edge = 500
                     else:
                         continue
                     new_result = api.query(q)
