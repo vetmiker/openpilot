@@ -40,7 +40,7 @@ class Traffic:
         self.shown_dead_warning = False
         self.past_preds.append(list(self.sm['trafficModelRaw'].prediction))
         pred, confidence = self.get_prediction()  # uses most common prediction from weighted past second list (1 / model_rate), NONE until car is started for min time
-        print('{}, confidence: {}'.format(pred, confidence))
+        #print('{}, confidence: {}'.format(pred, confidence))
         self.send_prediction(pred, confidence)
       else:
         if not self.shown_dead_warning and self.last_log['log'] != 0:
