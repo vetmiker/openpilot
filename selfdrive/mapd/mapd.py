@@ -164,6 +164,7 @@ class QueryThread(LoggerThread):
                 try:
                     if self.is_connected_to_local():
                         api = overpy.Overpass(url=self.OVERPASS_API_LOCAL)
+                        api.timeout = 15.0
                         self.distance_to_edge = radius * 3 / 8
                     elif self.is_connected_to_internet():
                         api = overpy.Overpass(url=self.OVERPASS_API_URL)
@@ -171,6 +172,7 @@ class QueryThread(LoggerThread):
                         self.distance_to_edge = radius/4
                     elif self.is_connected_to_internet2():
                         api = overpy.Overpass(url=self.OVERPASS_API_URL2)
+                        api.timeout = 10.0
                         self.logger.error("Using backup Server")
                         self.distance_to_edge = radius/4
                     else:
