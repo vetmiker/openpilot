@@ -572,7 +572,7 @@ class Way:
     maybe = False
     factor = max(111132.954*math.cos(float(lat)/180*3.141592), 111132.954 - 559.822 * math.cos( 2 * float(lat)/180*3.141592) + 1.175 * math.cos( 4 * float(lat)/180*3.141592))
     for n in range(len(self.way.nodes)-1):
-      if factor * distance(lat,lon,float(self.way.nodes[n].lat),float(self.way.nodes[n].lon),float(self.way.nodes[n+1].lat),float(self.way.nodes[n+1].lon)) < 5.0:
+      if factor * distance(lat,lon,float(self.way.nodes[n].lat),float(self.way.nodes[n].lon),float(self.way.nodes[n+1].lat),float(self.way.nodes[n+1].lon)) < 10.0:
         maybe = True 
     if not maybe:
       return False
