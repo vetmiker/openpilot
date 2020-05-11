@@ -3,6 +3,7 @@
 import time
 import math
 import overpy
+import socket
 import requests
 import threading
 import numpy as np
@@ -55,6 +56,7 @@ class QueryThread(LoggerThread):
         self.sharedParams = sharedParams
         # memorize some parameters
         self.OVERPASS_API_LOCAL = "http://192.168.43.1:12345/api/interpreter"
+        socket.setdefaulttimeout(15)
         self.distance_to_edge = 500
         self.OVERPASS_API_URL = "https://z.overpass-api.de/api/interpreter"
         self.OVERPASS_API_URL2 = "https://lz4.overpass-api.de/api/interpreter"
