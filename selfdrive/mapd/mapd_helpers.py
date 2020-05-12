@@ -189,7 +189,7 @@ class Way:
     if query_results is None:
       return None
     else:
-      if prev_way is not None:
+      if prev_way is not None and len(prev_way.way.nodes) < 10:
         if prev_way.on_way(lat, lon, heading):
           return prev_way
         else:
