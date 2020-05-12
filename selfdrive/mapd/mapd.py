@@ -254,6 +254,7 @@ class MapsdThread(LoggerThread):
         max_speed_ahead = None
         max_speed_ahead_dist = None
         max_speed_prev = 0
+        had_good_gps = False
         start = time.time()
         while True:
             if time.time() - start > 0.2:
@@ -280,8 +281,15 @@ class MapsdThread(LoggerThread):
             fix_ok = gps.flags & 1
             self.logger.debug("fix_ok = %s" % str(fix_ok))
 
-            if gps.accuracy > 2.5 and not speedLimittrafficvalid:
-                fix_ok = False
+            if gps.accuracy > 2.5:
+                if gps.accuracy > 5.0:
+                    had_good_gps = False
+                    if not speedLimittrafficvalid:
+                        fix_ok = False
+                if not speedLimittrafficvalid and not had_good_gps:
+                    fix_ok = False
+            elif not had_good_gps:
+                had_good_gps = True
             if not fix_ok or self.sharedParams['last_query_result'] is None or not self.sharedParams['cache_valid']:
                 self.logger.debug("fix_ok %s" % fix_ok)
                 self.logger.error("Error in fix_ok logic")
