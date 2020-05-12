@@ -191,12 +191,17 @@ class Way:
     else:
       if prev_way is not None and prev_way.on_way(lat, lon, heading):
         return prev_way
+      else:
+        way = prev_way.next_way(heading)
+        if way is not None and way.on_way(lat, lon, heading):
+          return way
+        
       results, tree, real_nodes, node_to_way, location_info = query_results
 
     cur_pos = geodetic2ecef((lat, lon, 0))
-    nodes = tree.query_ball_point(cur_pos, 500)
+    nodes = tree.query_ball_point(cur_pos, 50)
 
-    # If no nodes within 500m, choose closest one
+    # If no nodes within 50m, choose closest one
     if not nodes:
       nodes = [tree.query(cur_pos)[1]]
 
