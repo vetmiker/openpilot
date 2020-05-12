@@ -90,8 +90,8 @@ docker pull wiktorn/overpass-api
 docker run \
 -e OVERPASS_META=yes \
 -e OVERPASS_MODE=init \
--e OVERPASS_PLANET_URL=https://download.geofabrik.de/europe/germany/baden-wuerttemberg-latest.osm.bz2 \
--e OVERPASS_DIFF_URL=http://download.geofabrik.de/europe/germany/baden-wuerttemberh-updates/ \
+-e OVERPASS_PLANET_URL=http://download.geofabrik.de/europe/germany/baden-wuerttemberg/tuebingen-regbez-latest.osm.bz2 \
+-e OVERPASS_DIFF_URL=http://download.geofabrik.de/europe/germany/baden-wuerttemberg/tuebingen-regbez-updates/ \
 -e OVERPASS_RULES_LOAD=10 \
 -v /big/docker/overpass_db/:/db \
 -p 12345:80 \
