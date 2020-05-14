@@ -6,7 +6,7 @@ def get_pt_bus(car_fingerprint, has_relay):
   return 1 if car_fingerprint in HONDA_BOSCH and has_relay else 0
 
 
-def get_lkas_cmd_bus(car_fingerprint, has_relay, openpilot_longitudinal_control):
+def get_lkas_cmd_bus(car_fingerprint, has_relay, openpilot_longitudinal_control=False):
   if openpilot_longitudinal_control:
     return get_pt_bus(car_fingerprint, has_relay)
   return 2 if car_fingerprint in HONDA_BOSCH and not has_relay else 0
@@ -70,8 +70,8 @@ def create_acc_commands(packer, enabled, accel, gas, idx, stopping, starting, ca
   }
   commands.append(packer.make_can_msg("ACC_CONTROL_ON", bus, acc_control_on_values, idx))
   
-  blank_values = {}
-  commands.append(packer.make_can_msg("BLANK_1FA", bus, blank_values, idx))
+  #blank_values = {}
+  #commands.append(packer.make_can_msg("BLANK_1FA", bus, blank_values, idx))
   
   return commands
 
@@ -82,6 +82,17 @@ def create_steering_control(packer, apply_steer, lkas_active, car_fingerprint, i
   }
   bus = get_lkas_cmd_bus(car_fingerprint, has_relay, openpilot_longitudinal_control)
   return packer.make_can_msg("STEERING_CONTROL", bus, values, idx)
+
+
+def create_bosch_supplemental_1(packer, car_fingerprint, idx, has_relay):
+  # non-active params
+  values = {
+    "SET_ME_X04": 0x04,
+    "SET_ME_X80": 0x80,
+    "SET_ME_X10": 0x10,
+  }
+  bus = get_lkas_cmd_bus(car_fingerprint, has_relay)
+  return packer.make_can_msg("BOSCH_SUPPLEMENTAL_1", bus, values, idx)
 
 
 def create_ui_commands(packer, pcm_speed, hud, car_fingerprint, is_metric, idx, has_relay, openpilot_longitudinal_control, stock_hud):
@@ -127,7 +138,7 @@ def create_ui_commands(packer, pcm_speed, hud, car_fingerprint, is_metric, idx, 
     'BEEP': 0,
   }
   commands.append(packer.make_can_msg('LKAS_HUD', bus_lkas, lkas_hud_values, idx))
-  
+
   if openpilot_longitudinal_control and car_fingerprint in HONDA_BOSCH:
     radar_hud_values = {
       'SET_TO_1' : 0x01,
@@ -144,3 +155,4 @@ def spam_buttons_command(packer, button_val, idx, car_fingerprint, has_relay):
   }
   bus = get_pt_bus(car_fingerprint, has_relay)
   return packer.make_can_msg("SCM_BUTTONS", bus, values, idx)
+  
