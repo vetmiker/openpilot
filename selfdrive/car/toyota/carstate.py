@@ -318,7 +318,7 @@ class CarState(CarStateBase):
         self.arne_pm.send('liveTrafficData', dat)
     if ret.gasPressed and not self.gas_pressed:
       self.engaged_when_gas_was_pressed = self.pcm_acc_active
-    if (self.gas_pressed and not ret.gasPressed) and self.engaged_when_gas_was_pressed and ret.vEgo > self.smartspeed:
+    if ((ret.gasPressed) or (self.gas_pressed and not ret.gasPressed)) and self.engaged_when_gas_was_pressed and ret.vEgo > self.smartspeed:
       self.rsa_ignored_speed = self.spdval1
       dat = messaging_arne.new_message('liveTrafficData')
       dat.liveTrafficData.speedLimitValid = True
