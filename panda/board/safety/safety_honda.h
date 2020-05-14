@@ -209,7 +209,7 @@ static int honda_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
   } else if ((honda_hw == HONDA_BH_HW) && honda_bosch_long) {
     tx = msg_allowed(addr, bus, HONDA_BH_LONG_TX_MSGS, sizeof(HONDA_BH_LONG_TX_MSGS)/sizeof(HONDA_BH_LONG_TX_MSGS[0]));
   } else {
-    tx = addr, bus(addr, bus, HONDA_N_TX_MSGS, sizeof(HONDA_N_TX_MSGS)/sizeof(HONDA_N_TX_MSGS[0]));
+    tx = msg_allowed(addr, bus, HONDA_N_TX_MSGS, sizeof(HONDA_N_TX_MSGS)/sizeof(HONDA_N_TX_MSGS[0]));
   }
 
   if (relay_malfunction) {
