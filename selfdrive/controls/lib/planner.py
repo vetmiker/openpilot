@@ -169,6 +169,8 @@ class Planner():
       elif slowest == 'model':
         self.v_acc = self.mpc_model.v_mpc + 5.0
         self.a_acc = self.mpc_model.a_mpc
+        print("Model Speed kph")
+        print(self.mpc_model.v_mpc*3.6)
 
     self.v_acc_future = v_cruise_setpoint
     if lead1_check:

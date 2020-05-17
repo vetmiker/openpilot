@@ -3,6 +3,7 @@
 import time
 import math
 import overpy
+import socket
 import requests
 import threading
 import numpy as np
@@ -55,6 +56,7 @@ class QueryThread(LoggerThread):
         self.sharedParams = sharedParams
         # memorize some parameters
         self.OVERPASS_API_LOCAL = "http://192.168.43.1:12345/api/interpreter"
+        socket.setdefaulttimeout(15)
         self.distance_to_edge = 500
         self.OVERPASS_API_URL = "https://z.overpass-api.de/api/interpreter"
         self.OVERPASS_API_URL2 = "https://lz4.overpass-api.de/api/interpreter"
@@ -64,7 +66,7 @@ class QueryThread(LoggerThread):
         }
         self.prev_ecef = None
         
-    def is_connected_to_local(self, timeout=1.0):
+    def is_connected_to_local(self, timeout=3.0):
         try:
             requests.get(self.OVERPASS_API_LOCAL, timeout=timeout)
             self.logger.debug("connection local active")
@@ -116,6 +118,7 @@ class QueryThread(LoggerThread):
         
         # for now we follow old logic, will be optimized later
         start = time.time()
+        radius = 3000
         while True:
             if time.time() - start > 2.0:
                 print("Mapd QueryThread lagging by: %s" % str(time.time() - start - 1.0))
@@ -143,11 +146,11 @@ class QueryThread(LoggerThread):
                     self.prev_ecef = geodetic2ecef((last_query_pos.latitude, last_query_pos.longitude, last_query_pos.altitude))
                 
                 dist = np.linalg.norm(cur_ecef - self.prev_ecef)
-                if dist < 2000 - self.distance_to_edge: #updated when we are 500m from the edge of the downloaded circle
+                if dist < radius - self.distance_to_edge: #updated when we are close to the edge of the downloaded circle
                     continue
                     self.logger.debug("parameters, cur_ecef = %s, prev_ecef = %s, dist=%s" % (str(cur_ecef), str(self.prev_ecef), str(dist)))
 
-                if dist > 2000:
+                if dist > radius:
                     query_lock = self.sharedParams.get('query_lock', None)
                     if query_lock is not None:
                         query_lock.acquire()
@@ -157,19 +160,21 @@ class QueryThread(LoggerThread):
                         self.logger.error("There is no query_lock")
 
             if last_gps is not None and last_gps.accuracy < 5.0:
-                q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=2000)
+                q, lat, lon = self.build_way_query(last_gps.latitude, last_gps.longitude, last_gps.bearing, radius=radius)
                 try:
                     if self.is_connected_to_local():
                         api = overpy.Overpass(url=self.OVERPASS_API_LOCAL)
-                        self.distance_to_edge = 750
+                        api.timeout = 15.0
+                        self.distance_to_edge = radius * 3 / 8
                     elif self.is_connected_to_internet():
                         api = overpy.Overpass(url=self.OVERPASS_API_URL)
                         self.logger.error("Using origional Server")
-                        self.distance_to_edge = 500
+                        self.distance_to_edge = radius/4
                     elif self.is_connected_to_internet2():
                         api = overpy.Overpass(url=self.OVERPASS_API_URL2)
+                        api.timeout = 10.0
                         self.logger.error("Using backup Server")
-                        self.distance_to_edge = 500
+                        self.distance_to_edge = radius/4
                     else:
                         continue
                     new_result = api.query(q)
@@ -217,6 +222,7 @@ class QueryThread(LoggerThread):
 
                 except Exception as e:
                     self.logger.error("ERROR :" + str(e))
+                    print(str(e))
                     query_lock = self.sharedParams.get('query_lock', None)
                     query_lock.acquire()
                     self.sharedParams['last_query_result'] = None
@@ -248,6 +254,7 @@ class MapsdThread(LoggerThread):
         max_speed_ahead = None
         max_speed_ahead_dist = None
         max_speed_prev = 0
+        had_good_gps = False
         start = time.time()
         while True:
             if time.time() - start > 0.2:
@@ -274,8 +281,15 @@ class MapsdThread(LoggerThread):
             fix_ok = gps.flags & 1
             self.logger.debug("fix_ok = %s" % str(fix_ok))
 
-            if gps.accuracy > 2.5 and not speedLimittrafficvalid:
-                fix_ok = False
+            if gps.accuracy > 2.5:
+                if gps.accuracy > 5.0:
+                    had_good_gps = False
+                    if not speedLimittrafficvalid:
+                        fix_ok = False
+                if not speedLimittrafficvalid and not had_good_gps:
+                    fix_ok = False
+            elif not had_good_gps:
+                had_good_gps = True
             if not fix_ok or self.sharedParams['last_query_result'] is None or not self.sharedParams['cache_valid']:
                 self.logger.debug("fix_ok %s" % fix_ok)
                 self.logger.error("Error in fix_ok logic")
