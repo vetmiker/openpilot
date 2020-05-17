@@ -188,7 +188,7 @@ class Way:
   def closest(cls, query_results, lat, lon, heading, prev_way=None):
     if query_results is None:
       return None
-    #else:
+    else:
     #  if prev_way is not None and len(prev_way.way.nodes) < 10:
     #    if prev_way.on_way(lat, lon, heading):
     #      return prev_way
