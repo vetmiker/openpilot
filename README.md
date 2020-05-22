@@ -8,6 +8,9 @@ For a demo of this version of ArnePilot check the video below:
 Find me on Discord https://discord.gg/R5YtuVB
 
 # Installation
+Put this URL in the custom URL field after uninstalling through the UI
+https://d.sdut.me/arne/release4
+or if you want to use the command line or https://github.com/jfrux/workbench
 `cd /data; rm -rf openpilot; git clone https://github.com/arne182/openpilot; git checkout release4; reboot`
 
 still have trouble ?? More info about how to install this fork can be found [here](https://medium.com/@jfrux/comma-eon-installing-a-fork-of-openpilot-5c2b5c134b4b).
