@@ -4,8 +4,8 @@ const int TOYOTA_MAX_TORQUE = 1500;       // max torque cmd allowed ever
 // rate based torque limit + stay within actually applied
 // packet is sent at 100hz, so this limit is 1000/sec
 const int TOYOTA_MAX_RATE_UP = 10;        // ramp up slow
-const int TOYOTA_MAX_RATE_DOWN = 25;      // ramp down fast
-const int TOYOTA_MAX_TORQUE_ERROR = 350;  // max torque cmd in excess of torque motor
+const int TOYOTA_MAX_RATE_DOWN = 44;      // ramp down fast
+const int TOYOTA_MAX_TORQUE_ERROR = 500;  // max torque cmd in excess of torque motor
 
 // real time torque limit to prevent controls spamming
 // the real time limit is 1500/sec
@@ -13,11 +13,11 @@ const int TOYOTA_MAX_RT_DELTA = 375;      // max delta torque allowed for real t
 const uint32_t TOYOTA_RT_INTERVAL = 250000;    // 250ms between real time checks
 
 // longitudinal limits
-const int TOYOTA_MAX_ACCEL = 1500;        // 1.5 m/s2
-const int TOYOTA_MIN_ACCEL = -3000;       // -3.0 m/s2
+const int TOYOTA_MAX_ACCEL = 3500;        // 3.5 m/s2
+const int TOYOTA_MIN_ACCEL = -3500;       // -3.5 m/s2
 
-const int TOYOTA_ISO_MAX_ACCEL = 2000;        // 2.0 m/s2
-const int TOYOTA_ISO_MIN_ACCEL = -3500;       // -3.5 m/s2
+const int TOYOTA_ISO_MAX_ACCEL = 4000;        // 2.0 m/s2 above 20m/s and 4.0 below 5m/s
+const int TOYOTA_ISO_MIN_ACCEL = -5000;       // -3.5 m/s2 above 20m/s and -5.0m below 5m/s
 
 const int TOYOTA_STANDSTILL_THRSLD = 100;  // 1kph
 
@@ -44,6 +44,8 @@ const int TOYOTA_RX_CHECKS_LEN = sizeof(toyota_rx_checks) / sizeof(toyota_rx_che
 
 // global actuation limit states
 int toyota_dbc_eps_torque_factor = 100;   // conversion factor for STEER_TORQUE_EPS in %: see dbc file
+
+int ego_speed_toyota = 0;                 // speed
 
 static uint8_t toyota_compute_checksum(CAN_FIFOMailBox_TypeDef *to_push) {
   int addr = GET_ADDR(to_push);
@@ -87,9 +89,9 @@ static int toyota_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 
     // enter controls on rising edge of ACC, exit controls on ACC off
     // exit controls on rising edge of gas press
-    if (addr == 0x1D2) {
-      // 5th bit is CRUISE_ACTIVE
-      int cruise_engaged = GET_BYTE(to_push, 0) & 0x20;
+    if (addr == 0x1D3) {
+      // 15th bit is MAIN_ON
+      int cruise_engaged = GET_BYTE(to_push, 1) >> 7;
       if (!cruise_engaged) {
         controls_allowed = 0;
       }
@@ -114,7 +116,8 @@ static int toyota_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
         int next_byte = i + 1;  // hack to deal with misra 10.8
         speed += (GET_BYTE(to_push, i) << 8) + GET_BYTE(to_push, next_byte) - 0x1a6f;
       }
-      vehicle_moving = ABS(speed / 4) > TOYOTA_STANDSTILL_THRSLD;
+      ego_speed_toyota = ABS(speed / 4);
+      vehicle_moving = ego_speed_toyota > TOYOTA_STANDSTILL_THRSLD;
     }
 
     // exit controls on rising edge of brake pedal
@@ -122,7 +125,7 @@ static int toyota_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if ((addr == 0x224) || (addr == 0x226)) {
       int byte = (addr == 0x224) ? 0 : 4;
       bool brake_pressed = ((GET_BYTE(to_push, byte) >> 5) & 1) != 0;
-      if (brake_pressed && (!brake_pressed_prev || vehicle_moving)) {
+      if (!unsafe_mode && brake_pressed && (!brake_pressed_prev || vehicle_moving)) {
         controls_allowed = 0;
       }
       brake_pressed_prev = brake_pressed;
@@ -223,8 +226,12 @@ static int toyota_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
       }
 
       // no torque if controls is not allowed
-      if (!controls_allowed && (desired_torque != 0)) {
+      if (!controls_allowed) {
+        if (ego_speed_toyota > 4500){
+          violation |= max_limit_check(desired_torque, 805, -805);
+        } else {
         violation = 1;
+        }
       }
 
       // reset to 0 if either controls is not allowed or there's a violation
