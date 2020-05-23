@@ -8,6 +8,9 @@ For a demo of this version of ArnePilot check the video below:
 Find me on Discord https://discord.gg/R5YtuVB
 
 # Installation
+Put this URL in the custom URL field after uninstalling through the UI
+https://d.sdut.me/arne/release4
+or if you want to use the command line or https://github.com/jfrux/workbench
 `cd /data; rm -rf openpilot; git clone https://github.com/arne182/openpilot; git checkout release4; reboot`
 
 still have trouble ?? More info about how to install this fork can be found [here](https://medium.com/@jfrux/comma-eon-installing-a-fork-of-openpilot-5c2b5c134b4b).
@@ -24,7 +27,7 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 
 `release4`: this is the default branch that is most up to date with the ArnePilot 0.7 release branch. Normally you should use this branch because it has been tested and verified that it is fully working without any issues.
 
-`074-clean`: this is my default testing branch. When I finishing testing/adding new structure, I'll merge this into the
+`075-clean`: this is my default testing branch. When I finishing testing/adding new structure, I'll merge this into the
 `release4` branch.
 
 `release3`: this is my old branch, that is compatible with ArnePilot 0.6.
@@ -33,7 +36,7 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 
 # Configuration
 
-- You can turn on or off some of the feature by editing `op_edit.py`. run the following command `python /data/openpilot/op_edit.py`
+- You can turn on or off some of the [Feature](https://github.com/arne182/ArnePilot/blob/81a3258da49e1bb9739a5f1d0a84b38afd10583f/common/op_params.py#L500) by editing `op_edit.py`. Run the following command `python /data/openpilot/op_edit.py`
 
 # Todo
 
@@ -77,7 +80,10 @@ This aims to provide a smoother driving experience in stop and go traffic (under
 - Added ability to turn on and off RSA at certain speed. `python /data/ArnePilot/op_edit.py`
 - Easily view the EON's IP Address.Just look at the sidebar right under wifi singal strength's.
 - Battery has percentage instead of the battery icon.
-- [WIP] Traffic light detection from Littlemountainman, shane and brain.
+- [WIP] Traffic light detection from Littlemountainman, shane and brain. To get accurate result make sure your daily commute/area is mapped on [OSM](openstreetmap.org) with right direaction. [For example](https://imgur.com/purBVpd)...  [still dont get it watch the video by mageymoo1](https://youtu.be/7dPaF0tDb7Y). 
+- We also have enabled commas e2e model which will only work between 11 MPH to 29 MPH. Commas e2e model helps slows down for traffic light, stop sign, etc. e2e, traffic model and mapd all works together to help you stop at the light. All of this can be turned off via `/data/openpilot/op_edit.py`.
+- Loggin has been Disabled by default on this fork. If you would like to record your drive edit the [following line](https://github.com/arne182/ArnePilot/blob/4d66df96a91c9c13491a3d78b9c1c2a9e848724a/selfdrive/manager.py#L480)
+- Smart speed (smart speed is essentially speedlimit which eon will not go over unless you have set custom offset) can be overridden by pressing gas above the current smart speed.
 
 
 # Licensing
