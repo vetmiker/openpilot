@@ -360,8 +360,15 @@ class CarInterface(CarInterfaceBase):
         longControlDisabled = True
         ret.brakePressed = True
         self.waiting = False
+        self.disengage_due_to_slow_speed = False
     if ret.vEgo < 1 or not self.keep_openpilot_engaged:
       ret.cruiseState.enabled = self.CS.pcm_acc_active
+      if self.CS.out.cruiseState.enabled and not self.CS.pcm_acc_active:
+        self.disengage_due_to_slow_speed = True
+    if self.disengage_due_to_slow_speed and ret.vEgo > 1:
+      self.disengage_due_to_slow_speed = False
+      ret.cruiseState.enabled = bool(self.CS.main_on)
+    
       
     # events
     events, eventsArne182 = self.create_common_events(ret, extra_gears)
