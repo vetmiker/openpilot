@@ -102,7 +102,7 @@ class LongitudinalMpc():
     if self.df_profile == 'far':
       y_dist = [1.8, 2.7]  # TRs
     elif self.df_profile == 'close':  # for in congested traffic
-      x_vel = [5.0, 10.0]
+      x_vel = [5.0, 15.0]
       y_dist = [1.8, 0.9]
     else:  # default to normal
       y_dist = [1.8, 1.8]
