@@ -97,14 +97,14 @@ class LongitudinalMpc():
       self.last_cost = cost
 
   def dynamic_follow(self, CS, lead):
-    self.df_profile = self.op_params.get('dynamic_follow', 'relaxed').strip().lower()
-    x_vel = [5.0, 55.0]  # velocities
-    if self.df_profile == 'roadtrip':
+    self.df_profile = self.op_params.get('dynamic_follow', 'normal').strip().lower()
+    x_vel = [5.0, 15.0]  # velocities
+    if self.df_profile == 'far':
       y_dist = [1.8, 2.7]  # TRs
-    elif self.df_profile == 'traffic':  # for in congested traffic
-      x_vel = [5.0, 35.0]
+    elif self.df_profile == 'close':  # for in congested traffic
+      x_vel = [5.0, 15.0]
       y_dist = [1.8, 0.9]
-    else:  # default to relaxed/stock
+    else:  # default to normal
       y_dist = [1.8, 1.8]
     TR = interp(CS.vEgo, x_vel, y_dist)
 

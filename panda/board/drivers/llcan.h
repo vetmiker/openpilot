@@ -35,6 +35,7 @@ bool llcan_set_speed(CAN_TypeDef *CAN_obj, uint32_t speed, bool loopback, bool s
     if(timeout_counter >= CAN_INIT_TIMEOUT_MS){
       puts(CAN_NAME_FROM_CANIF(CAN_obj)); puts(" set_speed timed out (1)!\n");
       ret = false;
+      break;
     }
   }
 
@@ -64,6 +65,7 @@ bool llcan_set_speed(CAN_TypeDef *CAN_obj, uint32_t speed, bool loopback, bool s
       if(timeout_counter >= CAN_INIT_TIMEOUT_MS){
         puts(CAN_NAME_FROM_CANIF(CAN_obj)); puts(" set_speed timed out (2)!\n");
         ret = false;
+        break;
       }
     }
   }
@@ -87,6 +89,7 @@ bool llcan_init(CAN_TypeDef *CAN_obj) {
     if(timeout_counter >= CAN_INIT_TIMEOUT_MS){
       puts(CAN_NAME_FROM_CANIF(CAN_obj)); puts(" initialization timed out!\n");
       ret = false;
+      break;
     }
   }
   

@@ -10,8 +10,8 @@ from opendbc.can.packer import CANPacker
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
-BOSCH_ACCEL_LOOKUP_BP = [-1., 0.6]
-BOSCH_ACCEL_LOOKUP_V = [-3.5, 2.]
+BOSCH_ACCEL_LOOKUP_BP = [-1., 0., 0.6]
+BOSCH_ACCEL_LOOKUP_V = [-3.5, 0., 2.]
 BOSCH_GAS_LOOKUP_BP = [0., 0.6]
 BOSCH_GAS_LOOKUP_V = [0, 2000]
 
@@ -138,7 +138,7 @@ class CarController():
                   hud_lanes, fcw_display, acc_alert, steer_required)
 
     # **** process the car messages ****
-    
+
     if CS.CP.carFingerprint in HONDA_BOSCH:
       stopping = 0
       starting = 0
@@ -150,22 +150,11 @@ class CarController():
       elif accel > 0 and CS.out.vEgo < 0.3:
         starting = 1
       apply_accel = interp(accel, BOSCH_ACCEL_LOOKUP_BP, BOSCH_ACCEL_LOOKUP_V)
-      if CS.out.brakePressed:
-        apply_accel = min(apply_accel, 0.0)
-      if CS.out.gasPressed:
-        apply_accel = max(apply_accel, 0.0)
       apply_gas = interp(accel, BOSCH_GAS_LOOKUP_BP, BOSCH_GAS_LOOKUP_V)
-      if CS.out.brakePressed:
-        apply_gas = 0.0
     else:
       apply_gas = clip(actuators.gas, 0., 1.)
-      if CS.out.brakePressed:
-        apply_gas = 0.0
       apply_brake = int(clip(self.brake_last * P.BRAKE_MAX, 0, P.BRAKE_MAX - 1))
-      if CS.out.gasPressed:
-        apply_brake = int(0)
-      
-      
+
     # steer torque is converted back to CAN reference (positive when steering right)
     apply_steer = int(interp(-actuators.steer * P.STEER_MAX, P.STEER_LOOKUP_BP, P.STEER_LOOKUP_V))
 
@@ -191,6 +180,9 @@ class CarController():
       can_sends.extend(hondacan.create_ui_commands(self.packer, pcm_speed, hud, CS.CP.carFingerprint, CS.is_metric, idx, CS.CP.isPandaBlack, CS.CP.openpilotLongitudinalControl, CS.stock_hud))
 
     if not CS.CP.openpilotLongitudinalControl:
+      if (frame % 2) == 0:
+        idx = frame // 2
+        can_sends.append(hondacan.create_bosch_supplemental_1(self.packer, CS.CP.carFingerprint, idx, CS.CP.isPandaBlack))
       # If using stock ACC, spam cancel command to kill gas when OP disengages.
       if pcm_cancel_cmd:
         can_sends.append(hondacan.spam_buttons_command(self.packer, CruiseButtons.CANCEL, idx, CS.CP.carFingerprint, CS.CP.isPandaBlack))
