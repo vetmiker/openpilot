@@ -106,7 +106,7 @@ ALERTS = [
       "BRAKE PRESSED",
       "Longitudinal Control Disabled",
       AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 0.2),
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, .4, 2., 0.2),
 
   Alert(
       "trafficSlow",
