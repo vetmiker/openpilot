@@ -131,6 +131,7 @@ class Planner():
   def choose_solution(self, v_cruise_setpoint, enabled, lead_1, lead_2, steeringAngle):
     center_x = -2.5 # Wheel base 2.5m
     lead1_check = True
+    mpc_offset = opParams().get('mpc_offset', default=5.0)
     lead2_check = True
     if steeringAngle > 100: # only at high angles
       center_y = -1+2.5/math.tan(steeringAngle/1800.*math.pi) # Car Width 2m. Left side considered in left hand turn
@@ -150,7 +151,7 @@ class Planner():
         if self.mpc_model.v_mpc > 13.0: 
           solutions['model'] = NO_CURVATURE_SPEED
         else:
-          solutions['model'] = self.mpc_model.v_mpc + 5.0
+          solutions['model'] = self.mpc_model.v_mpc + mpc_offset
       solutions['cruise'] = self.v_cruise
 
       slowest = min(solutions, key=solutions.get)
@@ -167,16 +168,16 @@ class Planner():
         self.v_acc = self.v_cruise
         self.a_acc = self.a_cruise
       elif slowest == 'model':
-        self.v_acc = self.mpc_model.v_mpc + 5.0
+        self.v_acc = self.mpc_model.v_mpc + mpc_offset
         self.a_acc = self.mpc_model.a_mpc
         print("Model Speed kph")
         print(self.mpc_model.v_mpc*3.6)
 
     self.v_acc_future = v_cruise_setpoint
     if lead1_check:
-      self.v_acc_future = min([self.mpc1.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + 5.0])
+      self.v_acc_future = min([self.mpc1.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + mpc_offset])
     if lead2_check:
-      self.v_acc_future = min([self.mpc2.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + 5.0])
+      self.v_acc_future = min([self.mpc2.v_mpc_future, self.v_acc_future, self.mpc_model.v_mpc_future + mpc_offset])
     
 
   def update(self, sm, pm, CP, VM, PP, arne_sm):
