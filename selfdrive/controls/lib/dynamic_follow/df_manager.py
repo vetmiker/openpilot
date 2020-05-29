@@ -1,4 +1,4 @@
-import cereal.messaging as messaging
+import cereal.messaging_arne as messaging_arne
 from selfdrive.controls.lib.dynamic_follow.support import dfProfiles
 from common.realtime import sec_since_boot
 
@@ -18,7 +18,7 @@ class dfManager:
     self.op_params = op_params
     self.is_df = is_df
     self.df_profiles = dfProfiles()
-    self.sm = messaging.SubMaster(['dynamicFollowButton', 'dynamicFollowData'])
+    self.sm = messaging_arne.SubMaster(['dynamicFollowButton', 'dynamicFollowData'])
 
     self.cur_user_profile = self.op_params.get('dynamic_follow', default='auto').strip().lower()
     if not isinstance(self.cur_user_profile, str) or self.cur_user_profile not in self.df_profiles.to_idx:
