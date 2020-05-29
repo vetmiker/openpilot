@@ -54,8 +54,8 @@ class opParams:
                            'curvature_factor': {'default': 1.0, 'allowed_types': [float, int], 'description': 'Multiplier for the curvature slowdown. Increase for less braking.', 'live': False},
                            'cloak': {'default': True, 'allowed_types': [bool], 'description': "make comma believe you are on their fork", 'live': False},
                            'default_brake_distance': {'default': 250.0, 'allowed_types': [float, int], 'description': 'Distance in m to start braking for mapped speeds.', 'live': False},
-                           'dynamic_follow': {'default': 'relaxed', 'allowed_types': [str],
-                                              'description': "Can be: ('traffic', 'relaxed', 'roadtrip'): Left to right increases in following distance.\n"
+                           'dynamic_follow': {'default': 'normal', 'allowed_types': [str],
+                                              'description': "Can be: ('close', 'normal', 'far'): Left to right increases in following distance.\n"
                                                              "All profiles support dynamic follow so you'll get your preferred distance while\n"
                                                              "retaining the smoothness and safety of dynamic follow!", 'live': True},
                            'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
@@ -63,12 +63,14 @@ class opParams:
                                                       'description': 'True is stock behavior in this fork. False lets you use the brake and cruise control stalk to disengage as usual', 'live': False},
                            'limit_rsa': {'default': False, 'allowed_types': [bool], 'description': "Switch off RSA above rsa_max_speed", 'live': False},
                            'offset_limit': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed at which apk percent offset will work in m/s', 'live': False},
+                           'mpc_offset': {'default': 5.0, 'allowed_types': [float, int], 'description': 'Offset model braking by how many m/s. Lower numbers equals more model braking', 'live': True},
                            'osm': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use OSM for drives', 'live': False},
                            'rolling_stop': {'default': False, 'allowed_types': [bool], 'description': 'If you do not want stop signs to go down to 0 kph enable this for 9kph slow down', 'live': False},
                            'rsa_max_speed': {'default': 24.5, 'allowed_types': [float, int], 'description': 'Speed limit to ignore RSA in m/s', 'live': False},
                            'smart_speed': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use Smart Speed for drives above smart_speed_max_vego', 'live': False},
                            'smart_speed_max_vego': {'default': 26.8, 'allowed_types': [float, int], 'description': 'Speed limit to ignore Smartspeed in m/s', 'live': False},
                            'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
+                           'traffic_light_alerts': {'default': False, 'allowed_types': [bool], 'description': "Switch off the traffic light alerts", 'live': False},
                            'traffic_lights': {'default': True, 'allowed_types': [bool], 'description': "Should Openpilot stop for traffic lights", 'live': False},
                            'traffic_lights_without_direction': {'default': False, 'allowed_types': [bool], 'description': "Should Openpilot stop for traffic lights without a direction specified", 'live': False},
                            'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False}

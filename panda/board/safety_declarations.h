@@ -17,13 +17,13 @@ struct lookup_t {
 typedef struct {
   int addr;
   int bus;
-} AddrBus;
+  int len;
+} CanMsg;
 
 // params and flags about checksum, counter and frequency checks for each monitored address
 typedef struct {
   // const params
-  const int addr[3];                 // check either messages (e.g. honda steer). Array MUST terminate with a zero to know its length.
-  const int bus;                     // bus where to expect the addr. Temp hack: -1 means skip the bus check
+  const CanMsg msg[3];               // check either messages (e.g. honda steer). Array MUST terminate with an empty struct to know its length.
   const bool check_checksum;         // true is checksum check is performed
   const uint8_t max_counter;         // maximum value of the counter. 0 means that the counter check is skipped
   const uint32_t expected_timestep;  // expected time between message updates [us]
@@ -50,7 +50,7 @@ bool driver_limit_check(int val, int val_last, struct sample_t *val_driver,
 bool rt_rate_limit_check(int val, int val_last, const int MAX_RT_DELTA);
 float interpolate(struct lookup_t xy, float x);
 void gen_crc_lookup_table(uint8_t poly, uint8_t crc_lut[]);
-bool msg_allowed(int addr, int bus, const AddrBus addr_list[], int len);
+bool msg_allowed(CAN_FIFOMailBox_TypeDef *to_send, const CanMsg msg_list[], int len);
 int get_addr_check_index(CAN_FIFOMailBox_TypeDef *to_push, AddrCheckStruct addr_list[], const int len);
 void update_counter(AddrCheckStruct addr_list[], int index, uint8_t counter);
 void update_addr_timestamp(AddrCheckStruct addr_list[], int index);
@@ -89,6 +89,15 @@ bool gas_interceptor_detected = false;
 int gas_interceptor_prev = 0;
 bool gas_pressed_prev = false;
 bool brake_pressed_prev = false;
+bool cruise_engaged_prev = false;
+bool vehicle_moving = false;
+
+// for torque-based safety modes
+int desired_torque_last = 0;       // last desired steer torque
+int rt_torque_last = 0;            // last desired torque for real time check
+struct sample_t torque_meas;       // last 3 motor torques produced by the eps
+struct sample_t torque_driver;     // last 3 driver torques measured
+uint32_t ts_last = 0;
 
 // This can be set with a USB command
 // It enables features we consider to be unsafe, but understand others may have different opinions

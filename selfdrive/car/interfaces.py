@@ -18,6 +18,7 @@ class CarInterfaceBase():
   def __init__(self, CP, CarController, CarState):
     self.waiting = False
     self.keep_openpilot_engaged = True
+    self.disengage_due_to_slow_speed = False
     self.sm = messaging.SubMaster(['pathPlan'])
     self.op_params = opParams()
     self.alca_min_speed = self.op_params.get('alca_min_speed', default=20.0)
@@ -29,7 +30,10 @@ class CarInterfaceBase():
 
     self.CS = CarState(CP)
     self.cp = self.CS.get_can_parser(CP)
-    self.cp_init = self.CS.get_can_parser_init(CP)
+    try:
+      self.cp_init = self.CS.get_can_parser_init(CP)
+    except AttributeError:
+      self.cp_init = self.CS.get_can_parser(CP)
     self.cp_cam = self.CS.get_cam_can_parser(CP)
 
     self.CC = None

@@ -19,7 +19,7 @@
 #define POSE_IDX META_IDX + OTHER_META_SIZE + DESIRE_PRED_SIZE
 #define OUTPUT_SIZE  POSE_IDX + POSE_SIZE
 #ifdef TEMPORAL
-  #define TEMPORAL_SIZE 1024
+  #define TEMPORAL_SIZE 512
 #else
   #define TEMPORAL_SIZE 0
 #endif
@@ -31,10 +31,10 @@ Eigen::Matrix<float, MODEL_PATH_DISTANCE, POLYFIT_DEGREE - 1> vander;
 void model_init(ModelState* s, cl_device_id device_id, cl_context context, int temporal) {
   frame_init(&s->frame, MODEL_WIDTH, MODEL_HEIGHT, device_id, context);
   s->input_frames = (float*)calloc(MODEL_FRAME_SIZE * 2, sizeof(float));
-  
+
   const int output_size = OUTPUT_SIZE + TEMPORAL_SIZE;
   s->output = (float*)calloc(output_size, sizeof(float));
-  
+
   s->m = new DefaultRunModel("../../models/supercombo.dlc", s->output, output_size, USE_GPU_RUNTIME);
 
 #ifdef TEMPORAL
@@ -133,18 +133,18 @@ void model_free(ModelState* s) {
   delete s->m;
 }
 
-void poly_fit(float *in_pts, float *in_stds, float *out) {
+void poly_fit(float *in_pts, float *in_stds, float *out, int valid_len) {
   // References to inputs
-  Eigen::Map<Eigen::Matrix<float, MODEL_PATH_DISTANCE, 1> > pts(in_pts, MODEL_PATH_DISTANCE);
-  Eigen::Map<Eigen::Matrix<float, MODEL_PATH_DISTANCE, 1> > std(in_stds, MODEL_PATH_DISTANCE);
+  Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, 1> > pts(in_pts, valid_len);
+  Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, 1> > std(in_stds, valid_len);
   Eigen::Map<Eigen::Matrix<float, POLYFIT_DEGREE - 1, 1> > p(out, POLYFIT_DEGREE - 1);
 
   float y0 = pts[0];
   pts = pts.array() - y0;
 
   // Build Least Squares equations
-  Eigen::Matrix<float, MODEL_PATH_DISTANCE, POLYFIT_DEGREE - 1> lhs = vander.array().colwise() / std.array();
-  Eigen::Matrix<float, MODEL_PATH_DISTANCE, 1> rhs = pts.array() / std.array();
+  Eigen::Matrix<float, Eigen::Dynamic, POLYFIT_DEGREE - 1> lhs = vander.topRows(valid_len).array().colwise() / std.array();
+  Eigen::Matrix<float, Eigen::Dynamic, 1> rhs = pts.array() / std.array();
 
   // Improve numerical stability
   Eigen::Matrix<float, POLYFIT_DEGREE - 1, 1> scale = 1. / (lhs.array()*lhs.array()).sqrt().colwise().sum();
@@ -168,23 +168,19 @@ void fill_path(cereal::ModelData::PathData::Builder path, const float * data, bo
   float prob;
   float valid_len;
 
-  valid_len =  data[MODEL_PATH_DISTANCE*2];
+  // clamp to 5 and 192
+  valid_len =  fmin(192, fmax(5, data[MODEL_PATH_DISTANCE*2]));
   for (int i=0; i<MODEL_PATH_DISTANCE; i++) {
     points_arr[i] = data[i] + offset;
-    // Always do at least 5 points
-    if (i < 5 || i < valid_len) {
-      stds_arr[i] = softplus(data[MODEL_PATH_DISTANCE + i]);
-    } else {
-      stds_arr[i] = 1.0e3; 
-    }
+    stds_arr[i] = softplus(data[MODEL_PATH_DISTANCE + i]) + 1e-6;
   }
   if (has_prob) {
     prob =  sigmoid(data[MODEL_PATH_DISTANCE*2 + 1]);
   } else {
     prob = 1.0;
   }
-  std = softplus(data[MODEL_PATH_DISTANCE]);
-  poly_fit(points_arr, stds_arr, poly_arr);
+  std = softplus(data[MODEL_PATH_DISTANCE]) + 1e-6;
+  poly_fit(points_arr, stds_arr, poly_arr, valid_len);
 
   if (std::getenv("DEBUG")){
     kj::ArrayPtr<const float> stds(&stds_arr[0], ARRAYSIZE(stds_arr));
@@ -203,7 +199,7 @@ void fill_path(cereal::ModelData::PathData::Builder path, const float * data, bo
 void fill_lead(cereal::ModelData::LeadData::Builder lead, const float * data, int mdn_max_idx, int t_offset) {
   const double x_scale = 10.0;
   const double y_scale = 10.0;
- 
+
   lead.setProb(sigmoid(data[LEAD_MDN_N*MDN_GROUP_SIZE + t_offset]));
   lead.setDist(x_scale * data[mdn_max_idx*MDN_GROUP_SIZE]);
   lead.setStd(x_scale * softplus(data[mdn_max_idx*MDN_GROUP_SIZE + MDN_VALS]));
@@ -250,7 +246,7 @@ void model_publish(PubSocket *sock, uint32_t frame_id,
     capnp::MallocMessageBuilder msg;
     cereal::Event::Builder event = msg.initRoot<cereal::Event>();
     event.setLogMonoTime(nanos_since_boot());
-  
+
     auto framed = event.initModel();
     framed.setFrameId(frame_id);
     framed.setTimestampEof(timestamp_eof);
@@ -325,7 +321,7 @@ void posenet_publish(PubSocket *sock, uint32_t frame_id,
   posenetd.setTransStd(trans_std_vs);
   kj::ArrayPtr<const float> rot_std_vs(&rot_std_arr[0], 3);
   posenetd.setRotStd(rot_std_vs);
-  
+
   posenetd.setTimestampEof(timestamp_eof);
   posenetd.setFrameId(frame_id);
 

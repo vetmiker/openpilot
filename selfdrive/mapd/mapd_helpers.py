@@ -33,6 +33,9 @@ def rate_curvature_points(p2,p3,curvature2,curvature3):
     return abs((curvature3-curvature2)/(np.sqrt((x3-x2)**2+(y3-y2)**2)))
   else:
     return 0
+  
+def distance(x0,y0,x1,y1,x2,y2):
+  return abs((x2-x1)*(y1-y0) - (x1-x0)*(y2-y1)) / np.sqrt(np.square(x2-x1) + np.square(y2-y1))
 
 def circle_through_points(p1, p2, p3, force=False, direction=False):
   """Fits a circle through three points
@@ -186,12 +189,20 @@ class Way:
     if query_results is None:
       return None
     else:
+    #  if prev_way is not None and len(prev_way.way.nodes) < 10:
+    #    if prev_way.on_way(lat, lon, heading):
+    #      return prev_way
+    #    else:
+    #      way = prev_way.next_way(heading)
+    #      if way is not None and way.on_way(lat, lon, heading):
+    #        return way
+        
       results, tree, real_nodes, node_to_way, location_info = query_results
 
     cur_pos = geodetic2ecef((lat, lon, 0))
-    nodes = tree.query_ball_point(cur_pos, 500)
+    nodes = tree.query_ball_point(cur_pos, 150)
 
-    # If no nodes within 500m, choose closest one
+    # If no nodes within 150m, choose closest one
     if not nodes:
       nodes = [tree.query(cur_pos)[1]]
 
@@ -407,7 +418,7 @@ class Way:
           if 'highway' in n.tags and (n.tags['highway']=='stop' or n.tags['highway']=='give_way' or n.tags['highway']=='mini_roundabout' or (n.tags['highway']=='traffic_signals' and traffic_lights)) and way_pts[count,0] > 0:
             if traffic_status == 'DEAD':
               pass
-            elif traffic_confidence >= 75 and n.tags['highway']=='traffic_signals' and (traffic_status == 'GREEN' or (traffic_status == 'NONE' and not last_not_none_signal == 'SLOW')):
+            elif traffic_confidence >= 50 and n.tags['highway']=='traffic_signals' and (traffic_status == 'GREEN' or (traffic_status == 'NONE' and not last_not_none_signal == 'SLOW')):
               break
             #elif traffic_confidence >= 75 and traffic_status == 'SLOW' and n.tags['highway'] != 'motorway':
             #  speed_ahead = 0
@@ -416,10 +427,10 @@ class Way:
             #  break
             if 'direction' in n.tags:
               if backwards and (n.tags['direction']=='backward' or n.tags['direction']=='both'):
-                print("backward")
+                #print("backward")
                 if way_pts[count, 0] > 0:
                   speed_ahead_dist = max(0. , way_pts[count, 0] - 2.0)
-                  print(speed_ahead_dist)
+                  #print(speed_ahead_dist)
                   speed_ahead = 7/3.6
                   if n.tags['highway']=='stop':
                     if rolling_stop:
@@ -429,10 +440,10 @@ class Way:
                   loop_must_break = True
                   break
               elif not backwards and (n.tags['direction']=='forward' or n.tags['direction']=='both'):
-                print("forward")
+                #print("forward")
                 if way_pts[count, 0] > 0:
                   speed_ahead_dist = max(0. , way_pts[count, 0] - 2.0)
-                  print(speed_ahead_dist)
+                  #print(speed_ahead_dist)
                   speed_ahead = 7/3.6
                   if n.tags['highway']=='stop':
                     if rolling_stop:
@@ -443,7 +454,7 @@ class Way:
                   break
               try:
                 if int(n.tags['direction']) > -0.1 and int(n.tags['direction']) < 360.1:
-                  print(int(n.tags['direction']))
+                  #print(int(n.tags['direction']))
                   direction = int(n.tags['direction']) - heading
                   if direction < -180:
                     direction = direction + 360
@@ -451,7 +462,7 @@ class Way:
                     direction = direction - 360
                   if abs(direction) > 135:
                     speed_ahead_dist = max(0. , way_pts[count, 0] - 2.0)
-                    print(speed_ahead_dist)
+                    #print(speed_ahead_dist)
                     speed_ahead = 7/3.6
                     if n.tags['highway']=='stop':
                       if rolling_stop:
@@ -464,20 +475,20 @@ class Way:
                 pass
             elif 'traffic_signals:direction' in n.tags:
               if backwards and (n.tags['traffic_signals:direction']=='backward' or n.tags['traffic_signals:direction']=='both'):
-                print("backward")
+                #print("backward")
                 if way_pts[count, 0] > 0:
                   speed_ahead_dist = max(0. , way_pts[count, 0] - 6.0)
-                  print(speed_ahead_dist)
+                  #print(speed_ahead_dist)
                   speed_ahead = 5/3.6
                   if n.tags['highway']=='traffic_signals':
                     speed_ahead = 0
                   loop_must_break = True
                   break
               elif not backwards and (n.tags['traffic_signals:direction']=='forward' or n.tags['traffic_signals:direction']=='both'):
-                print("forward")
+                #print("forward")
                 if way_pts[count, 0] > 0:
                   speed_ahead_dist = max(0. , way_pts[count, 0] - 6.0)
-                  print(speed_ahead_dist)
+                  #print(speed_ahead_dist)
                   speed_ahead = 5/3.6
                   if n.tags['highway']=='traffic_signals':
                     speed_ahead = 0
@@ -485,7 +496,7 @@ class Way:
                   break
               try:
                 if int(n.tags['traffic_signals:direction']) > -0.1 and int(n.tags['traffic_signals:direction']) < 360.1:
-                  print(int(n.tags['traffic_signals:direction']))
+                  #print(int(n.tags['traffic_signals:direction']))
                   direction = int(n.tags['traffic_signals:direction']) - heading
                   if direction < -180:
                     direction = direction + 360
@@ -493,7 +504,7 @@ class Way:
                     direction = direction - 360
                   if abs(direction) > 135:
                     speed_ahead_dist = max(0. , way_pts[count, 0] - 6.0)
-                    print(speed_ahead_dist)
+                    #print(speed_ahead_dist)
                     speed_ahead = 5/3.6
                     if n.tags['highway']=='traffic_signals':
                       speed_ahead = 0
@@ -505,14 +516,14 @@ class Way:
               if n.tags['highway']=='mini_roundabout':
                 if way_pts[count, 0] > 0:
                   speed_ahead_dist = max(0. , way_pts[count, 0] - 5.0)
-                  print(speed_ahead_dist)
+                  #print(speed_ahead_dist)
                   speed_ahead = 15/3.6
                   loop_must_break = True
                   break
               if way_pts[count, 0] > 0 and traffic_lights_without_direction:
-                print("no direction")
+                #print("no direction")
                 speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
-                print(speed_ahead_dist)
+                #print(speed_ahead_dist)
                 speed_ahead = 5/3.6
                 if n.tags['highway']=='stop':
                   if rolling_stop:
@@ -522,7 +533,7 @@ class Way:
                 loop_must_break = True
                 break
           if 'railway' in n.tags and n.tags['railway']=='level_crossing':
-            if (way_pts[count, 0] > 0) and (traffic_confidence >= 75 and (traffic_status == 'SLOW' or (traffic_status == 'NONE' and last_not_none_signal == 'SLOW'))):
+            if way_pts[count, 0] > 0 and traffic_confidence >= 50 and traffic_status == 'SLOW':
               speed_ahead = 0
               speed_ahead_dist = max(0. , way_pts[count, 0] - 10.0)
               loop_must_break = True
@@ -563,7 +574,15 @@ class Way:
       adv_speed = parse_speed_unit(adv_speed)
     return adv_speed
 
-  def on_way(self, lat, lon, heading, points=None):
+  def on_way(self, lat, lon, heading, points = None):
+    #if len(self.way.nodes) < 10:
+    #  maybe = False
+    #  factor = max(111132.954*math.cos(float(lat)/180*3.141592), 111132.954 - 559.822 * math.cos( 2 * float(lat)/180*3.141592) + 1.175 * math.cos( 4 * float(lat)/180*3.141592))
+    #  for n in range(len(self.way.nodes)-1):
+    #    if factor * distance(lat,lon,float(self.way.nodes[n].lat),float(self.way.nodes[n].lon),float(self.way.nodes[n+1].lat),float(self.way.nodes[n+1].lon)) < 10.0:
+    #      maybe = True 
+    #  if not maybe:
+    #    return False
     if points is None:
       points = self.points_in_car_frame(lat, lon, heading, True)
     x = points[:, 0]

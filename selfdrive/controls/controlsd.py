@@ -31,6 +31,10 @@ from selfdrive.locationd.calibration_helpers import Calibration, Filter
 from common.op_params import opParams
 from selfdrive.controls.df_alert_manager import DfAlertManager
 
+op_params = opParams()
+
+traffic_light_alerts = op_params.get('traffic_light_alerts', True)
+
 #LANE_DEPARTURE_THRESHOLD = 0.1
 STEER_ANGLE_SATURATION_TIMEOUT = 1.0 / DT_CTRL
 STEER_ANGLE_SATURATION_THRESHOLD = 2.5  # Degrees
@@ -160,16 +164,16 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
   # decrease the soft disable timer at every step, as it's reset on
   # entrance in SOFT_DISABLING state
   soft_disable_timer = max(0, soft_disable_timer - 1)
-
-  traffic_status = arne_sm['trafficModelEvent'].status
-  traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
-  if traffic_confidence >= 75:
-    if traffic_status == 'SLOW':
-      AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
-    elif traffic_status == 'GREEN':
-      AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
-    elif traffic_status == 'DEAD':  # confidence will be 100
-      AM.add(frame, 'trafficDead', enabled)
+  if traffic_light_alerts:
+    traffic_status = arne_sm['trafficModelEvent'].status
+    traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
+    if traffic_confidence >= 75:
+      if traffic_status == 'SLOW':
+        AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+      elif traffic_status == 'GREEN':
+        AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+      elif traffic_status == 'DEAD':  # confidence will be 100
+        AM.add(frame, 'trafficDead', enabled)
 
   df_alert = df_alert_manager.update(arne_sm)
   if df_alert is not None:
@@ -620,7 +624,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
   params.put("CarParams", cp_bytes)
   put_nonblocking("CarParamsCache", cp_bytes)
   put_nonblocking("LongitudinalControl", "1" if CP.openpilotLongitudinalControl else "0")
-  if CP.carName == 'honda':
+  if CP.openpilotLongitudinalControl and CP.safetyModel in [car.CarParams.SafetyModel.hondaBoschGiraffe, car.CarParams.SafetyModel.hondaBoschHarness]:
     disable_radar(can_sock, pm.sock['sendcan'], 1 if has_relay else 0, timeout=1, retry=10)
 
   CC = car.CarControl.new_message()
@@ -665,7 +669,6 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
 
 
   prof = Profiler(False)  # off by default
-  op_params = opParams()
   df_alert_manager = DfAlertManager(op_params)
 
   while True:
@@ -683,7 +686,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
     elif not sm.all_alive_and_valid():
       events.append(create_event('commIssue', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if not sm['pathPlan'].mpcSolutionValid:
-      events.append(create_event('plannerError', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+      events.append(create_event('plannerError', [ET.NO_ENTRY, ET.WARNING]))
     if not sm['pathPlan'].sensorValid and os.getenv("NOSENSOR") is None:
       events.append(create_event('sensorDataInvalid', [ET.NO_ENTRY, ET.PERMANENT]))
     if not sm['pathPlan'].paramsValid:

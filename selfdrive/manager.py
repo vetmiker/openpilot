@@ -142,7 +142,8 @@ if not prebuilt:
         error_s = "\n \n".join(["\n".join(textwrap.wrap(e, 65)) for e in errors])
         with TextWindow("Openpilot failed to build\n \n" + error_s) as t:
           t.wait_for_exit()
-
+        process = subprocess.check_output(['git', 'pull'])
+        os.system('reboot')
         exit(1)
     else:
       break
@@ -579,6 +580,7 @@ def main():
     ("VisionRadarToggle", "0"),
     ("LaneChangeEnabled", "1"),
     ("IsDriverViewEnabled", "0"),
+    ("DisablePowerDownTime", "30"),
   ]
 
   # set unset params
@@ -632,7 +634,8 @@ if __name__ == "__main__":
     error = "Manager failed to start\n \n" + error
     with TextWindow(error) as t:
       t.wait_for_exit()
-
+    process = subprocess.check_output(['git', 'pull'])
+    os.system('reboot')
     raise
 
   # manual exit because we are forked

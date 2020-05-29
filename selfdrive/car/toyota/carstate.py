@@ -248,9 +248,9 @@ class CarState(CarStateBase):
       ret.cruiseState.speed = int(min(ret.cruiseState.speed, factor * interp(np.max(self.Angles), self.Angle, self.Angle_Speed)))
       ret.cruiseState.speed = int(min(ret.cruiseState.speed, factor * interp(np.max(self.Angles_later), self.Angle, self.Angle_Speed)))
     else:
-      self.Angles[self.Angle_counter] = abs(ret.steeringAngle)/2
+      self.Angles[self.Angle_counter] = abs(ret.steeringAngle) * 0.8
       if ret.vEgo > 11:
-        self.Angles_later[self.Angle_counter] = abs(angle_later)/2
+        self.Angles_later[self.Angle_counter] = abs(angle_later) * 0.8
       else:
         self.Angles_later[self.Angle_counter] = 0.0
     self.Angle_counter = (self.Angle_counter + 1 ) % 250
@@ -318,7 +318,7 @@ class CarState(CarStateBase):
         self.arne_pm.send('liveTrafficData', dat)
     if ret.gasPressed and not self.gas_pressed:
       self.engaged_when_gas_was_pressed = self.pcm_acc_active
-    if (self.gas_pressed and not ret.gasPressed) and self.engaged_when_gas_was_pressed and ret.vEgo > self.smartspeed:
+    if ((ret.gasPressed) or (self.gas_pressed and not ret.gasPressed)) and self.engaged_when_gas_was_pressed and ret.vEgo > self.smartspeed:
       self.rsa_ignored_speed = self.spdval1
       dat = messaging_arne.new_message('liveTrafficData')
       dat.liveTrafficData.speedLimitValid = True
