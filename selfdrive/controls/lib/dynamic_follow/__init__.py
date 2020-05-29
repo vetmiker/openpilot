@@ -6,12 +6,10 @@ from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 from common.op_params import opParams
 from common.numpy_fast import interp, clip
 from selfdrive.config import Conversions as CV
-from cereal.messaging import SubMaster
 
 from selfdrive.controls.lib.dynamic_follow.auto_df import predict
 from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
 from selfdrive.controls.lib.dynamic_follow.support import LeadData, CarData, dfData, dfProfiles
-from common.data_collector import DataCollector
 travis = False
 
 
@@ -41,12 +39,7 @@ class DynamicFollow:
     self.v_ego_retention = 2.5
     self.v_rel_retention = 1.5
 
-    self._setup_collector()
     self._setup_changing_variables()
-
-  def _setup_collector(self):
-    self.sm = SubMaster(['liveTracks'])
-    self.data_collector = DataCollector(file_path='/data/df_data', keys=['v_ego', 'a_lead', 'v_lead', 'x_lead', 'live_tracks', 'profile', 'time'])
 
   def _setup_changing_variables(self):
     self.TR = self.default_TR
@@ -67,9 +60,6 @@ class DynamicFollow:
     self._update_car(CS)
     self._get_profiles()
 
-    if self.mpc_id == 1:
-      self._gather_data()
-
     if not self.lead_data.status:
       self.TR = self.default_TR
     else:
@@ -88,18 +78,6 @@ class DynamicFollow:
     self.user_profile = df_out.user_profile
     if df_out.is_auto:  # todo: find some way to share prediction between the two mpcs to reduce processing overhead
       self._get_pred()  # sets self.model_profile, all other checks are inside function
-
-  def _gather_data(self):
-    self.sm.update(0)
-    live_tracks = [[i.dRel, i.vRel, i.aRel, i.yRel] for i in self.sm['liveTracks']]
-    if self.car_data.cruise_enabled:
-      self.data_collector.update([self.car_data.v_ego,
-                                  self.lead_data.a_lead,
-                                  self.lead_data.v_lead,
-                                  self.lead_data.x_lead,
-                                  live_tracks,
-                                  self.user_profile,
-                                  sec_since_boot()])
 
   def _norm(self, x, name):
     self.x = x
