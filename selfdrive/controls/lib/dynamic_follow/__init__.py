@@ -1,6 +1,6 @@
 import math
 import numpy as np
-import cereal.messaging as messaging
+import cereal.messaging_arne as messaging_arne
 from common.realtime import sec_since_boot
 from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 from common.op_params import opParams
@@ -21,7 +21,7 @@ class DynamicFollow:
     self.df_manager = dfManager(self.op_params)
 
     if not travis and mpc_id == 1:
-      self.pm = messaging.PubMaster(['dynamicFollowData'])
+      self.pm = messaging_arne.PubMaster(['dynamicFollowData'])
     else:
       self.pm = None
 
@@ -85,7 +85,7 @@ class DynamicFollow:
 
   def _send_cur_state(self):
     if self.mpc_id == 1 and self.pm is not None:
-      dat = messaging.new_message()
+      dat = messaging_arne.new_message()
       dat.init('dynamicFollowData')
       dat.dynamicFollowData.mpcTR = 1.8  # self.TR  # FIX THIS! sometimes nonetype
       dat.dynamicFollowData.profilePred = self.model_profile
