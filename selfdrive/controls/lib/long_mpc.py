@@ -4,6 +4,7 @@ import math
 import cereal.messaging as messaging
 from selfdrive.swaglog import cloudlog
 from common.realtime import sec_since_boot
+from common.travis_checker import travis
 from selfdrive.controls.lib.radar_helpers import _LEAD_ACCEL_TAU
 from selfdrive.controls.lib.longitudinal_mpc import libmpc_py
 from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
@@ -94,7 +95,10 @@ class LongitudinalMpc():
 
     # Calculate mpc
     t = sec_since_boot()
-    TR = self.dynamic_follow.update(CS, self.libmpc)  # update dynamic follow
+    if not travis:
+      TR = self.dynamic_follow.update(CS, self.libmpc)  # update dynamic follow
+    else:
+      TR = 1.8
     n_its = self.libmpc.run_mpc(self.cur_state, self.mpc_solution, self.a_lead_tau, a_lead, TR)
     duration = int((sec_since_boot() - t) * 1e9)
 

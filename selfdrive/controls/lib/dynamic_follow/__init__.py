@@ -6,11 +6,11 @@ from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 from common.op_params import opParams
 from common.numpy_fast import interp, clip
 from selfdrive.config import Conversions as CV
+from common.travis_checker import travis
 
 from selfdrive.controls.lib.dynamic_follow.auto_df import predict
 from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
 from selfdrive.controls.lib.dynamic_follow.support import LeadData, CarData, dfData, dfProfiles
-travis = False
 
 
 class DynamicFollow:
@@ -122,7 +122,7 @@ class DynamicFollow:
 
   def _get_pred(self):
     cur_time = sec_since_boot()
-    if self.car_data.cruise_enabled and self.lead_data.status:
+    if self.car_data.cruise_enabled and self.lead_data.status and not travis:
       if cur_time - self.last_predict_time > self.predict_rate:
         if len(self.auto_df_model_data) == self.model_input_len:
           pred = predict(np.array(self.auto_df_model_data[::self.skip_every], dtype=np.float32).flatten())
