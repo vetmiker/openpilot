@@ -151,7 +151,7 @@ def data_sample(CI, CC, sm, can_sock, state, mismatch_counter, can_error_counter
   return CS, events, cal_perc, mismatch_counter, can_error_counter, events_arne182
 
 
-def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_kph, AM, events_arne182, arne_sm, df_alert_manager):
+def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_kph, AM, events_arne182, arne_sm):
   """Compute conditional state transitions and execute actions on state transitions"""
   enabled = isEnabled(state)
 
@@ -187,10 +187,6 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
         AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
       elif traffic_status == 'DEAD':  # confidence will be 100
         AM.add(frame, 'trafficDead', enabled)
-
-  df_alert = df_alert_manager.update(arne_sm)
-  if df_alert is not None:
-    AM.add(frame, 'dfButtonAlert', enabled, extra_text_1=df_alert, extra_text_2='Dynamic follow: {} profile active'.format(df_alert))
 
   # DISABLED
   if state == State.disabled:
@@ -682,7 +678,6 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
 
 
   prof = Profiler(False)  # off by default
-  df_alert_manager = DfAlertManager(op_params)
 
   while True:
     start_time = sec_since_boot()
@@ -731,7 +726,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
     if not read_only:
       # update control state
       state, soft_disable_timer, v_cruise_kph, v_cruise_kph_last = \
-        state_transition(sm.frame, CS, CP, state, events, soft_disable_timer, v_cruise_kph, AM, events_arne182, arne_sm, df_alert_manager)
+        state_transition(sm.frame, CS, CP, state, events, soft_disable_timer, v_cruise_kph, AM, events_arne182, arne_sm)
       prof.checkpoint("State transition")
 
     # Compute actuators (runs PID loops and lateral MPC)
