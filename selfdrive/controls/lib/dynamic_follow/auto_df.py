@@ -4,8 +4,11 @@
 
 import numpy as np
 
-wb = np.load('/data/openpilot/selfdrive/controls/lib/dynamic_follow/auto_df_weights.npz', allow_pickle=True)
-w, b = wb['wb']
+
+def load_weights():
+  global w, b
+  wb = np.load('/data/openpilot/selfdrive/controls/lib/dynamic_follow/auto_df_weights.npz', allow_pickle=True)
+  w, b = wb['wb']
 
 def softmax(x):
   return np.exp(x) / np.sum(np.exp(x), axis=0)
