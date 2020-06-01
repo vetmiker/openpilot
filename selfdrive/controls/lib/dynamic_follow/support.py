@@ -21,9 +21,9 @@ class dfData:
 
 
 class dfProfiles:
-  traffic = 0
-  relaxed = 1
-  roadtrip = 2
+  close = 0
+  normal = 1
+  far = 2
   auto = 3
   to_profile = {0: 'close', 1: 'normal', 2: 'far', 3: 'auto'}
   to_idx = {v: k for k, v in to_profile.items()}
