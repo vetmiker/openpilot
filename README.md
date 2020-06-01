@@ -5,7 +5,7 @@ This README describes the custom features build by me (Arne Schwarck) on top of 
 For a demo of this version of ArnePilot check the video below:
 [![demo of ArnePilot with this branch](https://img.youtube.com/vi/WKwSq8TPdpo/0.jpg)](https://www.youtube.com/playlist?list=PL3CGUyxys8DuTE1JTkdZwY93ejSfAGxyV)
 
-Find me on Discord https://discord.gg/R5YtuVB
+Find me on Discord https://discord.gg/Ebgn8Mr
 
 # Installation
 Put this URL in the custom URL field after uninstalling through the UI
