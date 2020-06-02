@@ -44,8 +44,8 @@ class DynamicFollow:
 
   def _setup_changing_variables(self):
     self.TR = self.default_TR
-    self.user_profile = self.df_profiles.auto  # just a starting point
-    self.model_profile = self.df_profiles.auto
+    self.user_profile = self.df_profiles.normal  # just a starting point
+    self.model_profile = self.df_profiles.normal
 
     self.sng = False
     self.car_data = CarData()
