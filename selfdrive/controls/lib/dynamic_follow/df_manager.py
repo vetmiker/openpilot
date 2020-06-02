@@ -22,7 +22,7 @@ class dfManager:
 
     self.cur_user_profile = self.op_params.get('dynamic_follow', default='auto').strip().lower()
     if not isinstance(self.cur_user_profile, str) or self.cur_user_profile not in self.df_profiles.to_idx:
-      self.cur_user_profile = self.df_profiles.auto  # relaxed
+      self.cur_user_profile = self.df_profiles.normal  # relaxed
     else:
       self.cur_user_profile = self.df_profiles.to_idx[self.cur_user_profile]
 
@@ -47,7 +47,7 @@ class dfManager:
     self.sm.update(0)
     df_out = dfReturn()
     if self.first_run:
-      df_out.changed = True  # to show alert on start
+      #df_out.changed = True  # to show alert on start
       self.first_run = False
 
     button_status = self.sm['dynamicFollowButton'].status
