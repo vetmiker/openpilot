@@ -27,5 +27,3 @@ class dfProfiles:
   auto = 3
   to_profile = {0: 'close', 1: 'normal', 2: 'far', 3: 'auto'}
   to_idx = {v: k for k, v in to_profile.items()}
-
-  default = auto

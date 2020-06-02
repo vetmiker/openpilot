@@ -22,7 +22,7 @@ class dfManager:
 
     self.cur_user_profile = self.op_params.get('dynamic_follow', default='auto').strip().lower()
     if not isinstance(self.cur_user_profile, str) or self.cur_user_profile not in self.df_profiles.to_idx:
-      self.cur_user_profile = self.df_profiles.default  # relaxed
+      self.cur_user_profile = self.df_profiles.auto  # relaxed
     else:
       self.cur_user_profile = self.df_profiles.to_idx[self.cur_user_profile]
 
