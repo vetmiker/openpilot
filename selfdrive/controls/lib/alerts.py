@@ -106,7 +106,7 @@ ALERTS = [
       "BRAKE PRESSED",
       "Longitudinal Control Disabled",
       AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 0.2),
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, .4, 2., 0.2),
 
   Alert(
       "trafficSlow",
@@ -226,6 +226,18 @@ ALERTS = [
       "Always keep hands on wheel and eyes on road",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 15.),
+
+  Alert("dfButtonAlert",
+        "Using profile: ",
+        "",
+        AlertStatus.normal, AlertSize.mid,
+        Priority.LOWER, VisualAlert.none, AudibleAlert.chimeWarning1, 0.2, 0., 2.),
+
+  Alert("dfButtonAlertNoSound",
+        "Using profile: ",
+        "",
+        AlertStatus.normal, AlertSize.mid,
+        Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0.2, 0., 2.),
 
   Alert(
       "ethicalDilemma",
@@ -576,8 +588,8 @@ ALERTS = [
       "plannerError",
       "TAKE CONTROL IMMEDIATELY",
       "Planner Solution Error",
-      AlertStatus.critical, AlertSize.full,
-      Priority.HIGHEST, VisualAlert.steerRequired, AudibleAlert.chimeWarningRepeat, 2.2, 3., 4.),
+      AlertStatus.normal, AlertSize.mid,
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeError, 2.2, 3., 4.),
 
   Alert(
       "relayMalfunction",
