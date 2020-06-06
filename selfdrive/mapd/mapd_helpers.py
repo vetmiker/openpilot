@@ -550,6 +550,11 @@ class Way:
                 speed_ahead_dist = way_pts[count, 0]
                 loop_must_break = True
                 break
+              elif n.tags['traffic_calming']=='yes':
+                speed_ahead = 40/3.6
+                speed_ahead_dist = way_pts[count, 0]
+                loop_must_break = True
+                break
           count += 1
         if loop_must_break: break
       except (KeyError, IndexError, ValueError):
