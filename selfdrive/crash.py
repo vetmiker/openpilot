@@ -36,7 +36,7 @@ else:
     ipaddress = "255.255.255.255"
   error_tags = {'dirty': dirty, 'dongle_id': dongle_id, 'branch': branch, 'remote': origin}
   username = op_params.get('username', None)
-  if username is not None and isinstance(username, str):
+  if isinstance(username, str) and isinstance(uniqueID, str):
     error_tags['username'] = username + uniqueID
   else:
     error_tags['username'] = uniqueID
