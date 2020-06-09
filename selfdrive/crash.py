@@ -8,7 +8,6 @@ from common.params import Params
 from selfdrive.version import version, dirty, origin, branch
 from common.op_params import opParams
 op_params = opParams()
-uniqueID = op_params.get('uniqueID', None)
 
 from selfdrive.swaglog import cloudlog
 from common.android import ANDROID
@@ -36,10 +35,15 @@ else:
     ipaddress = "255.255.255.255"
   error_tags = {'dirty': dirty, 'dongle_id': dongle_id, 'branch': branch, 'remote': origin}
   username = op_params.get('username', None)
-  if username is not None and isinstance(username, str):
-    error_tags['username'] = username + uniqueID
-  else:
-    error_tags['username'] = uniqueID
+  uniqueID = op_params.get('uniqueID', None)
+
+  u_tag = []
+  if isinstance(username, str):
+    u_tag.append(username)
+  if isinstance(uniqueID, str):
+    u_tag.append(uniqueID)
+  if len(u_tag) > 0:
+    error_tags['username'] = ''.join(u_tag)
 
   client = Client('https://137e8e621f114f858f4c392c52e18c6d:8aba82f49af040c8aac45e95a8484970@sentry.io/1404547',
                   install_sys_hook=False, transport=HTTPTransport, release=version, tags=error_tags)
