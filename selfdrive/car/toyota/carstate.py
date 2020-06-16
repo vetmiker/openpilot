@@ -196,7 +196,10 @@ class CarState(CarStateBase):
     else:
       self.main_on = cp.vl["PCM_CRUISE_2"]['MAIN_ON'] != 0
       ret.cruiseState.speed = cp.vl["PCM_CRUISE_2"]['SET_SPEED']
-      self.low_speed_lockout = cp.vl["PCM_CRUISE_2"]['LOW_SPEED_LOCKOUT'] == 2
+      if self.CP.carFingerprint == CAR.COROLLAH_TSS2:
+        self.low_speed_lockout = False
+      else:
+        self.low_speed_lockout = cp.vl["PCM_CRUISE_2"]['LOW_SPEED_LOCKOUT'] == 2
     ret.cruiseState.available = self.main_on
     v_cruise_pcm_max = ret.cruiseState.speed
     if self.CP.carFingerprint in TSS2_CAR:
@@ -383,7 +386,7 @@ class CarState(CarStateBase):
       signals.append(("LOW_SPEED_LOCKOUT", "PCM_CRUISE_2", 0))
       checks.append(("PCM_CRUISE_2", 33))
 
-    if CP.carFingerprint in [CAR.COROLLAH_TSS2, CAR.LEXUS_ESH_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_UXH_TSS2]:
+    if CP.carFingerprint in [CAR.COROLLAH_TSS2, CAR.LEXUS_ESH_TSS2, CAR.RAV4H_TSS2, CAR.LEXUS_UXH_TSS2, CAR.CHRH]:
       signals.append(("SPORT_ON", "GEAR_PACKET2", 0))
       signals.append(("ECON_ON", "GEAR_PACKET2", 0))
 

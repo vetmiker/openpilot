@@ -5,7 +5,7 @@ This README describes the custom features build by me (Arne Schwarck) on top of 
 For a demo of this version of ArnePilot check the video below:
 [![demo of ArnePilot with this branch](https://img.youtube.com/vi/WKwSq8TPdpo/0.jpg)](https://www.youtube.com/playlist?list=PL3CGUyxys8DuTE1JTkdZwY93ejSfAGxyV)
 
-Find me on Discord https://discord.gg/R5YtuVB
+Find me on Discord https://discord.gg/Ebgn8Mr
 
 # Installation
 Put this URL in the custom URL field after uninstalling through the UI
@@ -14,7 +14,6 @@ or if you want to use the command line or https://github.com/jfrux/workbench
 `cd /data; rm -rf openpilot; git clone https://github.com/arne182/openpilot; git checkout release4; reboot`
 
 still have trouble ?? More info about how to install this fork can be found [here](https://medium.com/@jfrux/comma-eon-installing-a-fork-of-openpilot-5c2b5c134b4b).
-
 ## Panda flashing
 
 This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/panda/board; make; reboot) to change the following:
@@ -22,6 +21,9 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 - changing acceleration limits for Toyota and
 - adapting lane departure warning where it gives you a slight push back into the middle of the lane without needing to be engaged (not yet complete)
 - The Panda version is also changed and checked.
+
+## opEdit Demo
+<img src=".media/op_edit.gif?raw=true" width="1000">
 
 ## Branches
 
@@ -72,7 +74,7 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 - Live speedlimit_offset in op_tune.py
 - If the model detect's cut in it will draw two different chevron to show the user that it see's both of the car.
 - Control 3 gas profiles with sport eco and normal buttons on car ( only for toyota).
-- [Dynamic distance profiles](https://github.com/ShaneSmiskol/ArnePilot/tree/stock_additions-devel#dynamic-follow-3-profiles) from Shane (In other word three different dynamic profiles: `close`, `normal`, `far`). Profile can be adjusted from either `python /data/ArnePilot/op_edit.py` or use live tuner to change the profile live (can take up to 4 sec to for new profile to be adjusted) `python /data/ArnePilot/op_tune.py`.
+- [Dynamic distance profiles](https://github.com/ShaneSmiskol/ArnePilot/tree/stock_additions-devel#dynamic-follow-3-profiles) from Shane (In other word three different dynamic profiles: `close`, `normal`, `far`, `auto`). Profile can be adjusted from either `python /data/ArnePilot/op_edit.py` or use live tuner to change the profile live (can take up to 4 sec to for new profile to be adjusted) `python /data/ArnePilot/op_tune.py`.
 - Dynamic Follow Button: Now you can change the Dynamic Follow Distance just by tapping the blue button on the bottom right.
 - [Dynamic Gas:](https://github.com/ShaneSmiskol/ArnePilot/tree/stock_additions-devel#dynamic-gas)
 This aims to provide a smoother driving experience in stop and go traffic (under 20 mph) by modifying the maximum gas that can be applied based on your current velocity and the relative velocity of the lead car. It'll also of course increase the maximum gas when the lead is accelerating to help you get up to speed quicker than stock. And smoother; this eliminates the jerking you get from stock ArnePilot with comma pedal. It tries to coast if the lead is only moving slowly, it doesn't use maximum gas as soon as the lead inches forward :). When you are above 20 mph, relative velocity and the following distance is taken into consideration.
@@ -80,7 +82,7 @@ This aims to provide a smoother driving experience in stop and go traffic (under
 - Added ability to turn on and off RSA at certain speed. `python /data/ArnePilot/op_edit.py`
 - Easily view the EON's IP Address.Just look at the sidebar right under wifi singal strength's.
 - Battery has percentage instead of the battery icon.
-- [WIP] Traffic light detection from Littlemountainman, shane and brain. To get accurate result make sure your daily commute/area is mapped on [OSM](openstreetmap.org) with right direaction. [For example](https://imgur.com/purBVpd)...  [still dont get it watch the video by mageymoo1](https://youtu.be/7dPaF0tDb7Y). 
+- [WIP] Traffic light detection from Littlemountainman, shane and brain. To get accurate result make sure your daily commute/area is mapped on [OSM](openstreetmap.org) with right direaction. [For example](https://imgur.com/purBVpd)...  [still dont get it watch the video by mageymoo1](https://youtu.be/7dPaF0tDb7Y).
 - We also have enabled commas e2e model which will only work between 11 MPH to 29 MPH. Commas e2e model helps slows down for traffic light, stop sign, etc. e2e, traffic model and mapd all works together to help you stop at the light. All of this can be turned off via `/data/openpilot/op_edit.py`.
 - Loggin has been Disabled by default on this fork. If you would like to record your drive edit the [following line](https://github.com/arne182/ArnePilot/blob/4d66df96a91c9c13491a3d78b9c1c2a9e848724a/selfdrive/manager.py#L480)
 - Smart speed (smart speed is essentially speedlimit which eon will not go over unless you have set custom offset) can be overridden by pressing gas above the current smart speed.
