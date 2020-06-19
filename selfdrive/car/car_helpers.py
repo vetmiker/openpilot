@@ -13,7 +13,6 @@ import selfdrive.crash as crash
 from selfdrive.car import gen_empty_fingerprint
 from common.travis_checker import travis
 from common.op_params import opParams
-from selfdrive.car.toyota.values import CAR
 
 op_params = opParams()
 use_car_caching = op_params.get('use_car_caching', True)
