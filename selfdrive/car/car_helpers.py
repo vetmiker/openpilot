@@ -13,6 +13,7 @@ import selfdrive.crash as crash
 from selfdrive.car import gen_empty_fingerprint
 from common.travis_checker import travis
 from common.op_params import opParams
+from selfdrive.car.toyota.values import CAR
 
 op_params = opParams()
 use_car_caching = op_params.get('use_car_caching', True)
@@ -162,9 +163,10 @@ def fingerprint(logcan, sendcan, has_relay):
         if frame > frame_fingerprint:
           # fingerprint done
           car_fingerprint = candidate_cars[b][0]
-      elif len(candidate_cars[b]) == 2: # For the RAV4 2019 and Corolla 2020 LE Fingerprint problem
+      elif len(candidate_cars[b]) < 4: # For the RAV4 2019 and Corolla 2020 LE Fingerprint problem
         if frame > 180:
-          car_fingerprint = candidate_cars[b][1]
+          if any(("TOYOTA COROLLA TSS2 2019" in c) for c in candidate_cars):
+            car_fingerprint = "TOYOTA COROLLA TSS2 2019"
 
     # bail if no cars left or we've been waiting for more than 2s
     failed = all(len(cc) == 0 for cc in candidate_cars.values()) or frame > 200
