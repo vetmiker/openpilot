@@ -36,12 +36,17 @@ def load_interfaces(brand_names):
   for brand_name in brand_names:
     path = ('selfdrive.car.%s' % brand_name)
     CarInterface = __import__(path + '.interface', fromlist=['CarInterface']).CarInterface
-    if os.path.exists(BASEDIR + '/' + path.replace('.', '/') + '/carcontroller.py'):
-      CarController = __import__(path + '.carcontroller', fromlist=['CarController']).CarController
+
+    if os.path.exists(BASEDIR + '/' + path.replace('.', '/') + '/carstate.py'):
       CarState = __import__(path + '.carstate', fromlist=['CarState']).CarState
     else:
-      CarController = None
       CarState = None
+
+    if os.path.exists(BASEDIR + '/' + path.replace('.', '/') + '/carcontroller.py'):
+      CarController = __import__(path + '.carcontroller', fromlist=['CarController']).CarController
+    else:
+      CarController = None
+
     for model_name in brand_names[brand_name]:
       ret[model_name] = (CarInterface, CarController, CarState)
   return ret
@@ -157,9 +162,10 @@ def fingerprint(logcan, sendcan, has_relay):
         if frame > frame_fingerprint:
           # fingerprint done
           car_fingerprint = candidate_cars[b][0]
-      elif len(candidate_cars[b]) == 2: # For the RAV4 2019 and Corolla 2020 LE Fingerprint problem
+      elif len(candidate_cars[b]) < 4: # For the RAV4 2019 and Corolla 2020 LE Fingerprint problem
         if frame > 180:
-          car_fingerprint = candidate_cars[b][1]
+          if any(("TOYOTA COROLLA TSS2 2019" in c) for c in candidate_cars[b]):
+            car_fingerprint = "TOYOTA COROLLA TSS2 2019"
 
     # bail if no cars left or we've been waiting for more than 2s
     failed = all(len(cc) == 0 for cc in candidate_cars.values()) or frame > 200

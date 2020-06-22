@@ -58,9 +58,11 @@ def update_panda():
       panda_dfu.recover()
 
     time.sleep(1)
-
-  fw_fn = get_firmware_fn()
-  fw_signature = get_expected_signature(fw_fn)
+  #try:
+  #  fw_fn = get_firmware_fn()
+  #except:
+  #  fw_fn = None
+  #fw_signature = get_expected_signature(fw_fn)
 
   try:
     serial = panda.get_serial()[0].decode("utf-8")
@@ -75,16 +77,20 @@ def update_panda():
     panda_version,
     panda_signature.hex(),
     repo_version,
-    fw_signature.hex(),
+    "None",#fw_signature.hex(),
   ))
 
   if panda.bootstub or not panda_version.startswith(repo_version):# or panda_signature != fw_signature:
     cloudlog.info("Panda firmware out of date, update required")
-    panda.flash()
+    try:
+      panda.flash()
+    except:
+      pass
     cloudlog.info("Done flashing")
 
   if panda.bootstub:
-    cloudlog.info("Flashed firmware not booting, flashing development bootloader")
+    bootstub_version = panda.get_version()
+    cloudlog.info(f"Flashed firmware not booting, flashing development bootloader. Bootstub version: {bootstub_version}")
     panda.recover()
     cloudlog.info("Done flashing bootloader")
 

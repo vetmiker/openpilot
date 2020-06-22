@@ -8,6 +8,7 @@ from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event,
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 import cereal.messaging as messaging
 from common.op_params import opParams
+from common.travis_checker import travis
 
 GearShifter = car.CarState.GearShifter
 
@@ -17,6 +18,7 @@ class CarInterfaceBase():
   def __init__(self, CP, CarController, CarState):
     self.waiting = False
     self.keep_openpilot_engaged = True
+    self.disengage_due_to_slow_speed = False
     self.sm = messaging.SubMaster(['pathPlan'])
     self.op_params = opParams()
     self.alca_min_speed = self.op_params.get('alca_min_speed', default=20.0)
@@ -24,14 +26,14 @@ class CarInterfaceBase():
     self.VM = VehicleModel(CP)
 
     self.frame = 0
-    self.gas_pressed_prev = False
-    self.brake_pressed_prev = False
-    self.cruise_enabled_prev = False
     self.low_speed_alert = False
 
     self.CS = CarState(CP)
     self.cp = self.CS.get_can_parser(CP)
-    self.cp_init = self.CS.get_can_parser_init(CP)
+    try:
+      self.cp_init = self.CS.get_can_parser_init(CP)
+    except AttributeError:
+      self.cp_init = self.CS.get_can_parser(CP)
     self.cp_cam = self.CS.get_cam_can_parser(CP)
 
     self.CC = None
@@ -89,12 +91,15 @@ class CarInterfaceBase():
   def apply(self, c):
     raise NotImplementedError
 
-  def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1):
-    if cs_out.cruiseState.enabled and not self.cruise_enabled_prev:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
+  def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1, pcm_enable=True):
+    if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
       disengage_event = True
     else:
-      disengage_event = False
-    
+      if travis:
+        disengage_event = True
+      else:
+        disengage_event = False
+
     events = []
     eventsArne182 = []
 
@@ -128,9 +133,16 @@ class CarInterfaceBase():
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0.
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
-    if disengage_event and ((cs_out.gasPressed and (not self.gas_pressed_prev) and cs_out.vEgo > gas_resume_speed) or \
-       (cs_out.brakePressed and (not self.brake_pressed_prev or not cs_out.standstill))):
+    if disengage_event and ((cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
+       (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill))):
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
+
+    # we engage when pcm is active (rising edge)
+    if pcm_enable:
+      if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:
+        events.append(create_event('pcmEnable', [ET.ENABLE]))
+      elif not cs_out.cruiseState.enabled:
+        events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
 
     return events, eventsArne182
 
@@ -153,6 +165,7 @@ class CarStateBase:
     self.CP = CP
     self.car_fingerprint = CP.carFingerprint
     self.cruise_buttons = 0
+    self.out = car.CarState.new_message()
 
     # Q = np.matrix([[10.0, 0.0], [0.0, 100.0]])
     # R = 1e3

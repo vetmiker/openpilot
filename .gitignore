@@ -20,7 +20,9 @@ a.out
 .*.un~
 *.tmp
 *.o
+*.o-*
 *.os
+*.os-*
 *.so
 *.a
 *.clb
@@ -61,6 +63,7 @@ selfdrive/mapd/MapsdThread-Thread.log.5
 selfdrive/trafficd/trafficd
 phonelibs/libjson.a
 phonelibs/libjson11.a
+phonelibs/nanovg/nanovg.o
 /src/
 
 one

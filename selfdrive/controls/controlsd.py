@@ -6,12 +6,13 @@ from cereal import car, log
 from common.numpy_fast import clip
 from common.realtime import sec_since_boot, set_realtime_priority, Ratekeeper, DT_CTRL
 from common.profiler import Profiler
-from common.params import Params
+from common.params import Params, put_nonblocking
 import cereal.messaging as messaging
 import cereal.messaging_arne as messaging_arne
 from selfdrive.config import Conversions as CV
 from selfdrive.boardd.boardd import can_list_to_can_capnp
 from selfdrive.car.car_helpers import get_car, get_startup_alert
+from selfdrive.car.disable_radar import disable_radar
 #from selfdrive.controls.lib.lane_planner import CAMERA_OFFSET
 from selfdrive.controls.lib.drive_helpers import get_events, \
                                                  create_event, \
@@ -28,9 +29,17 @@ from selfdrive.controls.lib.planner import LON_MPC_STEP
 from selfdrive.locationd.calibration_helpers import Calibration, Filter
 #from common.travis_checker import travis
 from common.op_params import opParams
-from selfdrive.controls.df_alert_manager import DfAlertManager
+from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
+
+op_params = opParams()
+df_manager = dfManager(op_params)
+
+hide_auto_df_alerts = op_params.get('hide_auto_df_alerts', False)
+traffic_light_alerts = op_params.get('traffic_light_alerts', True)
 
 #LANE_DEPARTURE_THRESHOLD = 0.1
+STEER_ANGLE_SATURATION_TIMEOUT = 1.0 / DT_CTRL
+STEER_ANGLE_SATURATION_THRESHOLD = 2.5  # Degrees
 
 ThermalStatus = log.ThermalData.ThermalStatus
 State = log.ControlsState.OpenpilotState
@@ -122,6 +131,9 @@ def data_sample(CI, CC, sm, can_sock, state, mismatch_counter, can_error_counter
     else:
       events.append(create_event('calibrationInvalid', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
 
+  if CS.vEgo > 160 * CV.KPH_TO_MS:
+    events.append(create_event('speedTooHigh', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+
   # When the panda and controlsd do not agree on controls_allowed
   # we want to disengage openpilot. However the status from the panda goes through
   # another socket other than the CAN messages and one can arrive earlier than the other.
@@ -139,7 +151,7 @@ def data_sample(CI, CC, sm, can_sock, state, mismatch_counter, can_error_counter
   return CS, events, cal_perc, mismatch_counter, can_error_counter, events_arne182
 
 
-def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_kph, AM, events_arne182, arne_sm, df_alert_manager):
+def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_kph, AM, events_arne182, arne_sm):
   """Compute conditional state transitions and execute actions on state transitions"""
   enabled = isEnabled(state)
 
@@ -155,19 +167,26 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
   # entrance in SOFT_DISABLING state
   soft_disable_timer = max(0, soft_disable_timer - 1)
 
-  traffic_status = arne_sm['trafficModelEvent'].status
-  traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
-  if traffic_confidence >= 75:
-    if traffic_status == 'SLOW':
-      AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
-    elif traffic_status == 'GREEN':
-      AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
-    elif traffic_status == 'DEAD':  # confidence will be 100
-      AM.add(frame, 'trafficDead', enabled)
+  df_out = df_manager.update()
+  if df_out.changed:
+    df_alert = 'dfButtonAlert'
+    if df_out.is_auto and df_out.last_is_auto:
+      if CS.cruiseState.enabled and not hide_auto_df_alerts:
+        df_alert += 'NoSound'
+        AM.add(frame, df_alert, enabled, extra_text_1=df_out.model_profile_text + ' (auto)', extra_text_2='Dynamic follow: {} profile active'.format(df_out.model_profile_text))
+    else:
+      AM.add(frame, df_alert, enabled, extra_text_1=df_out.user_profile_text, extra_text_2='Dynamic follow: {} profile active'.format(df_out.user_profile_text))
 
-  df_alert = df_alert_manager.update(arne_sm)
-  if df_alert is not None:
-    AM.add(frame, 'dfButtonAlert', enabled, extra_text_1=df_alert, extra_text_2='Dynamic follow: {} profile active'.format(df_alert))
+  if traffic_light_alerts:
+    traffic_status = arne_sm['trafficModelEvent'].status
+    traffic_confidence = round(arne_sm['trafficModelEvent'].confidence * 100, 2)
+    if traffic_confidence >= 75:
+      if traffic_status == 'SLOW':
+        AM.add(frame, 'trafficSlow', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+      elif traffic_status == 'GREEN':
+        AM.add(frame, 'trafficGreen', enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+      elif traffic_status == 'DEAD':  # confidence will be 100
+        AM.add(frame, 'trafficDead', enabled)
 
   # DISABLED
   if state == State.disabled:
@@ -310,8 +329,7 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
 
 
 def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cruise_kph, v_cruise_kph_last,
-
-                  AM, rk, LaC, LoC, read_only, is_metric, cal_perc, last_blinker_frame, arne_sm, events_arne182, radarstate):
+                  AM, rk, LaC, LoC, read_only, is_metric, cal_perc, last_blinker_frame, arne_sm, events_arne182, radarstate, saturated_count):
 
   """Given the state, this function returns an actuators packet"""
 
@@ -376,8 +394,14 @@ def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cr
   # Steering PID loop and lateral MPC
   actuators.steer, actuators.steerAngle, lac_log = LaC.update(active, CS.vEgo, CS.steeringAngle, CS.steeringRate, CS.steeringTorqueEps, CS.steeringPressed, CS.steeringRateLimited, CP, path_plan)
 
+  # Check for difference between desired angle and angle for angle based control
+  angle_control_saturated = CP.steerControlType == car.CarParams.SteerControlType.angle and \
+    abs(actuators.steerAngle - CS.steeringAngle) > STEER_ANGLE_SATURATION_THRESHOLD
+
+  saturated_count = saturated_count + 1 if angle_control_saturated and not CS.steeringPressed and active else 0
+
   # Send a "steering required alert" if saturation count has reached the limit
-  if lac_log.saturated and not CS.steeringPressed:
+  if (lac_log.saturated and not CS.steeringPressed) or (saturated_count > STEER_ANGLE_SATURATION_TIMEOUT):
     # Check if we deviated from the path
     left_deviation = actuators.steer > 0 and path_plan.dPoly[3] > 0.1
     right_deviation = actuators.steer < 0 and path_plan.dPoly[3] < -0.1
@@ -408,7 +432,7 @@ def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cr
         extra_text_2 = str(int(round(Filter.MIN_SPEED * CV.MS_TO_MPH))) + " mph"
     AM.add(frame, str(e) + "Permanent", enabled, extra_text_1=extra_text_1, extra_text_2=extra_text_2)
 
-  return actuators, v_cruise_kph, v_acc_sol, a_acc_sol, lac_log, last_blinker_frame
+  return actuators, v_cruise_kph, v_acc_sol, a_acc_sol, lac_log, last_blinker_frame, saturated_count
 
 
 def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk, AM,
@@ -469,7 +493,7 @@ def data_send(sm, pm, CS, CI, CP, VM, state, events, actuators, v_cruise_kph, rk
     can_sends = CI.apply(CC)
     pm.send('sendcan', can_list_to_can_capnp(can_sends, msgtype='sendcan', valid=CS.canValid))
 
-  force_decel = sm['dMonitoringState'].awarenessStatus < 0.
+  force_decel = (sm['dMonitoringState'].awarenessStatus < 0.) or (state == State.softDisabling)
 
   # controlsState
   dat = messaging.new_message('controlsState')
@@ -569,6 +593,10 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
 
   passive = passive or not openpilot_enabled_toggle
 
+  # Passive if internet needed
+  internet_needed = params.get("Offroad_ConnectivityNeeded", encoding='utf8') is not None
+  passive = passive or internet_needed
+
   # Pub/Sub Sockets
   if pm is None:
     pm = messaging.PubMaster(['sendcan', 'controlsState', 'carState', 'carControl', 'carEvents', 'carParams'])
@@ -603,8 +631,10 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
   # Write CarParams for radard and boardd safety mode
   cp_bytes = CP.to_bytes()
   params.put("CarParams", cp_bytes)
-  params.put("CarParamsCache", cp_bytes)
-  params.put("LongitudinalControl", "1" if CP.openpilotLongitudinalControl else "0")
+  put_nonblocking("CarParamsCache", cp_bytes)
+  put_nonblocking("LongitudinalControl", "1" if CP.openpilotLongitudinalControl else "0")
+  if CP.openpilotLongitudinalControl and CP.safetyModel in [car.CarParams.SafetyModel.hondaBoschGiraffe, car.CarParams.SafetyModel.hondaBoschHarness]:
+    disable_radar(can_sock, pm.sock['sendcan'], 1 if has_relay else 0, timeout=1, retry=10)
 
   CC = car.CarControl.new_message()
   AM = AlertManager()
@@ -629,6 +659,7 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
   mismatch_counter = 0
   can_error_counter = 0
   last_blinker_frame = 0
+  saturated_count = 0
   events_prev = []
 
   sm['liveCalibration'].calStatus = Calibration.INVALID
@@ -645,11 +676,8 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
   # controlsd is driven by can recv, expected at 100Hz
   rk = Ratekeeper(100, print_delay_threshold=None)
 
-  internet_needed = params.get("Offroad_ConnectivityNeeded", encoding='utf8') is not None
 
   prof = Profiler(False)  # off by default
-  op_params = opParams()
-  df_alert_manager = DfAlertManager(op_params)
 
   while True:
     start_time = sec_since_boot()
@@ -666,8 +694,8 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
     elif not sm.all_alive_and_valid():
       events.append(create_event('commIssue', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if not sm['pathPlan'].mpcSolutionValid:
-      events.append(create_event('plannerError', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-    if not sm['pathPlan'].sensorValid:
+      events.append(create_event('plannerError', [ET.NO_ENTRY, ET.WARNING]))
+    if not sm['pathPlan'].sensorValid and os.getenv("NOSENSOR") is None:
       events.append(create_event('sensorDataInvalid', [ET.NO_ENTRY, ET.PERMANENT]))
     if not sm['pathPlan'].paramsValid:
       events.append(create_event('vehicleModelInvalid', [ET.WARNING]))
@@ -687,21 +715,24 @@ def controlsd_thread(sm=None, pm=None, can_sock=None, arne_sm=None):
       events.append(create_event('communityFeatureDisallowed', [ET.PERMANENT]))
     if read_only and not passive:
       events.append(create_event('carUnrecognized', [ET.PERMANENT]))
+    if log.HealthData.FaultType.relayMalfunction in sm['health'].faults:
+      events.append(create_event('relayMalfunction', [ET.NO_ENTRY, ET.PERMANENT, ET.IMMEDIATE_DISABLE]))
+
 
     # Only allow engagement with brake pressed when stopped behind another stopped car
-    if CS.brakePressed and sm['plan'].vTargetFuture >= STARTING_TARGET_SPEED and not CP.radarOffCan and CS.vEgo < 0.3:
+    if CS.brakePressed and sm['plan'].vTargetFuture >= STARTING_TARGET_SPEED and CP.openpilotLongitudinalControl and CS.vEgo < 0.3:
       events.append(create_event('noTarget', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
 
     if not read_only:
       # update control state
       state, soft_disable_timer, v_cruise_kph, v_cruise_kph_last = \
-        state_transition(sm.frame, CS, CP, state, events, soft_disable_timer, v_cruise_kph, AM, events_arne182, arne_sm, df_alert_manager)
+        state_transition(sm.frame, CS, CP, state, events, soft_disable_timer, v_cruise_kph, AM, events_arne182, arne_sm)
       prof.checkpoint("State transition")
 
     # Compute actuators (runs PID loops and lateral MPC)
-    actuators, v_cruise_kph, v_acc, a_acc, lac_log, last_blinker_frame = \
+    actuators, v_cruise_kph, v_acc, a_acc, lac_log, last_blinker_frame, saturated_count = \
       state_control(sm.frame, sm.rcv_frame, sm['plan'], sm['pathPlan'], CS, CP, state, events, v_cruise_kph, v_cruise_kph_last, AM, rk,
-                    LaC, LoC, read_only, is_metric, cal_perc, last_blinker_frame, arne_sm, events_arne182, sm['radarState'])
+                    LaC, LoC, read_only, is_metric, cal_perc, last_blinker_frame, arne_sm, events_arne182, sm['radarState'], saturated_count)
 
     prof.checkpoint("State Control")
 

@@ -1,8 +1,8 @@
 from cereal import car, arne182
-#from selfdrive.config import Conversions as CV
+from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import create_event, EventTypes as ET
 from selfdrive.car.volkswagen.values import CAR, BUTTON_STATES
-from common.params import Params
+from common.params import put_nonblocking
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
 
@@ -23,8 +23,34 @@ class CarInterface(CarInterfaceBase):
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), has_relay=False, car_fw=[]):
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint, has_relay)
 
-    # Applies to all models for now
-    # if candidate in (CAR.VW_GOLF, CAR.SKODA_SUPERB_B8, CAR.VW_TOURAN):
+    # VW port is a community feature, since we don't own one to test
+    ret.communityFeature = True
+
+    if candidate == CAR.GOLF:
+      # Set common MQB parameters that will apply globally
+      ret.carName = "volkswagen"
+      ret.radarOffCan = True
+      ret.safetyModel = car.CarParams.SafetyModel.volkswagen
+
+      # Additional common MQB parameters that may be overridden per-vehicle
+      ret.steerRateCost = 0.5
+      ret.steerActuatorDelay = 0.05 # Hopefully all MQB racks are similar here
+      ret.steerLimitTimer = 0.4
+
+      # As a starting point for speed-adjusted lateral tuning, use the example
+      # map speed breakpoints from a VW Tiguan (SSP 399 page 9). It's unclear
+      # whether the driver assist map breakpoints have any direct bearing on
+      # HCA assist torque, but if they're good breakpoints for the driver,
+      # they're probably good breakpoints for HCA as well. OP won't be driving
+      # 250kph/155mph but it provides interpolation scaling above 100kmh/62mph.
+      ret.lateralTuning.pid.kpBP = [0., 15 * CV.KPH_TO_MS, 50 * CV.KPH_TO_MS]
+      ret.lateralTuning.pid.kiBP = [0., 15 * CV.KPH_TO_MS, 50 * CV.KPH_TO_MS]
+
+      # FIXME: Per-vehicle parameters need to be reintegrated.
+      # For the time being, per-vehicle stuff is being archived since we
+      # can't auto-detect very well yet. Now that tuning is figured out,
+      # averaged params should work reasonably on a range of cars. Owners
+      # can tweak here, as needed, until we have car type auto-detection.
 
     # Set common MQB parameters that will apply globally
     ret.carName = "volkswagen"
@@ -60,7 +86,7 @@ class CarInterface(CarInterfaceBase):
     # ret.openpilotLongitudinalControl = False
     # ret.steerControlType = car.CarParams.SteerControlType.torque
 
-    # Define default values across the MQB range, 
+    # Define default values across the MQB range,
     # redefined per model bellow.
     # Commented our for now as we don't allow unknown models for now.
 
@@ -86,7 +112,13 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 1700 + STD_CARGO_KG
       ret.wheelbase = 2.85
       tire_stiffness_factor = 0.8
-      
+
+    elif candidate == CAR.VW_ATLAS:
+
+      ret.mass = 1950 + STD_CARGO_KG
+      ret.wheelbase = 2.98
+      tire_stiffness_factor = 0.8
+
     # Not sure if I should simply exit or raise an error
     else:
       raise ValueError("Unsupported car %s" % candidate)
@@ -108,7 +140,6 @@ class CarInterface(CarInterfaceBase):
 
     ret_arne182 = arne182.CarStateArne182.new_message()
     buttonEvents = []
-    params = Params()
 
 
     # Process the most recent CAN message traffic, and check for validity
@@ -124,7 +155,7 @@ class CarInterface(CarInterfaceBase):
     # Update the EON metric configuration to match the car at first startup,
     # or if there's been a change.
     if self.CS.displayMetricUnits != self.displayMetricUnitsPrev:
-      params.put("IsMetric", "1" if self.CS.displayMetricUnits else "0")
+      put_nonblocking("IsMetric", "1" if self.CS.displayMetricUnits else "0")
 
     # Check for and process state-change events (button press or release) from
     # the turn stalk switch or ACC steering wheel/control stalk buttons.
@@ -143,22 +174,12 @@ class CarInterface(CarInterfaceBase):
     if self.CS.steeringFault:
       events.append(create_event('steerTempUnavailable', [ET.NO_ENTRY, ET.WARNING]))
 
-    # Engagement and longitudinal control using stock ACC. Make sure OP is
-    # disengaged if stock ACC is disengaged.
-    if not ret.cruiseState.enabled:
-      events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
-    # Attempt OP engagement only on rising edge of stock ACC engagement.
-    elif not self.cruise_enabled_prev:
-      events.append(create_event('pcmEnable', [ET.ENABLE]))
     ret_arne182.events = eventsArne182
     ret.events = events
     ret.buttonEvents = buttonEvents
     ret.canMonoTimes = canMonoTimes
 
     # update previous car states
-    self.gas_pressed_prev = ret.gasPressed
-    self.brake_pressed_prev = ret.brakePressed
-    self.cruise_enabled_prev = ret.cruiseState.enabled
     self.displayMetricUnitsPrev = self.CS.displayMetricUnits
     self.buttonStatesPrev = self.CS.buttonStates.copy()
 

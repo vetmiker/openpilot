@@ -27,18 +27,20 @@ class CarInterface(CarInterfaceBase):
     ret.steerActuatorDelay = 0.12  # Default delay, Prius has larger delay
     ret.steerLimitTimer = 0.4
 
-    #if ret.enableGasInterceptor:
-    #  ret.gasMaxBP = [0., 9., 55]
-    #  ret.gasMaxV = [0.2, 0.5, 0.7]
-    #  ret.longitudinalTuning.kpV = [0.5, 0.4, 0.3]  # braking tune
-    #  ret.longitudinalTuning.kiV = [0.135, 0.1]
-    #else:
-    ret.gasMaxBP = [0., 9., 55]
-    ret.gasMaxV = [0.2, 0.5, 0.7]
-    ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune from rav4h
-    ret.longitudinalTuning.kiV = [0.15, 0.10]
+    if ret.enableGasInterceptor:
+      ret.gasMaxBP = [0., 9., 55]
+      ret.gasMaxV = [0.2, 0.5, 0.7]
+      # ret.longitudinalTuning.kpV = [0.5, 0.4, 0.3]  # braking tune, todo: test me vs. stock below
+      # ret.longitudinalTuning.kiV = [0.135, 0.1]
+      ret.longitudinalTuning.kpV = [1.2, 0.8, 0.5]
+      ret.longitudinalTuning.kiV = [0.18, 0.12]
+    else:
+      ret.gasMaxBP = [0., 9., 55]
+      ret.gasMaxV = [0.2, 0.5, 0.7]
+      ret.longitudinalTuning.kpV = [0.39, 0.35, 0.325]  # braking tune from rav4h
+      ret.longitudinalTuning.kiV = [0.19, 0.10]
 
-    if candidate not in [CAR.PRIUS_2019, CAR.PRIUS, CAR.RAV4, CAR.RAV4H]: # These cars use LQR/INDI
+    if candidate not in [CAR.PRIUS_2019, CAR.PRIUS, CAR.RAV4, CAR.RAV4H, CAR.COROLLA]: # These cars use LQR/INDI
       ret.lateralTuning.init('pid')
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
 
@@ -87,8 +89,8 @@ class CarInterface(CarInterfaceBase):
 
       ret.lateralTuning.lqr.scale = 1500.0
       ret.lateralTuning.lqr.ki = 0.06
-      ret.longitudinalTuning.kpV = [0.325, 0.325, 0.325]  # braking tune
-      ret.longitudinalTuning.kiV = [0.15, 0.1]
+      ret.longitudinalTuning.kpV = [0.8, 1.0, 0.325]  # braking tune
+      ret.longitudinalTuning.kiV = [0.35, 0.1]
       ret.lateralTuning.lqr.a = [0., 1., -0.22619643, 1.21822268]
       ret.lateralTuning.lqr.b = [-1.92006585e-04, 3.95603032e-05]
       ret.lateralTuning.lqr.c = [1., 0.]
@@ -103,8 +105,17 @@ class CarInterface(CarInterfaceBase):
       ret.steerRatio = 18.27
       tire_stiffness_factor = 0.444  # not optimized yet
       ret.mass = 2860. * CV.LB_TO_KG + STD_CARGO_KG  # mean between normal and hybrid
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2], [0.05]]
-      ret.lateralTuning.pid.kf = 0.00003   # full torque for 20 deg at 80mph means 0.00007818594
+      ret.lateralTuning.init('lqr')
+
+      ret.lateralTuning.lqr.scale = 1500.0
+      ret.lateralTuning.lqr.ki = 0.06
+
+      ret.lateralTuning.lqr.a = [0., 1., -0.22619643, 1.21822268]
+      ret.lateralTuning.lqr.b = [-1.92006585e-04, 3.95603032e-05]
+      ret.lateralTuning.lqr.c = [1., 0.]
+      ret.lateralTuning.lqr.k = [-110.73572306, 451.22718255]
+      ret.lateralTuning.lqr.l = [0.3233671, 0.3185757]
+      ret.lateralTuning.lqr.dcGain = 0.002237852961363602
 
     elif candidate == CAR.LEXUS_RX:
       stop_and_go = True
@@ -156,7 +167,7 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
       ret.lateralTuning.pid.kf = 0.00006
 
-    elif candidate == CAR.HIGHLANDER_TSS2:
+    elif candidate in [CAR.HIGHLANDER_TSS2, CAR.HIGHLANDERH_TSS2]:
       stop_and_go = True
       ret.safetyParam = 73
       ret.wheelbase = 2.84988  # 112.2 in = 2.84988 m
@@ -192,7 +203,9 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.68986
       ret.steerRatio = 14.3
       tire_stiffness_factor = 0.7933
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15], [0.05]]
+      ret.longitudinalTuning.kpV = [0.2, 0.25, 0.325]
+      ret.longitudinalTuning.kiV = [0.10, 0.10]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.13], [0.05]]
       ret.mass = 3370. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kf = 0.00004
 
@@ -202,7 +215,9 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.68986
       ret.steerRatio = 14.3
       tire_stiffness_factor = 0.7933
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15], [0.05]]
+      ret.longitudinalTuning.kpV = [0.2, 0.25, 0.325]
+      ret.longitudinalTuning.kiV = [0.10, 0.10]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.12], [0.04]]
       ret.mass = 3800. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kf = 0.00004
 
@@ -213,7 +228,7 @@ class CarInterface(CarInterfaceBase):
       ret.steerRatio = 13.9
       tire_stiffness_factor = 0.444  # not optimized yet
       ret.mass = 3060. * CV.LB_TO_KG + STD_CARGO_KG
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.5], [0.1]]
       ret.lateralTuning.pid.kf = 0.00007818594
 
     elif candidate in [CAR.LEXUS_ES_TSS2, CAR.LEXUS_ESH_TSS2]:
@@ -230,10 +245,10 @@ class CarInterface(CarInterfaceBase):
       stop_and_go = True
       ret.safetyParam = 73
       ret.wheelbase = 3.03
-      ret.steerRatio = 16.0
+      ret.steerRatio = 15.5
       tire_stiffness_factor = 0.444
       ret.mass = 4590. * CV.LB_TO_KG + STD_CARGO_KG
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.05]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.19], [0.02]]
       ret.lateralTuning.pid.kf = 0.00007818594
 
     elif candidate in [CAR.LEXUS_IS, CAR.LEXUS_ISH, CAR.LEXUS_RX]:
@@ -347,25 +362,34 @@ class CarInterface(CarInterfaceBase):
 
     # gear except P, R
     extra_gears = [GearShifter.neutral, GearShifter.eco, GearShifter.manumatic, GearShifter.drive, GearShifter.sport, GearShifter.low, GearShifter.brake, GearShifter.unknown]
-
-    # events
-    events, eventsArne182 = self.create_common_events(ret, extra_gears)
-
+    
+    longControlDisabled = False
     # cruise state
-    if not self.cruise_enabled_prev:
+    if not self.CS.out.cruiseState.enabled:
       self.waiting = False
       ret.cruiseState.enabled = self.CS.pcm_acc_active
     else:
       if self.keep_openpilot_engaged:
         ret.cruiseState.enabled = bool(self.CS.main_on)
       if not self.CS.pcm_acc_active:
-        eventsArne182.append(create_event_arne('longControlDisabled', [ET.WARNING]))
+        longControlDisabled = True
         ret.brakePressed = True
         self.waiting = False
+        self.disengage_due_to_slow_speed = False
     if ret.vEgo < 1 or not self.keep_openpilot_engaged:
       ret.cruiseState.enabled = self.CS.pcm_acc_active
-    ret.cruiseState.available = bool(self.CS.main_on)
-    ret.cruiseState.speedOffset = 0.
+      if self.CS.out.cruiseState.enabled and not self.CS.pcm_acc_active:
+        self.disengage_due_to_slow_speed = True
+    if self.disengage_due_to_slow_speed and ret.vEgo > 1:
+      self.disengage_due_to_slow_speed = False
+      ret.cruiseState.enabled = bool(self.CS.main_on)
+    
+      
+    # events
+    events, eventsArne182 = self.create_common_events(ret, extra_gears)
+    
+    if longControlDisabled:
+      eventsArne182.append(create_event_arne('longControlDisabled', [ET.WARNING]))
 
     ret.buttonEvents = []
 
@@ -395,18 +419,8 @@ class CarInterface(CarInterfaceBase):
         # while in standstill, send a user alert
         events.append(create_event('manualRestart', [ET.WARNING]))
 
-    # enable request in prius is simple, as we activate when Toyota is active (rising edge)
-    if ret.cruiseState.enabled and not self.cruise_enabled_prev:
-      events.append(create_event('pcmEnable', [ET.ENABLE]))
-    elif not ret.cruiseState.enabled:
-      events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
-
     ret.events = events
     ret_arne182.events = eventsArne182
-
-    self.gas_pressed_prev = ret.gasPressed
-    self.brake_pressed_prev = ret.brakePressed
-    self.cruise_enabled_prev = ret.cruiseState.enabled
 
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()

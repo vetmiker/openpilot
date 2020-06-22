@@ -65,12 +65,6 @@ class CarInterface(CarInterfaceBase):
     # events
     events, eventsArne182 = self.create_common_events(ret)
 
-    # enable request in prius is simple, as we activate when Toyota is active (rising edge)
-    if ret.cruiseState.enabled and not self.cruise_enabled_prev:
-      events.append(create_event('pcmEnable', [ET.ENABLE]))
-    elif not ret.cruiseState.enabled:
-      events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
-
     if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
       events.append(create_event('steerTempUnavailableMute', [ET.WARNING]))
 
@@ -81,7 +75,7 @@ class CarInterface(CarInterfaceBase):
     self.brake_pressed_prev = ret.brakePressed
     self.cruise_enabled_prev = ret.cruiseState.enabled
     self.CS.out = ret.as_reader()
-    
+
     return self.CS.out, ret_arne182.as_reader()
 
   # pass in a car.CarControl
