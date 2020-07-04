@@ -42,7 +42,7 @@ class CarInterface(CarInterfaceBase):
 
     if candidate not in [CAR.PRIUS_2019, CAR.PRIUS, CAR.RAV4, CAR.RAV4H, CAR.COROLLA]: # These cars use LQR/INDI
       ret.lateralTuning.init('pid')
-      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
+      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kfBP = [[0.], [0.], [0.]]
 
     if candidate in [CAR.PRIUS, CAR.PRIUS_2019]:
       stop_and_go = True
@@ -125,7 +125,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.5533
       ret.mass = 4387. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.05]]
-      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kfV = 0.00006
 
     elif candidate == CAR.LEXUS_RXH:
       stop_and_go = True
@@ -135,7 +135,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.444  # not optimized yet
       ret.mass = 4481. * CV.LB_TO_KG + STD_CARGO_KG  # mean between min and max
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
-      ret.lateralTuning.pid.kf = 0.00006   # full torque for 10 deg at 80mph means 0.00007818594
+      ret.lateralTuning.pid.kfV = 0.00006   # full torque for 10 deg at 80mph means 0.00007818594
 
     elif candidate == CAR.LEXUS_RX_TSS2:
       stop_and_go = True
@@ -145,7 +145,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.5533  # not optimized yet
       ret.mass = 4387. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
-      ret.lateralTuning.pid.kf = 0.00007818594
+      ret.lateralTuning.pid.kfV = 0.00007818594
 
     elif candidate in [CAR.CHR, CAR.CHRH]:
       stop_and_go = True
@@ -155,7 +155,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.7933
       ret.mass = 3300. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.723], [0.0428]]
-      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kfV = 0.00006
 
     elif candidate in [CAR.CAMRY, CAR.CAMRYH]:
       stop_and_go = True
@@ -165,7 +165,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.7933
       ret.mass = 3400. * CV.LB_TO_KG + STD_CARGO_KG #mean between normal and hybrid
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
-      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kfV = 0.00006
 
     elif candidate in [CAR.HIGHLANDER_TSS2, CAR.HIGHLANDERH_TSS2]:
       stop_and_go = True
@@ -175,7 +175,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.8
       ret.mass = 4700. * CV.LB_TO_KG + STD_CARGO_KG  # 4260 + 4-5 people
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.18], [0.015]]  # community tuning
-      ret.lateralTuning.pid.kf = 0.00012  # community tuning
+      ret.lateralTuning.pid.kfV = 0.00012  # community tuning
 
     elif candidate in [CAR.HIGHLANDER, CAR.HIGHLANDERH]:
       stop_and_go = True
@@ -185,7 +185,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.8
       ret.mass = 4607. * CV.LB_TO_KG + STD_CARGO_KG #mean between normal and hybrid limited
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.18], [0.015]]  # community tuning
-      ret.lateralTuning.pid.kf = 0.00012  # community tuning
+      ret.lateralTuning.pid.kfV = 0.00012  # community tuning
 
     elif candidate == CAR.AVALON:
       stop_and_go = False
@@ -195,7 +195,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.7983
       ret.mass = 3505. * CV.LB_TO_KG + STD_CARGO_KG  # mean between normal and hybrid
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.17], [0.03]]
-      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kfV = 0.00006
 
     elif candidate == CAR.RAV4_TSS2:
       stop_and_go = True
@@ -207,7 +207,7 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalTuning.kiV = [0.10, 0.10]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.13], [0.05]]
       ret.mass = 3370. * CV.LB_TO_KG + STD_CARGO_KG
-      ret.lateralTuning.pid.kf = 0.00004
+      ret.lateralTuning.pid.kfV = 0.00004
 
     elif candidate == CAR.RAV4H_TSS2:
       stop_and_go = True
@@ -219,17 +219,18 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalTuning.kiV = [0.10, 0.10]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.12], [0.04]]
       ret.mass = 3800. * CV.LB_TO_KG + STD_CARGO_KG
-      ret.lateralTuning.pid.kf = 0.00004
+      ret.lateralTuning.pid.kfV = 0.00004
 
     elif candidate in [CAR.COROLLA_TSS2, CAR.COROLLAH_TSS2]:
       stop_and_go = True
       ret.safetyParam = 73
       ret.wheelbase = 2.63906
-      ret.steerRatio = 13.9
-      tire_stiffness_factor = 0.444  # not optimized yet
+      ret.steerRatio = 15.329726219177246
+      tire_stiffness_factor = 0.99565589427948  # not optimized yet
       ret.mass = 3060. * CV.LB_TO_KG + STD_CARGO_KG
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.5], [0.1]]
-      ret.lateralTuning.pid.kf = 0.00007818594
+      ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kpV = [[0.0, 14.0, 26.0], [0.005, 0.015, 0.1]]
+      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kiV = [[0.0, 14.0, 26.0], [0.13, 0.39, 0.6]]
+      ret.lateralTuning.pid.kfBP, ret.lateralTuning.pid.kfV = [[0.0, 26.0], [0.0001, 0.0000781818594]]
 
     elif candidate in [CAR.LEXUS_ES_TSS2, CAR.LEXUS_ESH_TSS2]:
       stop_and_go = True
@@ -239,7 +240,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.444  # not optimized yet
       ret.mass = 3704. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
-      ret.lateralTuning.pid.kf = 0.00007818594
+      ret.lateralTuning.pid.kfV = 0.00007818594
 
     elif candidate == CAR.SIENNA:
       stop_and_go = True
@@ -249,7 +250,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.444
       ret.mass = 4590. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.19], [0.02]]
-      ret.lateralTuning.pid.kf = 0.00007818594
+      ret.lateralTuning.pid.kfV = 0.00007818594
 
     elif candidate in [CAR.LEXUS_IS, CAR.LEXUS_ISH, CAR.LEXUS_RX]:
       stop_and_go = False
@@ -259,7 +260,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.444
       ret.mass = 3736.8 * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.05]]
-      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kfV = 0.00006
 
     elif candidate == CAR.LEXUS_CTH:
       stop_and_go = True
@@ -269,7 +270,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.517
       ret.mass = 3108 * CV.LB_TO_KG + STD_CARGO_KG  # mean between min and max
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.05]]
-      ret.lateralTuning.pid.kf = 0.00007
+      ret.lateralTuning.pid.kfV = 0.00007
 
     elif candidate == CAR.LEXUS_NXH:
       stop_and_go = True
@@ -279,7 +280,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.444 # not optimized yet
       ret.mass = 4070 * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
-      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kfV = 0.00006
 
     elif candidate == CAR.LEXUS_NXH:
       stop_and_go = True
@@ -289,7 +290,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.444 # not optimized yet
       ret.mass = 4070 * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
-      ret.lateralTuning.pid.kf = 0.00006
+      ret.lateralTuning.pid.kfV = 0.00006
       
     elif candidate == CAR.LEXUS_UXH_TSS2:
       stop_and_go = True
@@ -299,7 +300,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.444  # not optimized yet
       ret.mass = 3500. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
-      ret.lateralTuning.pid.kf = 0.00007
+      ret.lateralTuning.pid.kfV = 0.00007
 
     ret.steerRateCost = 1.
     ret.centerToFront = ret.wheelbase * 0.44
