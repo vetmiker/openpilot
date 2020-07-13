@@ -6,6 +6,10 @@ from selfdrive.car.toyota.values import Ecu, ECU_FINGERPRINT, CAR, TSS2_CAR, FIN
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, is_ecu_disconnected, gen_empty_fingerprint
 from selfdrive.swaglog import cloudlog
 from selfdrive.car.interfaces import CarInterfaceBase
+from common.op_params import opParams
+
+op_params = opParams()
+spairrowtuning = op_params.get('spairrowtuning', False)
 
 GearShifter = car.CarState.GearShifter
 
@@ -225,12 +229,18 @@ class CarInterface(CarInterfaceBase):
       stop_and_go = True
       ret.safetyParam = 73
       ret.wheelbase = 2.63906
-      ret.steerRatio = 15.329726219177246
-      tire_stiffness_factor = 0.99565589427948  # not optimized yet
+      ret.steerRatio = 13.9
+      tire_stiffness_factor = 0.444  # not optimized yet
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.5], [0.1]]
       ret.mass = 3060. * CV.LB_TO_KG + STD_CARGO_KG
-      ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kpV = [[0.0, 14.0, 26.0], [0.005, 0.015, 0.1]]
-      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kiV = [[0.0, 14.0, 26.0], [0.13, 0.39, 0.6]]
-      ret.lateralTuning.pid.kfBP, ret.lateralTuning.pid.kfV = [[0.0, 26.0], [0.0001, 0.0000781818594]]
+      ret.lateralTuning.pid.kfV = [0.00007818594]
+      if spairrowtuning:
+        ret.steerRatio = 15.329726219177246
+        tire_stiffness_factor = 0.99565589427948  # not optimized yet
+        ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kpV = [[0.0, 14.0, 26.0], [0.005, 0.015, 0.1]]
+        ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kiV = [[0.0, 14.0, 26.0], [0.13, 0.39, 0.6]]
+        ret.lateralTuning.pid.kfBP, ret.lateralTuning.pid.kfV = [[0.0, 26.0], [0.0001, 0.0000781818594]]
+        
 
     elif candidate in [CAR.LEXUS_ES_TSS2, CAR.LEXUS_ESH_TSS2]:
       stop_and_go = True
