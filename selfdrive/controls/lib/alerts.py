@@ -304,7 +304,7 @@ ALERTS = [
   Alert(
       "posenetInvalid",
       "TAKE CONTROL",
-      "Vision Model Output Uncertain",
+      "Camera blocked or Device too hot!",
       AlertStatus.userPrompt, AlertSize.mid,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 3.),
 
@@ -695,7 +695,7 @@ ALERTS = [
   Alert(
       "posenetInvalidNoEntry",
       "openpilot Unavailable",
-      "Vision Model Output Uncertain",
+      "Camera blocked or Device too hot!",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOW, VisualAlert.none, AudibleAlert.chimeError, .4, 2., 3.),
 
