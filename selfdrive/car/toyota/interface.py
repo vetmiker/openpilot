@@ -235,12 +235,11 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 3060. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kfV = [0.00007818594]
       if spairrowtuning:
-        ret.steerRatio = 15.329726219177246
-        tire_stiffness_factor = 0.99565589427948  # not optimized yet
-        ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kpV = [[0.0, 14.0, 26.0], [0.005, 0.015, 0.1]]
-        ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kiV = [[0.0, 14.0, 26.0], [0.13, 0.39, 0.6]]
-        ret.lateralTuning.pid.kfBP, ret.lateralTuning.pid.kfV = [[0.0, 26.0], [0.0001, 0.0000781818594]]
-        
+        ret.steerRatio = 15.33
+        tire_stiffness_factor = 0.996  # not optimized yet
+        ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kpV = [[0.0, 14.0, 26.0], [0.13, 0.39, 0.64]]
+        ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kiV = [[0.0, 14.0, 26.0], [0.005, 0.01, 0.1]]
+        ret.lateralTuning.pid.kfBP, ret.lateralTuning.pid.kfV = [[0.0, 14,0, 26.0], [0.00009, 0.00015, 0.0000781818594]]
 
     elif candidate in [CAR.LEXUS_ES_TSS2, CAR.LEXUS_ESH_TSS2]:
       stop_and_go = True
