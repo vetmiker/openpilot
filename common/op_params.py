@@ -48,7 +48,7 @@ class opParams:
                                                              "All profiles support dynamic follow so you'll get your preferred distance while\n"
                                                              "retaining the smoothness and safety of dynamic follow!", 'live': True},
                            'force_pedal': {'default': False, 'allowed_types': [bool], 'description': "If openpilot isn't recognizing your comma pedal, set this to True", 'live': False},
-                           'global_df_mod': {'default': None, 'allowed_types': [type(None), float, int], 'description': 'The modifer for the current distance used by dynamic follow. The range is limited from 0.7 to 1.1\n'
+                           'global_df_mod': {'default': None, 'allowed_types': [type(None), float, int], 'description': 'The multiplier for the current distance used by dynamic follow. The range is limited from 0.85 to 1.2\n'
                                                                                                                         'Smaller values will get you closer, larger will get you farther\n'
                                                                                                                         'This is multiplied by any profile that\'s active. Set to None to disable', 'live': True},
                            'hide_auto_df_alerts': {'default': True, 'allowed_types': [bool], 'description': 'Hides the alert that shows what profile the model has chosen'},
@@ -63,11 +63,14 @@ class opParams:
                            'rsa_max_speed': {'default': 24.5, 'allowed_types': [float, int], 'description': 'Speed limit to ignore RSA in m/s', 'live': False},
                            'smart_speed': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use Smart Speed for drives above smart_speed_max_vego', 'live': False},
                            'smart_speed_max_vego': {'default': 26.8, 'allowed_types': [float, int], 'description': 'Speed limit to ignore Smartspeed in m/s', 'live': False},
+                           'spairrowtuning': {'default': False, 'allowed_types': [bool], 'description': 'Better Tuning for Corolla', 'live': False},
                            'speed_offset': {'default': 0, 'allowed_types': [float, int], 'description': 'Speed limit offset in m/s', 'live': True},
                            'traffic_light_alerts': {'default': False, 'allowed_types': [bool], 'description': "Switch off the traffic light alerts", 'live': False},
                            'traffic_lights': {'default': True, 'allowed_types': [bool], 'description': "Should Openpilot stop for traffic lights", 'live': False},
                            'traffic_lights_without_direction': {'default': False, 'allowed_types': [bool], 'description': "Should Openpilot stop for traffic lights without a direction specified", 'live': False},
-                           'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False}
+                           'use_car_caching': {'default': True, 'allowed_types': [bool], 'description': 'Whether to use fingerprint caching', 'live': False},
+                           'min_TR': {'default': None, 'allowed_types': [type(None), float, int], 'description': 'The minimum allowed following distance in seconds. Default is 0.9 seconds.\n'
+                                                                                                                 'The range is limited from 0.85 to 1.3. Set to None to disable', 'live': True},
                            }
 
     self.params = {}
