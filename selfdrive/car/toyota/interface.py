@@ -235,6 +235,7 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 3060. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kfV = [0.00007818594]
       if spairrowtuning:
+        ret.steerActuatorDelay = 0.32
         ret.steerRatio = 15.33
         tire_stiffness_factor = 0.996  # not optimized yet
         ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kpV = [[0.0, 14.0, 26.0], [0.13, 0.39, 0.64]]
