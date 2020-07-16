@@ -103,8 +103,8 @@ ALERTS = [
 
   Alert(
       "longControlDisabled",
-      "BRAKE PRESSED",
-      "Longitudinal Control Disabled",
+      "Steer Assist Active",
+      "Brake Pressed Acceleration Disabled",
       AlertStatus.userPrompt, AlertSize.mid,
       Priority.LOW, VisualAlert.none, AudibleAlert.none, .4, 2., 0.2),
 
