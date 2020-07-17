@@ -279,9 +279,9 @@ class CarState(CarStateBase):
     self.steer_state = cp.vl["EPS_STATUS"]['LKA_STATE']
     self.steer_warning = cp.vl["EPS_STATUS"]['LKA_STATE'] not in [1, 5]
     ret.cruiseState.speed = ret.cruiseState.speed * CV.KPH_TO_MS
-    self.barriers = cp_cam.vl["LKAS_HUD"]['BARRIERS']
-    self.rightline = cp_cam.vl["LKAS_HUD"]['RIGHT_LINE']
-    self.leftline = cp_cam.vl["LKAS_HUD"]['LEFT_LINE']
+    #self.barriers = cp_cam.vl["LKAS_HUD"]['BARRIERS']
+    #self.rightline = cp_cam.vl["LKAS_HUD"]['RIGHT_LINE']
+    #self.leftline = cp_cam.vl["LKAS_HUD"]['LEFT_LINE']
 
     self.tsgn1 = cp_cam.vl["RSA1"]['TSGN1']
     if self.spdval1 != cp_cam.vl["RSA1"]['SPDVAL1']:
