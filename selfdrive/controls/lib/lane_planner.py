@@ -94,10 +94,12 @@ class LanePlanner():
     print(self.lane_width)
     if self.lane_width < 2.0:
       self.r_poly[3] += 2.0 - self.lane_width # TODO: this should be l_poly if isRHD
+      self.p_poly[3] -= (2.0 - self.lane_width)/2
       self.lane_width = 2.0
       
     if self.lane_width > 4.0:
       self.l_poly[3] += self.lane_width - 4.0 # TODO: this should be r_poly if isRHD
+      self.p_poly[3] += (self.lane_width - 4.0)/2
       self.lane_width = 4.0
 
     self.d_poly = calc_d_poly(self.l_poly, self.r_poly, self.p_poly, self.l_prob, self.r_prob, self.lane_width, v_ego)
