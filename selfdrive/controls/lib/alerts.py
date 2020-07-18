@@ -282,15 +282,15 @@ ALERTS = [
       Priority.LOW, VisualAlert.none, AudibleAlert.none, .1, .1, .1),
   Alert(
       "preLaneChangeLeft",
-      "Checking blind spots preparing to change lanes Left",
-      "Monitor Other Vehicles",
+      "Checking Blind Spots",
+      "Monitor other vehicles left lane change initiated",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, .0, .1, .1, alert_rate=0.75),
 
   Alert(
       "preLaneChangeRight",
-      "Checking blind spots preparing to change lanes Right",
-      "Monitor Other Vehicles",
+      "Checking Blind Spots",
+      "Monitor other vehicles right lane change initiated",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, .0, .1, .1, alert_rate=0.75),
 
