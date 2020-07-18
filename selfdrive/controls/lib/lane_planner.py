@@ -93,12 +93,12 @@ class LanePlanner():
                       (1 - self.lane_width_certainty) * speed_lane_width
     #print(current_lane_width)
     if current_lane_width < 2.0:
-      self.r_poly[3] -= 2.0 - self.lane_width # TODO: this should be l_poly if isRHD
-      self.p_poly[3] += (2.0 - self.lane_width)/2
+      self.r_poly[3] += 2.0 - self.lane_width # TODO: this should be l_poly if isRHD
+      self.p_poly[3] -= (2.0 - self.lane_width)/2
       self.lane_width = 2.0
     elif current_lane_width > 4.0:
-      self.l_poly[3] -= self.lane_width - 4.0 # TODO: this should be r_poly if isRHD
-      self.p_poly[3] -= (self.lane_width - 4.0)/2
+      self.l_poly[3] += self.lane_width - 4.0 # TODO: this should be r_poly if isRHD
+      self.p_poly[3] += (self.lane_width - 4.0)/2
       self.lane_width = 4.0
 
     self.d_poly = calc_d_poly(self.l_poly, self.r_poly, self.p_poly, self.l_prob, self.r_prob, self.lane_width, v_ego)
