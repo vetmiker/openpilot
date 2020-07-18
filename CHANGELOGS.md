@@ -1,6 +1,13 @@
+2020-07-18 (0.7.7.0)
+========================
+* 優化 camera offset 讀取。
+* optomised loading camera offset value.
+* 更換模型延遲警示為一般警示。
+* Replaced model lagging loud alert to normal alert.
+
 2020-07-17 (0.7.7.0)
 ========================
-* 更新至最新 openpilot 0.7.7 devel.
+* 更新至最新 openpilot 0.7.7 devel。
 * Updated to latest openpilot 0.7.7 devel.
 
 2020-07-17 (0.7.7.0)

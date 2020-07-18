@@ -654,7 +654,12 @@ EVENTS = {
   },
 
   EventName.modeldLagging: {
-    ET.SOFT_DISABLE: SoftDisableAlert(_("Driving model lagging")),
+    ET.WARNING: Alert(
+    _("TAKE CONTROL"),
+    _("Driving model lagging"),
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.LOW, VisualAlert.none, AudibleAlert.none, .2, .2, .2),
+#     ET.SOFT_DISABLE: SoftDisableAlert(_("Driving model lagging")),
     ET.NO_ENTRY : NoEntryAlert(_("Driving model lagging")),
   },
 
