@@ -28,15 +28,6 @@ def get_startup_event(car_recognized, controller_available):
     event = EventName.startup
   else:
     event = EventName.startupMaster
-
-<<<<<<< HEAD
-def get_startup_alert(car_recognized, controller_available):
-  alert = 'startup'
-  if Params().get("GitRemote", encoding="utf8") in ['git@github.com:arne182/openpilot.git', 'https://github.com/arne182/openpilot.git']:
-    if Params().get("GitBranch", encoding="utf8") not in ['release2', 'release3', 'release4', 'release5', 'release6']:
-      alert = 'startupMaster'
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   if not car_recognized:
     event = EventName.startupNoCar
   elif car_recognized and not controller_available:
@@ -93,7 +84,6 @@ def only_toyota_left(candidate_cars):
 
 # **** for use live only ****
 def fingerprint(logcan, sendcan, has_relay):
-<<<<<<< HEAD
   params = Params()
   car_params = params.get("CarParams")
 
@@ -101,16 +91,13 @@ def fingerprint(logcan, sendcan, has_relay):
     cached_fingerprint = params.get('CachedFingerprint')
   else:
     cached_fingerprint = None
-   
+
   if car_params is not None:
     car_params = car.CarParams.from_bytes(car_params)
-  if has_relay:
-=======
   fixed_fingerprint = os.environ.get('FINGERPRINT', "")
   skip_fw_query = os.environ.get('SKIP_FW_QUERY', False)
 
   if has_relay and not fixed_fingerprint and not skip_fw_query:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     # Vin query only reliably works thorugh OBDII
     bus = 1
 
@@ -144,7 +131,7 @@ def fingerprint(logcan, sendcan, has_relay):
   car_fingerprint = None
   done = False
 
- 
+
   if cached_fingerprint is not None and use_car_caching:  # if we previously identified a car and fingerprint and user hasn't disabled caching
     cached_fingerprint = json.loads(cached_fingerprint)
     if cached_fingerprint[0] is None or len(cached_fingerprint) < 3:
@@ -153,8 +140,8 @@ def fingerprint(logcan, sendcan, has_relay):
       finger[0] = {int(key): value for key, value in cached_fingerprint[2].items()}
       source = car.CarParams.FingerprintSource.can
       return (str(cached_fingerprint[0]), finger, vin, car_fw, cached_fingerprint[1])
-  
-  
+
+
 
   while not done:
     a = messaging.get_one_can(logcan)
@@ -186,6 +173,8 @@ def fingerprint(logcan, sendcan, has_relay):
         if frame > 180:
           if any(("TOYOTA COROLLA TSS2 2019" in c) for c in candidate_cars[b]):
             car_fingerprint = "TOYOTA COROLLA TSS2 2019"
+          if any(("TOYOTA COROLLA HYBRID TSS2 2019" in c) for c in candidate_cars[b]):
+            car_fingerprint = "TOYOTA COROLLA HYBRID TSS2 2019"
 
     # bail if no cars left or we've been waiting for more than 2s
     failed = all(len(cc) == 0 for cc in candidate_cars.values()) or frame > 200
@@ -214,8 +203,8 @@ def is_connected_to_internet(timeout=5):
         requests.get("https://sentry.io", timeout=timeout)
         return True
     except:
-        return False 
-      
+        return False
+
 def crash_log(candidate):
   while True:
     if is_connected_to_internet():
