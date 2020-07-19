@@ -69,10 +69,10 @@ def create_acc_commands(packer, enabled, accel, gas, idx, stopping, starting, ca
     "SET_TO_30": 0x30,
   }
   commands.append(packer.make_can_msg("ACC_CONTROL_ON", bus, acc_control_on_values, idx))
-  
+
   #blank_values = {}
   #commands.append(packer.make_can_msg("BLANK_1FA", bus, blank_values, idx))
-  
+
   return commands
 
 def create_steering_control(packer, apply_steer, lkas_active, car_fingerprint, idx, has_relay, openpilot_longitudinal_control):
@@ -94,12 +94,7 @@ def create_bosch_supplemental_1(packer, car_fingerprint, idx, has_relay):
   bus = get_lkas_cmd_bus(car_fingerprint, has_relay)
   return packer.make_can_msg("BOSCH_SUPPLEMENTAL_1", bus, values, idx)
 
-
-<<<<<<< HEAD
-def create_ui_commands(packer, pcm_speed, hud, car_fingerprint, is_metric, idx, has_relay, openpilot_longitudinal_control, stock_hud):
-=======
 def create_ui_commands(packer, pcm_speed, hud, car_fingerprint, is_metric, idx, has_relay, stock_hud):
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   commands = []
   bus_pt = get_pt_bus(car_fingerprint, has_relay)
   bus_lkas = get_lkas_cmd_bus(car_fingerprint, has_relay, openpilot_longitudinal_control)
@@ -159,4 +154,3 @@ def spam_buttons_command(packer, button_val, idx, car_fingerprint, has_relay):
   }
   bus = get_pt_bus(car_fingerprint, has_relay)
   return packer.make_can_msg("SCM_BUTTONS", bus, values, idx)
-  

@@ -180,11 +180,7 @@ class CarController():
       idx = (frame//10) % 4
       can_sends.extend(hondacan.create_ui_commands(self.packer, pcm_speed, hud, CS.CP.carFingerprint, CS.is_metric, idx, CS.CP.isPandaBlack, CS.CP.openpilotLongitudinalControl, CS.stock_hud))
 
-<<<<<<< HEAD
-    if not CS.CP.openpilotLongitudinalControl:
-=======
     if CS.CP.radarOffCan:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       if (frame % 2) == 0:
         idx = frame // 2
         can_sends.append(hondacan.create_bosch_supplemental_1(self.packer, CS.CP.carFingerprint, idx, CS.CP.isPandaBlack))
