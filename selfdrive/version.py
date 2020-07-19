@@ -57,6 +57,8 @@ training_version = b"0.2.0"
 terms_version = b"2"
 
 dirty = True
+comma_remote = False
+tested_branch = False
 origin = get_git_remote()
 branch = get_git_full_branchname()
 
@@ -68,10 +70,15 @@ try:
     pass
 
   if (origin is not None) and (branch is not None):
+<<<<<<< HEAD
     if cloak:
       comma_remote = origin.startswith('git@github.com:commaai') or origin.startswith('https://github.com/commaai')
     else:
       comma_remote = origin.startswith('git@github.com:arne182') or origin.startswith('https://github.com/arne182')
+=======
+    comma_remote = origin.startswith('git@github.com:commaai') or origin.startswith('https://github.com/commaai')
+    tested_branch = branch in ['devel', 'release2-staging', 'dashcam-staging', 'release2', 'dashcam']
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     dirty = not comma_remote
     if not cloak:
@@ -81,7 +88,8 @@ try:
       dirty_files = subprocess.check_output(["git", "diff-index", branch, "--"], encoding='utf8')
       commit = subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"], encoding='utf8').rstrip()
       origin_commit = subprocess.check_output(["git", "rev-parse", "--verify", branch], encoding='utf8').rstrip()
-      cloudlog.event("dirty comma branch", version=version, dirty=dirty, origin=origin, branch=branch, dirty_files=dirty_files, commit=commit, origin_commit=origin_commit)
+      cloudlog.event("dirty comma branch", version=version, dirty=dirty, origin=origin, branch=branch,
+                     dirty_files=dirty_files, commit=commit, origin_commit=origin_commit)
 
 except subprocess.CalledProcessError:
   dirty = True

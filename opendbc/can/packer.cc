@@ -102,6 +102,12 @@ uint64_t CANPacker::pack(uint32_t address, const std::vector<SignalPackValue> &s
     } else if (sig.type == SignalType::SUBARU_CHECKSUM) {
       unsigned int chksm = subaru_checksum(address, ret, message_lookup[address].size);
       ret = set_value(ret, sig, chksm);
+<<<<<<< HEAD
+=======
+    } else if (sig.type == SignalType::CHRYSLER_CHECKSUM) {
+      unsigned int chksm = chrysler_checksum(address, ReverseBytes(ret), message_lookup[address].size);
+      ret = set_value(ret, sig, chksm);
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     } else {
       //WARN("CHECKSUM signal type not valid\n");
     }

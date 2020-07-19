@@ -2,7 +2,6 @@
 from cereal import car, arne182
 from selfdrive.swaglog import cloudlog
 from selfdrive.config import Conversions as CV
-from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event
 from selfdrive.car.ford.values import MAX_ANGLE, Ecu, ECU_FINGERPRINT, FINGERPRINTS
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, is_ecu_disconnected, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
@@ -15,7 +14,7 @@ class CarInterface(CarInterfaceBase):
     return float(accel) / 3.0
 
   @staticmethod
-  def get_params(candidate, fingerprint=gen_empty_fingerprint(), has_relay=False, car_fw=[]):
+  def get_params(candidate, fingerprint=gen_empty_fingerprint(), has_relay=False, car_fw=[]):  # pylint: disable=dangerous-default-value
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint, has_relay)
     ret.carName = "ford"
     ret.safetyModel = car.CarParams.SafetyModel.ford
@@ -62,6 +61,7 @@ class CarInterface(CarInterfaceBase):
     ret.canValid = self.cp.can_valid
 
     # events
+<<<<<<< HEAD
     events, eventsArne182 = self.create_common_events(ret)
 
     if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
@@ -76,6 +76,17 @@ class CarInterface(CarInterfaceBase):
     self.CS.out = ret.as_reader()
 
     return self.CS.out, ret_arne182.as_reader()
+=======
+    events = self.create_common_events(ret)
+
+    if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13. * CV.MPH_TO_MS and ret.cruiseState.enabled:
+      events.add(car.CarEvent.EventName.steerTempUnavailableMute)
+
+    ret.events = events.to_msg()
+
+    self.CS.out = ret.as_reader()
+    return self.CS.out
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   # pass in a car.CarControl
   # to be called @ 100hz

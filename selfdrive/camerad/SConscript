@@ -1,10 +1,21 @@
+<<<<<<< HEAD
 Import('env', 'arch', 'messaging', 'common', 'gpucommon', 'visionipc', 'cereal', 'webcam')
+=======
+Import('env', 'arch', 'cereal', 'messaging', 'common', 'gpucommon', 'visionipc', 'webcam', 'QCOM_REPLAY')
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
-libs = ['m', 'pthread', common, 'jpeg', 'json', cereal, 'OpenCL', messaging, 'czmq', 'zmq', 'capnp', 'kj', 'capnp_c', visionipc, gpucommon]
+libs = ['m', 'pthread', common, 'jpeg', 'OpenCL', cereal, messaging, 'czmq', 'zmq', 'capnp', 'kj', visionipc, gpucommon]
 
 if arch == "aarch64":
   libs += ['gsl', 'CB', 'adreno_utils', 'EGL', 'GLESv3', 'cutils', 'ui']
+<<<<<<< HEAD
   cameras = ['cameras/camera_qcom.c']
+=======
+  if QCOM_REPLAY:
+    cameras = ['cameras/camera_frame_stream.cc']
+  else:
+    cameras = ['cameras/camera_qcom.cc']
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 elif arch == "larch64":
   libs += []
   cameras = ['cameras/camera_qcom2.c']
@@ -19,6 +30,13 @@ else:
   else:
     libs += []
     cameras = ['cameras/camera_frame_stream.cc']
+<<<<<<< HEAD
+=======
+  if arch == "Darwin":
+    del libs[libs.index('OpenCL')]
+    env = env.Clone()
+    env['FRAMEWORKS'] = ['OpenCL']
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 env.SharedLibrary('snapshot/visionipc',
   ["#selfdrive/common/visionipc.c", "#selfdrive/common/ipc.c"])
@@ -26,5 +44,6 @@ env.SharedLibrary('snapshot/visionipc',
 env.Program('camerad', [
     'main.cc',
     'transforms/rgb_to_yuv.c',
+    'imgproc/utils.cc',
     cameras,
   ], LIBS=libs)

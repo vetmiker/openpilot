@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 from cereal import car, arne182
+=======
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 from common.numpy_fast import clip, interp
 from selfdrive.config import Conversions as CV
+from cereal import car
 
 # kph
 V_CRUISE_MAX = 169
@@ -23,6 +27,7 @@ class MPC_COST_LONG:
   JERK = 20.0
 
 
+<<<<<<< HEAD
 class EventTypes:
   ENABLE = 'enable'
   PRE_ENABLE = 'preEnable'
@@ -57,6 +62,8 @@ def get_events(events, types):
   return out
 
 
+=======
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 def rate_limit(new_value, last_value, dw_step, up_step):
   return clip(new_value, last_value + dw_step, last_value + up_step)
 
@@ -70,9 +77,9 @@ def update_v_cruise(v_cruise_kph, buttonEvents, enabled):
   # would have the effect of both enabling and changing speed is checked after the state transition
   for b in buttonEvents:
     if enabled and not b.pressed:
-      if b.type == "accelCruise":
+      if b.type == car.CarState.ButtonEvent.Type.accelCruise:
         v_cruise_kph += V_CRUISE_DELTA - (v_cruise_kph % V_CRUISE_DELTA)
-      elif b.type == "decelCruise":
+      elif b.type == car.CarState.ButtonEvent.Type.decelCruise:
         v_cruise_kph -= V_CRUISE_DELTA - ((V_CRUISE_DELTA - v_cruise_kph) % V_CRUISE_DELTA)
       v_cruise_kph = clip(v_cruise_kph, V_CRUISE_MIN, V_CRUISE_MAX)
 
@@ -82,7 +89,7 @@ def update_v_cruise(v_cruise_kph, buttonEvents, enabled):
 def initialize_v_cruise(v_ego, buttonEvents, v_cruise_last):
   for b in buttonEvents:
     # 250kph or above probably means we never had a set speed
-    if b.type == "accelCruise" and v_cruise_last < 250:
+    if b.type == car.CarState.ButtonEvent.Type.accelCruise and v_cruise_last < 250:
       return v_cruise_last
 
   return int(round(clip(v_ego * CV.MS_TO_KPH, V_CRUISE_ENABLE_MIN, V_CRUISE_MAX)))

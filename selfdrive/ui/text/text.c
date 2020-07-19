@@ -14,7 +14,10 @@
 #include "nanovg_gl.h"
 #include "nanovg_gl_utils.h"
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 #include "common/framebuffer.h"
 #include "common/touch.h"
 
@@ -25,6 +28,7 @@
 extern const unsigned char _binary_opensans_regular_ttf_start[];
 extern const unsigned char _binary_opensans_regular_ttf_end[];
 
+<<<<<<< HEAD
 static void set_brightness(int brightness) {
   FILE *f = fopen("/sys/class/leds/lcd-backlight/brightness", "wb");
   if (f != NULL) {
@@ -33,6 +37,8 @@ static void set_brightness(int brightness) {
   }
 }
 
+=======
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 int main(int argc, char** argv) {
   int err;
 
@@ -81,7 +87,11 @@ assert(font >= 0);
 
     float lineh;
     nvgTextMetrics(vg, NULL, NULL, &lineh);
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     // nvgTextBox strips leading whitespace. We have to reimplement
     char * next = strtok(text, "\n");
     while (next != NULL){

@@ -39,6 +39,10 @@ enum SignalType {
   VOLKSWAGEN_CHECKSUM,
   VOLKSWAGEN_COUNTER,
   SUBARU_CHECKSUM,
+<<<<<<< HEAD
+=======
+  CHRYSLER_CHECKSUM,
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 };
 
 struct Signal {

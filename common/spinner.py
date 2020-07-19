@@ -36,12 +36,12 @@ class Spinner():
   def __del__(self):
     self.close()
 
-  def __exit__(self, type, value, traceback):
+  def __exit__(self, exc_type, exc_value, traceback):
     self.close()
 
 
-class FakeSpinner():
-  def __init__(self):
+class FakeSpinner(Spinner):
+  def __init__(self):  # pylint: disable=super-init-not-called
     pass
 
   def __enter__(self):
@@ -53,7 +53,11 @@ class FakeSpinner():
   def close(self):
     pass
 
+<<<<<<< HEAD
   def __exit__(self, type, value, traceback):
+=======
+  def __exit__(self, exc_type, exc_value, traceback):
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     pass
 
 

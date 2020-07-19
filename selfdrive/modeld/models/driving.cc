@@ -1,10 +1,15 @@
+
 #include <string.h>
 #include <assert.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <eigen3/Eigen/Dense>
+
 #include "common/timing.h"
 #include "common/params.h"
 #include "driving.h"
+
+
 
 
 #define PATH_IDX 0
@@ -55,11 +60,17 @@ void model_init(ModelState* s, cl_device_id device_id, cl_context context, int t
   for (int i = 0; i < TRAFFIC_CONVENTION_LEN; i++) s->traffic_convention[i] = 0.0;
   s->m->addTrafficConvention(s->traffic_convention, TRAFFIC_CONVENTION_LEN);
 
+<<<<<<< HEAD
   char *string;
   const int result = read_db_value(NULL, "IsRHD", &string, NULL);
   if (result == 0) {
     bool is_rhd = string[0] == '1';
     free(string);
+=======
+  std::vector<char> result = read_db_bytes("IsRHD");
+  if (result.size() > 0) {
+    bool is_rhd = result[0] == '1';
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     if (is_rhd) {
       s->traffic_convention[1] = 1.0;
     } else {
@@ -112,6 +123,8 @@ ModelDataRaw model_eval_frame(ModelState* s, cl_command_queue q,
     assert(1==2);
   #endif
 
+  clEnqueueUnmapMemObject(q, s->frame.net_input, (void*)new_frame_buf, 0, NULL, NULL);
+
   // net outputs
   ModelDataRaw net_outputs;
   net_outputs.path = &s->output[PATH_IDX];
@@ -151,8 +164,7 @@ void poly_fit(float *in_pts, float *in_stds, float *out, int valid_len) {
   lhs = lhs * scale.asDiagonal();
 
   // Solve inplace
-  Eigen::ColPivHouseholderQR<Eigen::Ref<Eigen::MatrixXf> > qr(lhs);
-  p = qr.solve(rhs);
+  p = lhs.colPivHouseholderQr().solve(rhs);
 
   // Apply scale to output
   p = p.transpose() * scale.asDiagonal();
@@ -169,7 +181,11 @@ void fill_path(cereal::ModelData::PathData::Builder path, const float * data, bo
   float valid_len;
 
   // clamp to 5 and 192
+<<<<<<< HEAD
   valid_len =  fmin(192, fmax(5, data[MODEL_PATH_DISTANCE*2]));
+=======
+  valid_len = fmin(192, fmax(5, data[MODEL_PATH_DISTANCE*2]));
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   for (int i=0; i<MODEL_PATH_DISTANCE; i++) {
     points_arr[i] = data[i] + offset;
     stds_arr[i] = softplus(data[MODEL_PATH_DISTANCE + i]) + 1e-6;
@@ -194,6 +210,7 @@ void fill_path(cereal::ModelData::PathData::Builder path, const float * data, bo
   path.setPoly(poly);
   path.setProb(prob);
   path.setStd(std);
+  path.setValidLen(valid_len);
 }
 
 void fill_lead(cereal::ModelData::LeadData::Builder lead, const float * data, int mdn_max_idx, int t_offset) {
@@ -240,6 +257,7 @@ void fill_longi(cereal::ModelData::LongitudinalData::Builder longi, const float 
   longi.setAccelerations(accel);
 }
 
+<<<<<<< HEAD
 void model_publish(PubSocket *sock, uint32_t frame_id,
                    const ModelDataRaw net_outputs, uint64_t timestamp_eof) {
     // make msg
@@ -268,33 +286,64 @@ void model_publish(PubSocket *sock, uint32_t frame_id,
       if (net_outputs.lead[i*MDN_GROUP_SIZE + 8 + t_offset] > net_outputs.lead[mdn_max_idx*MDN_GROUP_SIZE + 8 + t_offset]) {
         mdn_max_idx = i;
       }
+=======
+void model_publish(PubMaster &pm, uint32_t vipc_frame_id, uint32_t frame_id,
+                   uint32_t vipc_dropped_frames, float frame_drop, const ModelDataRaw &net_outputs, uint64_t timestamp_eof) {
+  // make msg
+  capnp::MallocMessageBuilder msg;
+  cereal::Event::Builder event = msg.initRoot<cereal::Event>();
+  event.setLogMonoTime(nanos_since_boot());
+
+  uint32_t frame_age = (frame_id > vipc_frame_id) ? (frame_id - vipc_frame_id) : 0;
+
+  auto framed = event.initModel();
+  framed.setFrameId(vipc_frame_id);
+  framed.setFrameAge(frame_age);
+  framed.setFrameDropPerc(frame_drop * 100);
+  framed.setTimestampEof(timestamp_eof);
+
+  auto lpath = framed.initPath();
+  fill_path(lpath, net_outputs.path, false, 0);
+  auto left_lane = framed.initLeftLane();
+  fill_path(left_lane, net_outputs.left_lane, true, 1.8);
+  auto right_lane = framed.initRightLane();
+  fill_path(right_lane, net_outputs.right_lane, true, -1.8);
+  auto longi = framed.initLongitudinal();
+  fill_longi(longi, net_outputs.long_x, net_outputs.long_v, net_outputs.long_a);
+
+
+  // Find the distribution that corresponds to the current lead
+  int mdn_max_idx = 0;
+  int t_offset = 0;
+  for (int i=1; i<LEAD_MDN_N; i++) {
+    if (net_outputs.lead[i*MDN_GROUP_SIZE + 8 + t_offset] > net_outputs.lead[mdn_max_idx*MDN_GROUP_SIZE + 8 + t_offset]) {
+      mdn_max_idx = i;
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     }
-    auto lead = framed.initLead();
-    fill_lead(lead, net_outputs.lead, mdn_max_idx, t_offset);
-    // Find the distribution that corresponds to the lead in 2s
-    mdn_max_idx = 0;
-    t_offset = 1;
-    for (int i=1; i<LEAD_MDN_N; i++) {
-      if (net_outputs.lead[i*MDN_GROUP_SIZE + 8 + t_offset] > net_outputs.lead[mdn_max_idx*MDN_GROUP_SIZE + 8 + t_offset]) {
-        mdn_max_idx = i;
-      }
-    }
-    auto lead_future = framed.initLeadFuture();
-    fill_lead(lead_future, net_outputs.lead, mdn_max_idx, t_offset);
-
-
-    auto meta = framed.initMeta();
-    fill_meta(meta, net_outputs.meta);
-
-
-    // send message
-    auto words = capnp::messageToFlatArray(msg);
-    auto bytes = words.asBytes();
-    sock->send((char*)bytes.begin(), bytes.size());
   }
+  auto lead = framed.initLead();
+  fill_lead(lead, net_outputs.lead, mdn_max_idx, t_offset);
+  // Find the distribution that corresponds to the lead in 2s
+  mdn_max_idx = 0;
+  t_offset = 1;
+  for (int i=1; i<LEAD_MDN_N; i++) {
+    if (net_outputs.lead[i*MDN_GROUP_SIZE + 8 + t_offset] > net_outputs.lead[mdn_max_idx*MDN_GROUP_SIZE + 8 + t_offset]) {
+      mdn_max_idx = i;
+    }
+  }
+  auto lead_future = framed.initLeadFuture();
+  fill_lead(lead_future, net_outputs.lead, mdn_max_idx, t_offset);
 
-void posenet_publish(PubSocket *sock, uint32_t frame_id,
-                   const ModelDataRaw net_outputs, uint64_t timestamp_eof) {
+
+  auto meta = framed.initMeta();
+  fill_meta(meta, net_outputs.meta);
+  event.setValid(frame_drop < MAX_FRAME_DROP);
+
+  pm.send("model", msg);
+}
+
+void posenet_publish(PubMaster &pm, uint32_t vipc_frame_id, uint32_t frame_id,
+                     uint32_t vipc_dropped_frames, float frame_drop, const ModelDataRaw &net_outputs, uint64_t timestamp_eof) {
   capnp::MallocMessageBuilder msg;
   cereal::Event::Builder event = msg.initRoot<cereal::Event>();
   event.setLogMonoTime(nanos_since_boot());
@@ -322,10 +371,14 @@ void posenet_publish(PubSocket *sock, uint32_t frame_id,
   kj::ArrayPtr<const float> rot_std_vs(&rot_std_arr[0], 3);
   posenetd.setRotStd(rot_std_vs);
 
-  posenetd.setTimestampEof(timestamp_eof);
-  posenetd.setFrameId(frame_id);
+<<<<<<< HEAD
+=======
 
-  auto words = capnp::messageToFlatArray(msg);
-  auto bytes = words.asBytes();
-  sock->send((char*)bytes.begin(), bytes.size());
-  }
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+  posenetd.setTimestampEof(timestamp_eof);
+  posenetd.setFrameId(vipc_frame_id);
+
+  event.setValid(vipc_dropped_frames < 1);
+
+  pm.send("cameraOdometry", msg);
+}

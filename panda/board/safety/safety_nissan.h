@@ -11,6 +11,7 @@ const struct lookup_t NISSAN_LOOKUP_ANGLE_RATE_DOWN = {
 
 const int NISSAN_DEG_TO_CAN = 100;
 
+<<<<<<< HEAD
 const CanMsg NISSAN_TX_MSGS[] = {{0x169, 0, 8}, {0x2b1, 0, 8}, {0x4cc, 0, 8}, {0x20b, 2, 8}, {0x280, 2, 8}};
 
 AddrCheckStruct nissan_rx_checks[] = {
@@ -29,6 +30,21 @@ int nissan_desired_angle_last = 0;
 
 struct sample_t nissan_angle_meas;            // last 3 steer angles
 
+=======
+const CanMsg NISSAN_TX_MSGS[] = {{0x169, 0, 8}, {0x2b1, 0, 8}, {0x4cc, 0, 8}, {0x20b, 2, 6}, {0x280, 2, 8}};
+
+AddrCheckStruct nissan_rx_checks[] = {
+  {.msg = {{0x2, 0, 5, .expected_timestep = 10000U}}},  // STEER_ANGLE_SENSOR (100Hz)
+  {.msg = {{0x285, 0, 8, .expected_timestep = 20000U}}}, // WHEEL_SPEEDS_REAR (50Hz)
+  {.msg = {{0x30f, 2, 3, .expected_timestep = 100000U}}}, // CRUISE_STATE (10Hz)
+  {.msg = {{0x15c, 0, 8, .expected_timestep = 20000U},
+           {0x239, 0, 8, .expected_timestep = 20000U}}}, // GAS_PEDAL (100Hz / 50Hz)
+  {.msg = {{0x454, 0, 8, .expected_timestep = 100000U},
+           {0x1cc, 0, 4, .expected_timestep = 10000U}}}, // DOORS_LIGHTS (10Hz) / BRAKE (100Hz)
+};
+const int NISSAN_RX_CHECK_LEN = sizeof(nissan_rx_checks) / sizeof(nissan_rx_checks[0]);
+
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 static int nissan_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 
@@ -50,12 +66,13 @@ static int nissan_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
         angle_meas_new = to_signed(angle_meas_new, 16) * 10;
 
         // update array of samples
-        update_sample(&nissan_angle_meas, angle_meas_new);
+        update_sample(&angle_meas, angle_meas_new);
       }
 
       if (addr == 0x285) {
         // Get current speed
         // Factor 0.005
+<<<<<<< HEAD
         nissan_speed = ((GET_BYTE(to_push, 2) << 8) | (GET_BYTE(to_push, 3))) * 0.005 / 3.6;
         vehicle_moving = nissan_speed > 0.;
       }
@@ -64,18 +81,30 @@ static int nissan_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       // X-Trail 0x15c, Leaf 0x239
       if ((addr == 0x15c) || (addr == 0x239)) {
         bool gas_pressed = true;
+=======
+        vehicle_speed = ((GET_BYTE(to_push, 2) << 8) | (GET_BYTE(to_push, 3))) * 0.005 / 3.6;
+        vehicle_moving = vehicle_speed > 0.;
+      }
+
+      // X-Trail 0x15c, Leaf 0x239
+      if ((addr == 0x15c) || (addr == 0x239)) {
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
         if (addr == 0x15c){
           gas_pressed = ((GET_BYTE(to_push, 5) << 2) | ((GET_BYTE(to_push, 6) >> 6) & 0x3)) > 1;
         } else {
           gas_pressed = GET_BYTE(to_push, 0) > 3;
+<<<<<<< HEAD
         }
 
         if (!unsafe_allow_gas && gas_pressed && !gas_pressed_prev) {
           controls_allowed = 0;
+=======
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
         }
-        gas_pressed_prev = gas_pressed;
       }
+    }
 
+<<<<<<< HEAD
       // 0x169 is lkas cmd. If it is on bus 0, then relay is unexpectedly closed
       if ((safety_mode_cnt > RELAY_TRNS_TIMEOUT) && (addr == 0x169)) {
         relay_malfunction_set();
@@ -109,8 +138,31 @@ static int nissan_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       if (!cruise_engaged) {
         controls_allowed = 0;
       }
+=======
+    // X-trail 0x454, Leaf  0x1cc
+    if ((addr == 0x454) || (addr == 0x1cc)) {
+      if (addr == 0x454){
+        brake_pressed = (GET_BYTE(to_push, 2) & 0x80) != 0;
+      } else {
+        brake_pressed = GET_BYTE(to_push, 0) > 3;
+      }
+    }
+
+    // Handle cruise enabled
+    if ((bus == 2) && (addr == 0x30f)) {
+      bool cruise_engaged = (GET_BYTE(to_push, 0) >> 3) & 1;
+
+      if (cruise_engaged && !cruise_engaged_prev) {
+        controls_allowed = 1;
+      }
+      if (!cruise_engaged) {
+        controls_allowed = 0;
+      }
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       cruise_engaged_prev = cruise_engaged;
     }
+
+    generic_rx_checks((addr == 0x169));
   }
   return valid;
 }
@@ -140,24 +192,27 @@ static int nissan_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
     if (controls_allowed && lka_active) {
       // add 1 to not false trigger the violation
       float delta_angle_float;
-      delta_angle_float = (interpolate(NISSAN_LOOKUP_ANGLE_RATE_UP, nissan_speed) * NISSAN_DEG_TO_CAN) + 1.;
+      delta_angle_float = (interpolate(NISSAN_LOOKUP_ANGLE_RATE_UP, vehicle_speed) * NISSAN_DEG_TO_CAN) + 1.;
       int delta_angle_up = (int)(delta_angle_float);
-      delta_angle_float =  (interpolate(NISSAN_LOOKUP_ANGLE_RATE_DOWN, nissan_speed) * NISSAN_DEG_TO_CAN) + 1.;
+      delta_angle_float =  (interpolate(NISSAN_LOOKUP_ANGLE_RATE_DOWN, vehicle_speed) * NISSAN_DEG_TO_CAN) + 1.;
       int delta_angle_down = (int)(delta_angle_float);
+<<<<<<< HEAD
       int highest_desired_angle = nissan_desired_angle_last + ((nissan_desired_angle_last > 0) ? delta_angle_up : delta_angle_down);
       int lowest_desired_angle = nissan_desired_angle_last - ((nissan_desired_angle_last >= 0) ? delta_angle_down : delta_angle_up);
+=======
+      int highest_desired_angle = desired_angle_last + ((desired_angle_last > 0) ? delta_angle_up : delta_angle_down);
+      int lowest_desired_angle = desired_angle_last - ((desired_angle_last >= 0) ? delta_angle_down : delta_angle_up);
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
       // check for violation;
       violation |= max_limit_check(desired_angle, highest_desired_angle, lowest_desired_angle);
-
-      //nissan_controls_allowed_last = controls_allowed;
     }
-    nissan_desired_angle_last = desired_angle;
+    desired_angle_last = desired_angle;
 
     // desired steer angle should be the same as steer angle measured when controls are off
     if ((!controls_allowed) &&
-          ((desired_angle < (nissan_angle_meas.min - 1)) ||
-          (desired_angle > (nissan_angle_meas.max + 1)))) {
+          ((desired_angle < (angle_meas.min - 1)) ||
+          (desired_angle > (angle_meas.max + 1)))) {
       violation = 1;
     }
 

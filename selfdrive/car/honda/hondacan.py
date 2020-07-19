@@ -95,7 +95,11 @@ def create_bosch_supplemental_1(packer, car_fingerprint, idx, has_relay):
   return packer.make_can_msg("BOSCH_SUPPLEMENTAL_1", bus, values, idx)
 
 
+<<<<<<< HEAD
 def create_ui_commands(packer, pcm_speed, hud, car_fingerprint, is_metric, idx, has_relay, openpilot_longitudinal_control, stock_hud):
+=======
+def create_ui_commands(packer, pcm_speed, hud, car_fingerprint, is_metric, idx, has_relay, stock_hud):
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   commands = []
   bus_pt = get_pt_bus(car_fingerprint, has_relay)
   bus_lkas = get_lkas_cmd_bus(car_fingerprint, has_relay, openpilot_longitudinal_control)

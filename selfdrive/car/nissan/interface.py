@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+<<<<<<< HEAD
 from cereal import car, arne182
 from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import create_event, EventTypes as ET
+=======
+from cereal import car
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 from selfdrive.car.nissan.values import CAR
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
@@ -16,7 +20,11 @@ class CarInterface(CarInterfaceBase):
     return float(accel) / 4.0
 
   @staticmethod
+<<<<<<< HEAD
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), has_relay=False, car_fw=[]):
+=======
+  def get_params(candidate, fingerprint=gen_empty_fingerprint(), has_relay=False, car_fw=[]):  # pylint: disable=dangerous-default-value
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint, has_relay)
     ret.carName = "nissan"
@@ -30,12 +38,22 @@ class CarInterface(CarInterfaceBase):
     ret.steerRateCost = 0.5
 
     ret.steerActuatorDelay = 0.1
+<<<<<<< HEAD
     ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kfBP = [[0.0], [0.0], [0.0]]
     ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV, ret.lateralTuning.pid.kfV = [[0.01], [0.005], [0.00006]]
     ret.steerMaxBP = [0.] # m/s
     ret.steerMaxV = [1.]
 
     if candidate == CAR.XTRAIL:
+=======
+    ret.lateralTuning.pid.kf = 0.00006
+    ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.0], [0.0]]
+    ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.01], [0.005]]
+    ret.steerMaxBP = [0.]  # m/s
+    ret.steerMaxV = [1.]
+
+    if candidate in [CAR.ROGUE, CAR.XTRAIL]:
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       ret.mass = 1610 + STD_CARGO_KG
       ret.wheelbase = 2.705
       ret.centerToFront = ret.wheelbase * 0.44
@@ -64,17 +82,25 @@ class CarInterface(CarInterfaceBase):
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
     self.cp_adas.update_strings(can_strings)
+<<<<<<< HEAD
     ret_arne182 = arne182.CarStateArne182.new_message()
     ret = self.CS.update(self.cp, self.cp_adas, self.cp_cam)
 
     ret.canValid = self.cp.can_valid and self.cp_adas.can_valid and self.cp_cam.can_valid
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
+=======
+
+    ret = self.CS.update(self.cp, self.cp_adas, self.cp_cam)
+
+    ret.canValid = self.cp.can_valid and self.cp_adas.can_valid and self.cp_cam.can_valid
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     buttonEvents = []
     be = car.CarState.ButtonEvent.new_message()
     be.type = car.CarState.ButtonEvent.Type.accelCruise
     buttonEvents.append(be)
 
+<<<<<<< HEAD
     events, eventsArne182 = self.create_common_events(ret)
 
     if self.CS.lkas_enabled:
@@ -85,11 +111,26 @@ class CarInterface(CarInterfaceBase):
     
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()
+=======
+    events = self.create_common_events(ret)
+
+    if self.CS.lkas_enabled:
+      events.add(car.CarEvent.EventName.invalidLkasSetting)
+
+    ret.events = events.to_msg()
+
+    self.CS.out = ret.as_reader()
+    return self.CS.out
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   def apply(self, c):
     can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,
                                c.cruiseControl.cancel, c.hudControl.visualAlert,
+<<<<<<< HEAD
                                c.hudControl.leftLaneVisible,c.hudControl.rightLaneVisible,
+=======
+                               c.hudControl.leftLaneVisible, c.hudControl.rightLaneVisible,
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
                                c.hudControl.leftLaneDepart, c.hudControl.rightLaneDepart)
     self.frame += 1
     return can_sends

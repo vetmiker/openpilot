@@ -39,12 +39,21 @@ class TextWindow():
   def __del__(self):
     self.close()
 
+<<<<<<< HEAD
   def __exit__(self, type, value, traceback):
     self.close()
 
 
 class FakeTextWindow():
   def __init__(self, s):
+=======
+  def __exit__(self, exc_type, exc_value, traceback):
+    self.close()
+
+
+class FakeTextWindow(TextWindow):
+  def __init__(self, s):  # pylint: disable=super-init-not-called
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     pass
 
   def get_status(self):
@@ -59,7 +68,14 @@ class FakeTextWindow():
   def update(self, _):
     pass
 
+<<<<<<< HEAD
   def __exit__(self, type, value, traceback):
+=======
+  def close(self):
+    pass
+
+  def __exit__(self, exc_type, exc_value, traceback):
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     pass
 
 

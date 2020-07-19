@@ -129,6 +129,8 @@ struct FrameData {
   gainFrac @15 :Float32;
   focusVal @16 :List(Int16);
   focusConf @17 :List(UInt8);
+  sharpnessScore @18 :List(UInt16);
+  recoverState @19 :Int32;
 
   frameType @7 :FrameType;
   timestampSof @8 :UInt64;
@@ -370,6 +372,10 @@ struct HealthData {
     interruptRateTim1 @16;
     interruptRateTim3 @17;
     registerDivergent @18;
+<<<<<<< HEAD
+=======
+    interruptRateKlineInit @19;
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     # Update max fault type in boardd when adding faults
   }
 
@@ -380,6 +386,7 @@ struct HealthData {
     blackPanda @3;
     pedal @4;
     uno @5;
+    dos @6;
   }
 
   enum UsbPowerMode {
@@ -595,8 +602,6 @@ struct ControlsState @0x97ff69c53601abf1 {
     lqrOutput @4 :Float32;
     saturated @5 :Bool;
    }
-
-
 }
 
 struct LiveEventData {
@@ -606,6 +611,8 @@ struct LiveEventData {
 
 struct ModelData {
   frameId @0 :UInt32;
+  frameAge @12 :UInt32;
+  frameDropPerc @13 :Float32;
   timestampEof @9 :UInt64;
 
   path @1 :PathData;
@@ -626,6 +633,7 @@ struct ModelData {
     std @2 :Float32;
     stds @3 :List(Float32);
     poly @4 :List(Float32);
+    validLen @5 :Float32;
   }
 
   struct LeadData {
@@ -838,6 +846,7 @@ struct LiveLocationKalman {
   # These angles are all eulers and roll, pitch, yaw
   # orientationECEF transforms to rot matrix: ecef_from_device
   orientationECEF @6 : Measurement;
+  calibratedOrientationECEF @20 : Measurement;
   orientationNED @7 : Measurement;
   angularVelocityDevice @8 : Measurement;
 
@@ -854,6 +863,13 @@ struct LiveLocationKalman {
   gpsTimeOfWeek @14 :Float64;
   status @15 :Status;
   unixTimestampMillis @16 :Int64;
+<<<<<<< HEAD
+=======
+  inputsOK @17 :Bool = true;
+  posenetOK @18 :Bool = true;
+  gpsOK @19 :Bool = true;
+  sensorsOK @21 :Bool = true;
+>>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   enum Status {
     uninitialized @0;
@@ -1881,6 +1897,7 @@ struct DriverState {
   irPwrDEPRECATED @10 :Float32;
   faceOrientationStd @11 :List(Float32);
   facePositionStd @12 :List(Float32);
+  sgProb @13 :Float32;
 }
 
 struct DMonitoringState {
