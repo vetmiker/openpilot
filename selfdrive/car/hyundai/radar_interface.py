@@ -24,13 +24,7 @@ def get_radar_can_parser(CP):
 
 class RadarInterface(RadarInterfaceBase):
   def __init__(self, CP):
-<<<<<<< HEAD
-    # radar
-    self.pts = {}
-    self.delay = 0  # Delay of radar
-=======
     super().__init__(CP)
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     self.rcp = get_radar_can_parser(CP)
     self.updated_messages = set()
     self.trigger_msg = 0x420

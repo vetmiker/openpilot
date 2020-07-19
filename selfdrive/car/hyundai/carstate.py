@@ -10,12 +10,7 @@ GearShifter = car.CarState.GearShifter
 class CarState(CarStateBase):
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
-
-<<<<<<< HEAD
-    ret.doorOpen = any([cp.vl["CGW1"]['CF_Gway_DrvDrSw'],cp.vl["CGW1"]['CF_Gway_AstDrSw'],
-=======
     ret.doorOpen = any([cp.vl["CGW1"]['CF_Gway_DrvDrSw'], cp.vl["CGW1"]['CF_Gway_AstDrSw'],
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
                         cp.vl["CGW2"]['CF_Gway_RLDrSw'], cp.vl["CGW2"]['CF_Gway_RRDrSw']])
 
     ret.seatbeltUnlatched = cp.vl["CGW1"]['CF_Gway_DrvSeatBeltSw'] == 0
@@ -57,21 +52,6 @@ class CarState(CarStateBase):
 
     # TODO: Check this
     ret.brakeLights = bool(cp.vl["TCS13"]['BrakeLight'] or ret.brakePressed)
-<<<<<<< HEAD
-
-    #TODO: find pedal signal for EV/HYBRID Cars
-    if (cp.vl["TCS13"]["DriverOverride"] == 0 and cp.vl["TCS13"]['ACC_REQ'] == 1):
-      pedal_gas = 0
-    else:
-      pedal_gas = cp.vl["EMS12"]['TPS']
-
-    ret.gasPressed = pedal_gas > 1e-3
-    ret.gas = pedal_gas
-
-    # TODO: refactor gear parsing in function
-    # Gear Selection via Cluster - For those Kia/Hyundai which are not fully discovered, we can use the Cluster Indicator for Gear Selection, as this seems to be standard over all cars, but is not the preferred method.
-=======
-
     if self.CP.carFingerprint in EV_HYBRID:
       ret.gas = cp.vl["E_EMS11"]['Accel_Pedal_Pos'] / 256.
       ret.gasPressed = ret.gas > 0
@@ -82,7 +62,6 @@ class CarState(CarStateBase):
     # TODO: refactor gear parsing in function
     # Gear Selection via Cluster - For those Kia/Hyundai which are not fully discovered, we can use the Cluster Indicator for Gear Selection,
     # as this seems to be standard over all cars, but is not the preferred method.
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     if self.CP.carFingerprint in FEATURES["use_cluster_gears"]:
       if cp.vl["CLU15"]["CF_Clu_InhibitD"] == 1:
         ret.gearShifter = GearShifter.drive
@@ -108,11 +87,7 @@ class CarState(CarStateBase):
     # Gear Selecton - This is only compatible with optima hybrid 2017
     elif self.CP.carFingerprint in FEATURES["use_elect_gears"]:
       gear = cp.vl["ELECT_GEAR"]["Elect_Gear_Shifter"]
-<<<<<<< HEAD
-      if gear in (5, 8): # 5: D, 8: sport mode
-=======
       if gear in (5, 8):  # 5: D, 8: sport mode
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
         ret.gearShifter = GearShifter.drive
       elif gear == 6:
         ret.gearShifter = GearShifter.neutral
@@ -125,11 +100,7 @@ class CarState(CarStateBase):
     # Gear Selecton - This is not compatible with all Kia/Hyundai's, But is the best way for those it is compatible with
     else:
       gear = cp.vl["LVR12"]["CF_Lvr_Gear"]
-<<<<<<< HEAD
-      if gear in (5, 8): # 5: D, 8: sport mode
-=======
       if gear in (5, 8):  # 5: D, 8: sport mode
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
         ret.gearShifter = GearShifter.drive
       elif gear == 6:
         ret.gearShifter = GearShifter.neutral
@@ -139,8 +110,7 @@ class CarState(CarStateBase):
         ret.gearShifter = GearShifter.reverse
       else:
         ret.gearShifter = GearShifter.unknown
-<<<<<<< HEAD
-=======
+
 
     if self.CP.carFingerprint in FEATURES["use_fca"]:
       ret.stockAeb = cp.vl["FCA11"]['FCA_CmdAct'] != 0
@@ -152,29 +122,19 @@ class CarState(CarStateBase):
     if self.CP.carFingerprint in FEATURES["use_bsm"]:
       ret.leftBlindspot = cp.vl["LCA11"]["CF_Lca_IndLeft"] != 0
       ret.rightBlindspot = cp.vl["LCA11"]["CF_Lca_IndRight"] != 0
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+
 
     # save the entire LKAS11 and CLU11
     self.lkas11 = cp_cam.vl["LKAS11"]
     self.clu11 = cp.vl["CLU11"]
     self.park_brake = cp.vl["CGW1"]['CF_Gway_ParkBrakeSw']
-<<<<<<< HEAD
-    self.steer_state = cp.vl["MDPS12"]['CF_Mdps_ToiActive'] #0 NOT ACTIVE, 1 ACTIVE
-    self.steer_warning = cp.vl["MDPS12"]['CF_Mdps_ToiUnavail']
-=======
     self.steer_state = cp.vl["MDPS12"]['CF_Mdps_ToiActive']  # 0 NOT ACTIVE, 1 ACTIVE
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     self.lead_distance = cp.vl["SCC11"]['ACC_ObjDist']
 
     return ret
 
   @staticmethod
-<<<<<<< HEAD
-  def get_can_parser_init(CP):
-
-=======
   def get_can_parser(CP):
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     signals = [
       # sig_name, sig_address, default
       ("WHL_SPD_FL", "WHL_SPD11", 0),
