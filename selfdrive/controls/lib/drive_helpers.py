@@ -26,8 +26,6 @@ class MPC_COST_LONG:
   ACCELERATION = 10.0
   JERK = 20.0
 
-
-<<<<<<< HEAD
 class EventTypes:
   ENABLE = 'enable'
   PRE_ENABLE = 'preEnable'
@@ -61,9 +59,6 @@ def get_events(events, types):
         out.append(e.name)
   return out
 
-
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 def rate_limit(new_value, last_value, dw_step, up_step):
   return clip(new_value, last_value + dw_step, last_value + up_step)
 
