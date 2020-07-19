@@ -19,10 +19,7 @@ if arch == "aarch64" and not os.path.isdir("/system"):
   arch = "larch64"
 
 webcam = bool(ARGUMENTS.get("use_webcam", 0))
-<<<<<<< HEAD
-=======
 QCOM_REPLAY = arch == "aarch64" and os.getenv("QCOM_REPLAY") is not None
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 if arch == "aarch64" or arch == "larch64":
   lenv = {
@@ -48,29 +45,15 @@ if arch == "aarch64" or arch == "larch64":
   ]
 
   if arch == "larch64":
-<<<<<<< HEAD
-    cpppath += ["#phonelibs/capnp-cpp/include", "#phonelibs/capnp-c/include"]
-    libpath += ["#phonelibs/snpe/larch64"]
-    libpath += ["#phonelibs/libyuv/larch64/lib"]
-    libpath += ["#external/capnparm/lib", "/usr/lib/aarch64-linux-gnu"]
-=======
     libpath += [
       "#phonelibs/snpe/larch64",
       "#phonelibs/libyuv/larch64/lib",
       "/usr/lib/aarch64-linux-gnu"
     ]
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     cflags = ["-DQCOM2", "-mcpu=cortex-a57"]
     cxxflags = ["-DQCOM2", "-mcpu=cortex-a57"]
     rpath = ["/usr/local/lib"]
   else:
-<<<<<<< HEAD
-    libpath += ["#phonelibs/snpe/aarch64"]
-    libpath += ["#phonelibs/libyuv/lib"]
-    cflags = ["-DQCOM", "-mcpu=cortex-a57"]
-    cxxflags = ["-DQCOM", "-mcpu=cortex-a57"]
-    rpath = ["/system/vendor/lib64"]
-=======
     libpath += [
       "#phonelibs/snpe/aarch64",
       "#phonelibs/libyuv/lib"
@@ -82,7 +65,6 @@ if arch == "aarch64" or arch == "larch64":
     if QCOM_REPLAY:
       cflags += ["-DQCOM_REPLAY"]
       cxxflags += ["-DQCOM_REPLAY"]
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 else:
   cflags = []
@@ -227,16 +209,8 @@ def abspath(x):
     return x[0].path.rsplit("/", 1)[1][:-3]
 
 # still needed for apks
-<<<<<<< HEAD
-if arch == 'larch64':
-  zmq = 'zmq'
-else:
-  zmq = FindFile("libzmq.a", libpath)
-Export('env', 'arch', 'zmq', 'SHARED', 'webcam')
-=======
 zmq = 'zmq'
 Export('env', 'arch', 'zmq', 'SHARED', 'webcam', 'QCOM_REPLAY')
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 # cereal and messaging are shared with the system
 SConscript(['cereal/SConscript'])
@@ -291,14 +265,8 @@ if arch == "aarch64":
   SConscript(['selfdrive/logcatd/SConscript'])
   SConscript(['selfdrive/sensord/SConscript'])
   SConscript(['selfdrive/clocksd/SConscript'])
-<<<<<<< HEAD
   SConscript(['selfdrive/trafficd/SConscript'])
 
-SConscript(['selfdrive/locationd/SConscript'])
-SConscript(['selfdrive/locationd/kalman/SConscript'])
-
 # TODO: finish cereal, dbcbuilder, MPC
-=======
 else:
   SConscript(['tools/lib/index_log/SConscript'])
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
