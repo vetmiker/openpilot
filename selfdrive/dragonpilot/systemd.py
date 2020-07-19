@@ -40,6 +40,8 @@ def confd_thread():
   last_started = False
 
   dashcam_next_frame = 0
+  dashcam_folder_exists = False
+  dashcam_mkdir_retry = 0
 
   # thermal
   started = False
@@ -181,21 +183,31 @@ def confd_thread():
     '''
     dashcam = msg.dragonConf.dpDashcam
     if frame % 2 == 0 and dashcam:
-      if started:
-        if frame >= dashcam_next_frame - 2:
-          now = datetime.datetime.now()
-          file_name = now.strftime("%Y-%m-%d_%H-%M-%S")
-          os.system("screenrecord --bit-rate %s --time-limit %s %s%s.mp4 &" % (DASHCAM_BIT_RATES, DASHCAM_DURATION, DASHCAM_VIDEOS_PATH, file_name))
-          dashcam_next_frame = frame + DASHCAM_DURATION*2
-      else:
-        dashcam_next_frame = 0
-
-      if frame % 120 == 0 and ((free_space < DASHCAM_FREESPACE_LIMIT) or (get_used_spaces() > DASHCAM_KEPT)):
+      while not dashcam_folder_exists and dashcam_mkdir_retry <= 5:
         try:
-          files = [f for f in sorted(os.listdir(DASHCAM_VIDEOS_PATH)) if os.path.isfile(DASHCAM_VIDEOS_PATH + f)]
-          os.system("rm -fr %s &" % (DASHCAM_VIDEOS_PATH + files[0]))
-        except (IndexError, FileNotFoundError):
+          if not os.path.exists(DASHCAM_VIDEOS_PATH):
+            os.makedirs(DASHCAM_VIDEOS_PATH)
+          else:
+            dashcam_folder_exists = True
+        except OSError:
           pass
+        dashcam_mkdir_retry += 1
+      if dashcam_folder_exists:
+        if started:
+          if frame >= dashcam_next_frame - 2:
+            now = datetime.datetime.now()
+            file_name = now.strftime("%Y-%m-%d_%H-%M-%S")
+            os.system("screenrecord --bit-rate %s --time-limit %s %s%s.mp4 &" % (DASHCAM_BIT_RATES, DASHCAM_DURATION, DASHCAM_VIDEOS_PATH, file_name))
+            dashcam_next_frame = frame + DASHCAM_DURATION*2
+        else:
+          dashcam_next_frame = 0
+
+        if frame % 120 == 0 and ((free_space < DASHCAM_FREESPACE_LIMIT) or (get_used_spaces() > DASHCAM_KEPT)):
+          try:
+            files = [f for f in sorted(os.listdir(DASHCAM_VIDEOS_PATH)) if os.path.isfile(DASHCAM_VIDEOS_PATH + f)]
+            os.system("rm -fr %s &" % (DASHCAM_VIDEOS_PATH + files[0]))
+          except (IndexError, FileNotFoundError):
+            pass
     '''
     ===================================================
     auto shutdown
