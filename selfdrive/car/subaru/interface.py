@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
-<<<<<<< HEAD
 from cereal import car, arne182
 from selfdrive.config import Conversions as CV
-=======
-from cereal import car
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 from selfdrive.car.subaru.values import CAR
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
@@ -83,7 +79,6 @@ class CarInterface(CarInterfaceBase):
 
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
-<<<<<<< HEAD
     ret.yawRate = self.VM.yaw_rate(ret.steeringAngle * CV.DEG_TO_RAD, ret.vEgo)
 
     buttonEvents = []
@@ -92,8 +87,6 @@ class CarInterface(CarInterfaceBase):
     buttonEvents.append(be)
 
     ret.events, ret_arne182.events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.unknown])
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     ret.events = self.create_common_events(ret).to_msg()
 
