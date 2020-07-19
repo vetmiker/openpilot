@@ -61,11 +61,10 @@ class CarInterface(CarInterfaceBase):
     ret.canValid = self.cp.can_valid
 
     # events
-<<<<<<< HEAD
     events, eventsArne182 = self.create_common_events(ret)
 
     if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
-      events.append(create_event('steerTempUnavailableMute', [ET.WARNING]))
+      events.add(car.CarEvent.EventName.steerTempUnavailableMute, [ET.WARNING])
 
     ret.events = events
     ret_arne182.events = eventsArne182
@@ -76,17 +75,6 @@ class CarInterface(CarInterfaceBase):
     self.CS.out = ret.as_reader()
 
     return self.CS.out, ret_arne182.as_reader()
-=======
-    events = self.create_common_events(ret)
-
-    if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13. * CV.MPH_TO_MS and ret.cruiseState.enabled:
-      events.add(car.CarEvent.EventName.steerTempUnavailableMute)
-
-    ret.events = events.to_msg()
-
-    self.CS.out = ret.as_reader()
-    return self.CS.out
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   # pass in a car.CarControl
   # to be called @ 100hz

@@ -34,15 +34,10 @@ class CarInterface(CarInterfaceBase):
     tire_stiffness_factor = 0.444  # not optimized yet
 
     # Start with a baseline lateral tuning for all GM vehicles. Override tuning as needed in each model section below.
-<<<<<<< HEAD
-    ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kfBP = [[0.], [0.], [0.]]
-    ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV, ret.lateralTuning.pid.kfV = [[0.2], [0.00], [0.00004]]   # full torque for 20 deg at 80mph means 0.00007818594
-=======
     ret.minSteerSpeed = 7 * CV.MPH_TO_MS
     ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
     ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2], [0.00]]
     ret.lateralTuning.pid.kf = 0.00004   # full torque for 20 deg at 80mph means 0.00007818594
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     ret.steerRateCost = 1.0
     ret.steerActuatorDelay = 0.1  # Default delay, not measured yet
 
@@ -155,54 +150,33 @@ class CarInterface(CarInterfaceBase):
 
     ret.buttonEvents = buttonEvents
 
-<<<<<<< HEAD
     events, eventsArne182 = self.create_common_events(ret, pcm_enable=False)
     if ret.brakePressed:
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     if ret.vEgo < self.CP.minEnableSpeed:
-      events.append(create_event('speedTooLow', [ET.NO_ENTRY]))
+      events.add(EventName.belowEngageSpeed, [ET.NO_ENTRY]))
     if self.CS.park_brake:
-      events.append(create_event('parkBrake', [ET.NO_ENTRY, ET.USER_DISABLE]))
+      events.add(EventName.parkBrake, [ET.NO_ENTRY, ET.USER_DISABLE]))
     if ret.cruiseState.standstill:
-      events.append(create_event('resumeRequired', [ET.WARNING]))
+      events.add(EventName.resumeRequired, [ET.WARNING]))
     if self.CS.pcm_acc_status == AccState.FAULTED:
-      events.append(create_event('controlsFailed', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-=======
-    events = self.create_common_events(ret, pcm_enable=False)
-
-    if ret.vEgo < self.CP.minEnableSpeed:
-      events.add(EventName.belowEngageSpeed)
-    if self.CS.park_brake:
-      events.add(EventName.parkBrake)
-    if ret.cruiseState.standstill:
-      events.add(EventName.resumeRequired)
-    if self.CS.pcm_acc_status == AccState.FAULTED:
-      events.add(EventName.controlsFailed)
-    if ret.vEgo < self.CP.minSteerSpeed:
-      events.add(car.CarEvent.EventName.belowSteerSpeed)
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+      events.add(EventName.controlsFailed, [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+      if ret.vEgo < self.CP.minSteerSpeed:
+        events.add(car.CarEvent.EventName.belowSteerSpeed)
 
     # handle button presses
     for b in ret.buttonEvents:
       # do enable on both accel and decel buttons
       if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
 <<<<<<< HEAD
-        events.append(create_event('buttonEnable', [ET.ENABLE]))
+        events.add(EventName.buttonEnable, [ET.ENABLE]))
       # do disable on button down
       if b.type == ButtonType.cancel and b.pressed:
-        events.append(create_event('buttonCancel', [ET.USER_DISABLE]))
-
-    ret.events = events
-    ret_arne182.events = eventsArne182
-=======
-        events.add(EventName.buttonEnable)
-      # do disable on button down
-      if b.type == ButtonType.cancel and b.pressed:
-        events.add(EventName.buttonCancel)
+        events.add(EventName.buttonCancel, [ET.USER_DISABLE]))
 
     ret.events = events.to_msg()
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+    ret_arne182.events = eventsArne182
 
     # copy back carState packet to CS
     self.CS.out = ret.as_reader()

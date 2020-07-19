@@ -125,7 +125,3 @@ def create_lka_icon_command(bus, active, critical, steer):
   else:
     dat = b"\x00\x00\x00"
   return make_can_msg(0x104c006c, dat, bus)
-<<<<<<< HEAD
-
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d

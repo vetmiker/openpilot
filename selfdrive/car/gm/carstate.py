@@ -5,12 +5,7 @@ from opendbc.can.can_define import CANDefine
 from opendbc.can.parser import CANParser
 from selfdrive.car.interfaces import CarStateBase
 from selfdrive.car.gm.values import DBC, CAR, AccState, CanBus, \
-<<<<<<< HEAD
-                                    CruiseButtons, is_eps_status_ok, \
-                                    STEER_THRESHOLD
-=======
                                     CruiseButtons, STEER_THRESHOLD
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 
 class CarState(CarStateBase):
@@ -61,13 +56,11 @@ class CarState(CarStateBase):
     ret.cruiseState.available = bool(pt_cp.vl["ECMEngineStatus"]['CruiseMainOn'])
     ret.espDisabled = pt_cp.vl["ESPStatus"]['TractionControlOn'] != 1
     self.pcm_acc_status = pt_cp.vl["AcceleratorPedal2"]['CruiseState']
-<<<<<<< HEAD
 
     regen_pressed = False
     if self.car_fingerprint == CAR.VOLT:
       regen_pressed = bool(pt_cp.vl["EBCMRegenPaddle"]['RegenPaddle'])
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+
 
     ret.brakePressed = ret.brake > 1e-5
     # Regen braking is braking
@@ -116,10 +109,9 @@ class CarState(CarStateBase):
       signals += [
         ("RegenPaddle", "EBCMRegenPaddle", 0),
       ]
-<<<<<<< HEAD
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, [], CanBus.POWERTRAIN)
-  
+
   @staticmethod
   def get_can_parser(CP):
     # this function generates lists for signal, messages and initial values
@@ -153,7 +145,5 @@ class CarState(CarStateBase):
       signals += [
         ("RegenPaddle", "EBCMRegenPaddle", 0),
       ]
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, [], CanBus.POWERTRAIN)

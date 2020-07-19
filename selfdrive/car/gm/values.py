@@ -28,18 +28,9 @@ class AccState:
 
 class CanBus:
   POWERTRAIN = 0
-<<<<<<< HEAD
-  OBSTACLE   = 1
-  CHASSIS    = 2
-  SW_GMLAN   = 3
-
-def is_eps_status_ok(eps_status, car_fingerprint):
-  return eps_status in [0, 1]
-=======
   OBSTACLE = 1
   CHASSIS = 2
   SW_GMLAN = 3
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 FINGERPRINTS = {
   # Astra BK MY17, ASCM unplugged
