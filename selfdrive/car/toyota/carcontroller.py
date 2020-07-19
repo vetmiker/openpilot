@@ -3,15 +3,10 @@ import json
 from common.params import Params
 from common.numpy_fast import clip
 from selfdrive.car import apply_toyota_steer_torque_limits, create_gas_command, make_can_msg, gen_empty_fingerprint
-from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_command, \
-<<<<<<< HEAD
-                                           create_accel_command, create_acc_cancel_command, create_fcw_command
+from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_command
 from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams, TSS2_CAR
-=======
                                            create_accel_command, create_acc_cancel_command, \
                                            create_fcw_command
-from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 from opendbc.can.packer import CANPacker
 #from common.op_params import opParams
 #import cereal.messaging as messaging
@@ -22,13 +17,8 @@ VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 # Accel limits
 ACCEL_HYST_GAP = 0.02  # don't change accel command for small oscilalitons within this value
-<<<<<<< HEAD
 ACCEL_MAX = 3.5  # 3.5 m/s2
 ACCEL_MIN = -3.5 # 3.5 m/s2
-=======
-ACCEL_MAX = 1.5  # 1.5 m/s2
-ACCEL_MIN = -3.0  # 3   m/s2
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 ACCEL_SCALE = max(ACCEL_MAX, -ACCEL_MIN)
 
 # Blindspot codes
@@ -82,7 +72,6 @@ class CarController():
     self.steer_rate_limited = False
 
     self.fake_ecus = set()
-<<<<<<< HEAD
     if CP.enableCamera: self.fake_ecus.add(Ecu.fwdCamera)
     if CP.enableDsu: self.fake_ecus.add(Ecu.dsu)
     params = Params()
@@ -95,13 +84,7 @@ class CarController():
       if 0x2FF in finger[0] and vin == b'JTMWRREV10D058569': self.fake_ecus.add(Ecu.unknown)
     except:
       pass
-=======
-    if CP.enableCamera:
-      self.fake_ecus.add(Ecu.fwdCamera)
-    if CP.enableDsu:
-      self.fake_ecus.add(Ecu.dsu)
 
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     self.packer = CANPacker(dbc_name)
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, hud_alert,
@@ -259,11 +242,7 @@ class CarController():
     if (frame % 100 == 0 or send_ui) and Ecu.fwdCamera in self.fake_ecus:
       can_sends.append(create_ui_command(self.packer, steer_alert, pcm_cancel_cmd, left_line, right_line, left_lane_depart, right_lane_depart))
 
-<<<<<<< HEAD
     if frame % 100 == 0 and (Ecu.dsu in self.fake_ecus or Ecu.unknown in self.fake_ecus):
-=======
-    if frame % 100 == 0 and Ecu.dsu in self.fake_ecus:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       can_sends.append(create_fcw_command(self.packer, fcw_alert))
 
     #*** static msgs ***

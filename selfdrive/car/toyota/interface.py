@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 from cereal import car, arne182, log
 from selfdrive.config import Conversions as CV
-<<<<<<< HEAD
 from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 from selfdrive.car.toyota.values import Ecu, ECU_FINGERPRINT, CAR, TSS2_CAR, FINGERPRINTS
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, is_ecu_disconnected, gen_empty_fingerprint
 from selfdrive.swaglog import cloudlog
@@ -35,7 +32,6 @@ class CarInterface(CarInterfaceBase):
     ret.steerActuatorDelay = 0.12  # Default delay, Prius has larger delay
     ret.steerLimitTimer = 0.4
 
-<<<<<<< HEAD
     if ret.enableGasInterceptor:
       ret.gasMaxBP = [0., 9., 55]
       ret.gasMaxV = [0.2, 0.5, 0.7]
@@ -50,9 +46,6 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalTuning.kiV = [0.195, 0.10]
 
     if candidate not in [CAR.PRIUS_2019, CAR.PRIUS, CAR.RAV4, CAR.RAV4H, CAR.COROLLA]: # These cars use LQR/INDI
-=======
-    if candidate not in [CAR.PRIUS, CAR.RAV4, CAR.RAV4H]:  # These cars use LQR/INDI
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       ret.lateralTuning.init('pid')
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kfBP = [[0.], [0.], [0.]]
 
@@ -225,23 +218,17 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.68986
       ret.steerRatio = 14.3
       tire_stiffness_factor = 0.7933
-<<<<<<< HEAD
       ret.longitudinalTuning.kpV = [0.2, 0.25, 0.325]
       ret.longitudinalTuning.kiV = [0.10, 0.10]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.13], [0.05]]
       ret.mass = 3370. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kfV = [0.00004]
-=======
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15], [0.05]]
-      ret.mass = 3370. * CV.LB_TO_KG + STD_CARGO_KG
-      ret.lateralTuning.pid.kf = 0.00004
-
       for fw in car_fw:
         if fw.ecu == "eps" and fw.fwVersion == b"8965B42170\x00\x00\x00\x00\x00\x00":
           ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
           ret.lateralTuning.pid.kf = 0.00007818594
           break
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+
 
     elif candidate == CAR.RAV4H_TSS2:
       stop_and_go = True
@@ -255,17 +242,12 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.12], [0.04]]
       ret.mass = 3800. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kfV = [0.00004]
-=======
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15], [0.05]]
-      ret.mass = 3800. * CV.LB_TO_KG + STD_CARGO_KG
-      ret.lateralTuning.pid.kf = 0.00004
-
       for fw in car_fw:
         if fw.ecu == "eps" and fw.fwVersion == b"8965B42170\x00\x00\x00\x00\x00\x00":
           ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
           ret.lateralTuning.pid.kf = 0.00007818594
           break
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+
 
     elif candidate in [CAR.COROLLA_TSS2, CAR.COROLLAH_TSS2]:
       stop_and_go = True
@@ -283,10 +265,10 @@ class CarInterface(CarInterfaceBase):
         #ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kpV = [[0.0, 15.5, 21.0, 29.0], [0.13, 0.39, 0.39, 0.6]]
         #ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kiV = [[0.0, 15.5, 21.0, 29.0], [0.005, 0.015, 0.015, 0.1]]
         #ret.lateralTuning.pid.kfBP, ret.lateralTuning.pid.kfV = [[0.0, 15.5, 21.0, 29.0], [0.00009, 0.00015, 0.00015, 0.00007818594]]
-        ret.lateralTuning.init('indi') 
-        ret.lateralTuning.indi.innerLoopGain = 6.5 
-        ret.lateralTuning.indi.outerLoopGain = 15.0 
-        ret.lateralTuning.indi.timeConstant = 3.0 
+        ret.lateralTuning.init('indi')
+        ret.lateralTuning.indi.innerLoopGain = 6.5
+        ret.lateralTuning.indi.outerLoopGain = 15.0
+        ret.lateralTuning.indi.timeConstant = 3.0
         ret.lateralTuning.indi.actuatorEffectiveness = 4.5
 
     elif candidate in [CAR.LEXUS_ES_TSS2, CAR.LEXUS_ESH_TSS2]:
@@ -307,11 +289,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.444
       ret.mass = 4590. * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.19], [0.02]]
-<<<<<<< HEAD
-      ret.lateralTuning.pid.kfV = [0.00007818594]
-=======
       ret.lateralTuning.pid.kf = 0.00007818594
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     elif candidate in [CAR.LEXUS_IS, CAR.LEXUS_ISH, CAR.LEXUS_RX]:
       stop_and_go = False
@@ -352,7 +330,7 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 4070 * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.6], [0.1]]
       ret.lateralTuning.pid.kfV = [0.00006]
-      
+
     elif candidate == CAR.LEXUS_UXH_TSS2:
       stop_and_go = True
       ret.safetyParam = 73
@@ -423,7 +401,7 @@ class CarInterface(CarInterfaceBase):
 
     # gear except P, R
     extra_gears = [GearShifter.neutral, GearShifter.eco, GearShifter.manumatic, GearShifter.drive, GearShifter.sport, GearShifter.low, GearShifter.brake, GearShifter.unknown]
-    
+
     longControlDisabled = False
     # cruise state
     if not self.CS.out.cruiseState.enabled:
@@ -444,18 +422,17 @@ class CarInterface(CarInterfaceBase):
     if self.disengage_due_to_slow_speed and ret.vEgo > 1:
       self.disengage_due_to_slow_speed = False
       ret.cruiseState.enabled = bool(self.CS.main_on)
-    
-      
+
+
     # events
     events, eventsArne182 = self.create_common_events(ret, extra_gears)
-    
+
     if longControlDisabled:
       eventsArne182.append(create_event_arne('longControlDisabled', [ET.WARNING]))
 
     ret.buttonEvents = []
 
     if self.cp_cam.can_invalid_cnt >= 200 and self.CP.enableCamera:
-<<<<<<< HEAD
       events.append(create_event('invalidGiraffeToyota', [ET.PERMANENT]))
 
     if not self.waiting and ret.vEgo < 0.3 and not ret.gasPressed and self.CP.carFingerprint == CAR.RAV4H:
@@ -470,9 +447,7 @@ class CarInterface(CarInterfaceBase):
       eventsArne182.append(create_event_arne('rightALCbsm', [ET.WARNING]))
     if ret.leftBlinker and self.CS.leftblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
       eventsArne182.append(create_event_arne('leftALCbsm', [ET.WARNING]))
-=======
-      events.add(EventName.invalidGiraffeToyota)
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+
     if self.CS.low_speed_lockout and self.CP.openpilotLongitudinalControl:
       events.add(EventName.lowSpeedLockout)
     if ret.vEgo < self.CP.minEnableSpeed and self.CP.openpilotLongitudinalControl:
@@ -482,16 +457,9 @@ class CarInterface(CarInterfaceBase):
         events.add(EventName.speedTooLow)
       if ret.vEgo < 0.001:
         # while in standstill, send a user alert
-<<<<<<< HEAD
-        events.append(create_event('manualRestart', [ET.WARNING]))
-
+        events.add(EventName.manualRestart [ET.WARNING]))
     ret.events = events
     ret_arne182.events = eventsArne182
-=======
-        events.add(EventName.manualRestart)
-
-    ret.events = events.to_msg()
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()
