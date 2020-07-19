@@ -114,7 +114,15 @@ def confd_thread():
             val = params.get(conf['name'], encoding='utf8')
             if val is not None:
               val = val.rstrip('\x00')
-            setattr(msg.dragonConf, get_struct_name(conf['name']), to_struct_val(conf['name'], val))
+            struct_val = to_struct_val(conf['name'], val)
+            orig_val = struct_val
+            if conf.get('min') is not None:
+              struct_val = max(struct_val, conf.get('min'))
+            if conf.get('max') is not None:
+              struct_val = min(struct_val, conf.get('max'))
+            if orig_val != struct_val:
+              params.put(conf['name'], str(struct_val))
+            setattr(msg.dragonConf, get_struct_name(conf['name']), struct_val)
     '''
     ===================================================
     push ip addr every 10 secs to message

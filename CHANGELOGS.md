@@ -1,5 +1,7 @@
 2020-07-19 (0.7.7.0)
 ========================
+* 限制 dp_conf int / float 範圍。
+* Limited dp_conf int/float range.
 * 修復行車記錄文件夾不存在的錯誤。
 * Fixed dashcam folder not exist error.
 
