@@ -5,7 +5,6 @@ from selfdrive.car import make_can_msg
 GearShifter = car.CarState.GearShifter
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
-<<<<<<< HEAD
 def calc_checksum(data):
   """This function does not want the checksum byte in the input data.
 
@@ -33,9 +32,6 @@ def calc_checksum(data):
       shift = shift >> 1
   return ~checksum & 0xFF
 
-
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 def create_lkas_hud(packer, gear, lkas_active, hud_alert, hud_count, lkas_car_model):
   # LKAS_HUD 0x2a6 (678) Controls what lane-keeping icon is displayed.
 
