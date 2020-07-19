@@ -47,19 +47,13 @@ def process(in_fn, out_fn):
     checksum_start_bit = 0
     counter_start_bit = 0
     little_endian = True
-<<<<<<< HEAD
-  elif can_dbc.name.startswith(("subaru_")):
-=======
   elif can_dbc.name.startswith(("subaru_global_")):
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     checksum_type = "subaru"
     checksum_size = 8
     counter_size = None
     checksum_start_bit = 0
     counter_start_bit = None
     little_endian = True
-<<<<<<< HEAD
-=======
   elif can_dbc.name.startswith(("chrysler_")):
     checksum_type = "chrysler"
     checksum_size = 8
@@ -67,7 +61,6 @@ def process(in_fn, out_fn):
     checksum_start_bit = 7
     counter_start_bit = None
     little_endian = False
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   else:
     checksum_type = None
     checksum_size = None
