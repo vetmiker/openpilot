@@ -1,9 +1,6 @@
 import copy
 import crcmod
-<<<<<<< HEAD
 #from selfdrive.car.nissan.values import CAR
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 nissan_checksum = crcmod.mkCrcFun(0x11d, initCrc=0x00, rev=False, xorOut=0xff)
 

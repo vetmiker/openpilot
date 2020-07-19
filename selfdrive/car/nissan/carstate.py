@@ -17,33 +17,21 @@ class CarState(CarStateBase):
   def update(self, cp, cp_adas, cp_cam):
     ret = car.CarState.new_message()
 
-<<<<<<< HEAD
-    if self.CP.carFingerprint == CAR.XTRAIL:
-=======
     if self.CP.carFingerprint in [CAR.ROGUE, CAR.XTRAIL]:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       ret.gas = cp.vl["GAS_PEDAL"]["GAS_PEDAL"]
     elif self.CP.carFingerprint == CAR.LEAF:
       ret.gas = cp.vl["CRUISE_THROTTLE"]["GAS_PEDAL"]
 
     ret.gasPressed = bool(ret.gas > 3)
 
-<<<<<<< HEAD
-    if self.CP.carFingerprint == CAR.XTRAIL:
-=======
     if self.CP.carFingerprint in [CAR.ROGUE, CAR.XTRAIL]:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       ret.brakePressed = bool(cp.vl["DOORS_LIGHTS"]["USER_BRAKE_PRESSED"])
     elif self.CP.carFingerprint == CAR.LEAF:
       ret.brakePressed = bool(cp.vl["BRAKE_PEDAL"]["BRAKE_PEDAL"] > 3)
 
-<<<<<<< HEAD
-    if self.CP.carFingerprint == CAR.XTRAIL:
-=======
-    if self.CP.carFingerprint in [CAR.ROGUE, CAR.XTRAIL]:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
-      ret.brakeLights = bool(cp.vl["DOORS_LIGHTS"]["BRAKE_LIGHT"])
 
+    if self.CP.carFingerprint in [CAR.ROGUE, CAR.XTRAIL]:
+      ret.brakeLights = bool(cp.vl["DOORS_LIGHTS"]["BRAKE_LIGHT"])
     ret.wheelSpeeds.fl = cp.vl["WHEEL_SPEEDS_FRONT"]["WHEEL_SPEED_FL"] * CV.KPH_TO_MS
     ret.wheelSpeeds.fr = cp.vl["WHEEL_SPEEDS_FRONT"]["WHEEL_SPEED_FR"] * CV.KPH_TO_MS
     ret.wheelSpeeds.rl = cp.vl["WHEEL_SPEEDS_REAR"]["WHEEL_SPEED_RL"] * CV.KPH_TO_MS
@@ -55,21 +43,7 @@ class CarState(CarStateBase):
     ret.standstill = ret.vEgoRaw < 0.01
 
     ret.cruiseState.enabled = bool(cp_adas.vl["CRUISE_STATE"]["CRUISE_ENABLED"])
-<<<<<<< HEAD
-    if self.CP.carFingerprint == CAR.XTRAIL:
-      ret.cruiseState.available = bool(cp_cam.vl["PRO_PILOT"]["CRUISE_ON"])
-    elif self.CP.carFingerprint == CAR.LEAF:
-      ret.cruiseState.available = bool(cp.vl["CRUISE_THROTTLE"]["CRUISE_AVAILABLE"])
 
-    # TODO: Find mph/kph bit on XTRAIL until then, assume xtrail is kph.
-    # Unable to change kph to mph on the xtrail, need a rogue to test it on
-    speed = cp_adas.vl["PROPILOT_HUD"]["SET_SPEED"]
-    if speed != 255:
-      if self.CP.carFingerprint == CAR.XTRAIL:
-        conversion = CV.KPH_TO_MS
-      else:
-        conversion = CV.MPH_TO_MS if cp.vl["HUD_SETTINGS"]["SPEED_MPH"] else CV.KPH_TO_MS
-=======
     if self.CP.carFingerprint in [CAR.ROGUE, CAR.XTRAIL]:
       ret.seatbeltUnlatched = cp.vl["HUD"]["SEATBELT_DRIVER_LATCHED"] == 0
       ret.cruiseState.available = bool(cp_cam.vl["PRO_PILOT"]["CRUISE_ON"])
@@ -83,7 +57,6 @@ class CarState(CarStateBase):
         conversion = CV.MPH_TO_MS if cp.vl["HUD_SETTINGS"]["SPEED_MPH"] else CV.KPH_TO_MS
       else:
         conversion = CV.MPH_TO_MS if cp.vl["HUD"]["SPEED_MPH"] else CV.KPH_TO_MS
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       speed -= 1  # Speed on HUD is always 1 lower than actually sent on can bus
       ret.cruiseState.speed = speed * conversion
 
@@ -100,11 +73,8 @@ class CarState(CarStateBase):
                         cp.vl["DOORS_LIGHTS"]["DOOR_OPEN_FR"],
                         cp.vl["DOORS_LIGHTS"]["DOOR_OPEN_FL"]])
 
-<<<<<<< HEAD
     ret.seatbeltUnlatched = cp.vl["SEATBELT"]["SEATBELT_DRIVER_LATCHED"] == 0
 
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     ret.espDisabled = bool(cp.vl["ESP"]["ESP_DISABLED"])
 
     can_gear = int(cp.vl["GEARBOX"]["GEAR_SHIFTER"])
@@ -144,7 +114,6 @@ class CarState(CarStateBase):
       ("RIGHT_BLINKER", "LIGHTS", 0),
       ("LEFT_BLINKER", "LIGHTS", 0),
 
-<<<<<<< HEAD
       ("SEATBELT_DRIVER_LATCHED", "SEATBELT", 0),
 
       ("ESP_DISABLED", "ESP", 0),
@@ -208,7 +177,7 @@ class CarState(CarStateBase):
       ]
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
-    
+
   @staticmethod
   def get_can_parser_init(CP):
     # this function generates lists for signal, messages and initial values
@@ -233,8 +202,6 @@ class CarState(CarStateBase):
 
       ("SEATBELT_DRIVER_LATCHED", "SEATBELT", 0),
 
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       ("ESP_DISABLED", "ESP", 0),
 
       ("GEAR_SHIFTER", "GEARBOX", 0),
@@ -249,21 +216,15 @@ class CarState(CarStateBase):
       ("DOORS_LIGHTS", 10),
     ]
 
-<<<<<<< HEAD
-    if CP.carFingerprint == CAR.XTRAIL:
-=======
     if CP.carFingerprint in [CAR.ROGUE, CAR.XTRAIL]:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       signals += [
         ("USER_BRAKE_PRESSED", "DOORS_LIGHTS", 1),
         ("BRAKE_LIGHT", "DOORS_LIGHTS", 1),
 
         ("GAS_PEDAL", "GAS_PEDAL", 0),
-<<<<<<< HEAD
-=======
+
         ("SEATBELT_DRIVER_LATCHED", "HUD", 0),
         ("SPEED_MPH", "HUD", 0),
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
         ("PROPILOT_BUTTON", "CRUISE_THROTTLE", 0),
         ("CANCEL_BUTTON", "CRUISE_THROTTLE", 0),
@@ -292,10 +253,8 @@ class CarState(CarStateBase):
         ("GAS_PEDAL", "CRUISE_THROTTLE", 0),
         ("CRUISE_AVAILABLE", "CRUISE_THROTTLE", 0),
         ("SPEED_MPH", "HUD_SETTINGS", 0),
-<<<<<<< HEAD
-=======
+
         ("SEATBELT_DRIVER_LATCHED", "SEATBELT", 0),
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
         # Copy other values, we use this to cancel
         ("CANCEL_SEATBELT", "CANCEL_MSG", 0),
@@ -404,11 +363,8 @@ class CarState(CarStateBase):
   @staticmethod
   def get_cam_can_parser(CP):
     signals = []
-<<<<<<< HEAD
-    if CP.carFingerprint == CAR.XTRAIL:
-=======
+
     if CP.carFingerprint in [CAR.ROGUE, CAR.XTRAIL]:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       signals += [
         ("CRUISE_ON", "PRO_PILOT", 0),
       ]
