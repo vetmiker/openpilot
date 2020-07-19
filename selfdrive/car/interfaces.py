@@ -4,18 +4,14 @@ from cereal import car
 from common.kalman.simple_kalman import KF1D
 from common.realtime import DT_CTRL
 from selfdrive.car import gen_empty_fingerprint
-<<<<<<< HEAD
-from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne
+from selfdrive.controls.lib.events import Events
+from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne, V_CRUISE_MAX
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 import cereal.messaging as messaging
 from common.op_params import opParams
 from common.travis_checker import travis
-=======
 from selfdrive.config import Conversions as CV
-from selfdrive.controls.lib.events import Events
-from selfdrive.controls.lib.vehicle_model import VehicleModel
-from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+
 
 GearShifter = car.CarState.GearShifter
 EventName = car.CarEvent.EventName
@@ -37,20 +33,10 @@ class CarInterfaceBase():
     self.frame = 0
     self.low_speed_alert = False
 
-<<<<<<< HEAD
-    self.CS = CarState(CP)
-    self.cp = self.CS.get_can_parser(CP)
-    try:
-      self.cp_init = self.CS.get_can_parser_init(CP)
-    except AttributeError:
-      self.cp_init = self.CS.get_can_parser(CP)
-    self.cp_cam = self.CS.get_cam_can_parser(CP)
-=======
     if CarState is not None:
       self.CS = CarState(CP)
       self.cp = self.CS.get_can_parser(CP)
       self.cp_cam = self.CS.get_cam_can_parser(CP)
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     self.CC = None
     if CarController is not None:
@@ -108,7 +94,6 @@ class CarInterfaceBase():
   def apply(self, c):
     raise NotImplementedError
 
-<<<<<<< HEAD
   def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1, pcm_enable=True):
     if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:  # this lets us modularize which checks we want to turn off op if cc was engaged previoiusly or not
       disengage_event = True
@@ -122,49 +107,25 @@ class CarInterfaceBase():
     eventsArne182 = []
 
     if cs_out.doorOpen and disengage_event:
-      events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+      events.add(EventName.doorOpen, [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.seatbeltUnlatched and disengage_event:
-      events.append(create_event('seatbeltNotLatched', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+      events.add(EventName.seatbeltNotLatched, [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.gearShifter != GearShifter.drive and cs_out.gearShifter not in extra_gears:
       if cs_out.vEgo < 5:
         eventsArne182.append(create_event_arne('wrongGearArne', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
       else:
-        events.append(create_event('wrongGear', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+        events.add(EventName.wrongGear, [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.gearShifter == GearShifter.reverse:
       if cs_out.vEgo < 5:
         eventsArne182.append(create_event_arne('reverseGearArne', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
       else:
-        events.append(create_event('reverseGear', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-=======
-  def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1, pcm_enable=True):  # pylint: disable=dangerous-default-value
-    events = Events()
-
-    if cs_out.doorOpen:
-      events.add(EventName.doorOpen)
-    if cs_out.seatbeltUnlatched:
-      events.add(EventName.seatbeltNotLatched)
-    if cs_out.gearShifter != GearShifter.drive and cs_out.gearShifter not in extra_gears:
-      events.add(EventName.wrongGear)
-    if cs_out.gearShifter == GearShifter.reverse:
-      events.add(EventName.reverseGear)
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+        events.add(EventName.reverseGear, [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
     if not cs_out.cruiseState.available:
       events.add(EventName.wrongCarMode)
     if cs_out.espDisabled:
-<<<<<<< HEAD
-      events.append(create_event('espDisabled', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+      events.add(EventName.espDisabled, [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if cs_out.gasPressed and disengage_event:
-      events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
-
-    # TODO: move this stuff to the capnp strut
-    if getattr(self.CS, "steer_error", False):
-      events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
-    elif getattr(self.CS, "steer_warning", False):
-      events.append(create_event('steerTempUnavailable', [ET.NO_ENTRY, ET.WARNING]))
-=======
-      events.add(EventName.espDisabled)
-    if cs_out.gasPressed:
-      events.add(EventName.gasPressed)
+      events.add(EventName.gasPressed, [ET.PRE_ENABLE]))
     if cs_out.stockFcw:
       events.add(EventName.stockFcw)
     if cs_out.stockAeb:
@@ -174,38 +135,24 @@ class CarInterfaceBase():
     if cs_out.cruiseState.nonAdaptive:
       events.add(EventName.wrongCruiseMode)
 
+    # TODO: move this stuff to the capnp strut
     if cs_out.steerError:
-      events.add(EventName.steerUnavailable)
+      events.add(EventName.steerUnavailable, [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
     elif cs_out.steerWarning:
-      events.add(EventName.steerTempUnavailable)
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
-
+      events.add(EventName.steerTempUnavailable, [ET.NO_ENTRY, ET.WARNING]))
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0.
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
-<<<<<<< HEAD
     if disengage_event and ((cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
        (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill))):
-      events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
-=======
-    if (cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
-       (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
-      events.add(EventName.pedalPressed)
+      events.add(EventName.pedalPressed, [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     # we engage when pcm is active (rising edge)
     if pcm_enable:
       if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:
-        events.add(EventName.pcmEnable)
+        events.add(EventName.pcmEnable), [ET.ENABLE]))
       elif not cs_out.cruiseState.enabled:
-        events.add(EventName.pcmDisable)
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
-
-    # we engage when pcm is active (rising edge)
-    if pcm_enable:
-      if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:
-        events.append(create_event('pcmEnable', [ET.ENABLE]))
-      elif not cs_out.cruiseState.enabled:
-        events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
+        events.add(EventName.pcmDisable), [ET.USER_DISABLE]))
 
     return events, eventsArne182
 
