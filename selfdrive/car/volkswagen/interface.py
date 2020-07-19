@@ -41,52 +41,6 @@ class CarInterface(CarInterfaceBase):
       ret.steerRateCost = 1.0
       ret.steerActuatorDelay = 0.05  # Hopefully all MQB racks are similar here
       ret.steerLimitTimer = 0.4
-
-<<<<<<< HEAD
-      # As a starting point for speed-adjusted lateral tuning, use the example
-      # map speed breakpoints from a VW Tiguan (SSP 399 page 9). It's unclear
-      # whether the driver assist map breakpoints have any direct bearing on
-      # HCA assist torque, but if they're good breakpoints for the driver,
-      # they're probably good breakpoints for HCA as well. OP won't be driving
-      # 250kph/155mph but it provides interpolation scaling above 100kmh/62mph.
-      ret.lateralTuning.pid.kpBP = [0., 15 * CV.KPH_TO_MS, 50 * CV.KPH_TO_MS]
-      ret.lateralTuning.pid.kiBP = [0., 15 * CV.KPH_TO_MS, 50 * CV.KPH_TO_MS]
-
-      # FIXME: Per-vehicle parameters need to be reintegrated.
-      # For the time being, per-vehicle stuff is being archived since we
-      # can't auto-detect very well yet. Now that tuning is figured out,
-      # averaged params should work reasonably on a range of cars. Owners
-      # can tweak here, as needed, until we have car type auto-detection.
-
-    # Set common MQB parameters that will apply globally
-    ret.carName = "volkswagen"
-    ret.radarOffCan = True
-    ret.safetyModel = car.CarParams.SafetyModel.volkswagen
-
-    # Additional common MQB parameters that may be overridden per-vehicle
-    ret.steerRateCost = 1.0
-    ret.steerActuatorDelay = 0.05  # Hopefully all MQB racks are similar here
-    ret.steerLimitTimer = 0.4
-
-    ret.steerMaxBP = [0.]  # m/s
-    ret.steerMaxV = [1.]
-
-
-    # ret.lateralTuning.pid.kpBP = [0., 15 * CV.KPH_TO_MS, 50 * CV.KPH_TO_MS]
-    # ret.lateralTuning.pid.kiBP = [0., 15 * CV.KPH_TO_MS, 50 * CV.KPH_TO_MS]
-    # ret.lateralTuning.pid.kpV = [0.15, 0.25, 0.60]
-    # ret.lateralTuning.pid.kiV = [0.05, 0.05, 0.05]
-
-    ret.steerRatio = 15.6
-    ret.steerRatioRear = 0.
-
-    ret.lateralTuning.pid.kpBP = [0.]
-    ret.lateralTuning.pid.kiBP = [0.]
-    ret.lateralTuning.pid.kfBP = [0.]
-    ret.lateralTuning.pid.kpV = [0.6]
-    ret.lateralTuning.pid.kiV = [0.2]
-    ret.lateralTuning.pid.kfV = [0.00006]
-=======
       ret.lateralTuning.pid.kpBP = [0.]
       ret.lateralTuning.pid.kiBP = [0.]
 
@@ -98,7 +52,6 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpV = [0.6]
       ret.lateralTuning.pid.kiV = [0.2]
       tire_stiffness_factor = 1.0
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     ret.enableCamera = True  # Stock camera detection doesn't apply to VW
     ret.transmissionType = car.CarParams.TransmissionType.automatic
@@ -160,10 +113,6 @@ class CarInterface(CarInterfaceBase):
 
     ret_arne182 = arne182.CarStateArne182.new_message()
     buttonEvents = []
-<<<<<<< HEAD
-
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     # Process the most recent CAN message traffic, and check for validity
     # The camera CAN has no signals we use at this time, but we process it
@@ -195,16 +144,11 @@ class CarInterface(CarInterfaceBase):
     if self.CS.parkingBrakeSet:
       events.add(EventName.parkBrake)
     if self.CS.steeringFault:
-<<<<<<< HEAD
-      events.append(create_event('steerTempUnavailable', [ET.NO_ENTRY, ET.WARNING]))
+      events.add(EventName.steerTempUnavailable, [ET.NO_ENTRY, ET.WARNING]))
 
     ret_arne182.events = eventsArne182
-    ret.events = events
-=======
-      events.add(EventName.steerTempUnavailable)
-
     ret.events = events.to_msg()
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+    
     ret.buttonEvents = buttonEvents
     ret.canMonoTimes = canMonoTimes
 
