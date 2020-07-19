@@ -528,12 +528,21 @@ EVENTS = {
   EventName.posenetInvalid: {
     ET.WARNING: Alert(
       "TAKE CONTROL",
-      "Vision Model Output Uncertain",
+      "Camera blocked or Device too hot!",
       AlertStatus.userPrompt, AlertSize.mid,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .4, 2., 3.),
+      Priority.LOW, VisualAlert.none, AudibleAlert.chimeWarning1, .4, 2., 3.),
     ET.NO_ENTRY: NoEntryAlert("Vision Model Output Uncertain"),
   },
 
+  EventName.plannerError: {
+    ET.WARNING: Alert(
+      "TAKE CONTROL IMMEDIATELY",
+      "Planner Solution Error",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.LOW, VisualAlert.none, AudibleAlert.chimeWarning1, .4, 2., 3.),
+    ET.NO_ENTRY: NoEntryAlert("Planner Solution Error"),
+  },
+  
   EventName.focusRecoverActive: {
     ET.WARNING: Alert(
       "TAKE CONTROL",
@@ -650,7 +659,7 @@ EVENTS = {
   },
 
   EventName.modeldLagging: {
-    ET.SOFT_DISABLE: SoftDisableAlert("Driving model lagging"),
+    ET.WARNING: SoftDisableAlert("Driving model lagging"),
     ET.NO_ENTRY : NoEntryAlert("Driving model lagging"),
   },
 
@@ -718,10 +727,7 @@ EVENTS = {
     ET.IMMEDIATE_DISABLE: ImmediateDisableAlert("Cruise Is Off"),
   },
 
-  EventName.plannerError: {
-    ET.IMMEDIATE_DISABLE: ImmediateDisableAlert("Planner Solution Error"),
-    ET.NO_ENTRY: NoEntryAlert("Planner Solution Error"),
-  },
+
 
   EventName.relayMalfunction: {
     ET.IMMEDIATE_DISABLE: ImmediateDisableAlert("Harness Malfunction"),
