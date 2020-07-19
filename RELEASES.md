@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-Version 0.7.5 (2020-04-23)
-========================
-* Right-Hand Drive support for both driving and driver monitoring!
-* New driver monitoring model: overall improvement on comma two
-* Driver camera preview in settings to improve mounting position
-* Added support for many Hyundai, Kia, Genesis models thanks to xx979xx!
-* 2019 Nissan X-Trail and 2018 Nissan Leaf support thanks to avolmensky!
-=======
 Version 0.7.7 (2020-07-20)
 ========================
  * White panda is no longer supported, upgrade to comma two or black panda
@@ -40,7 +31,6 @@ Version 0.7.5 (2020-05-13)
 * New driver monitoring model: overall improvement on comma two
 * Driver camera preview in settings to improve mounting position
 * Added support for many Hyundai, Kia, Genesis models thanks to xx979xx!
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 * Improved lateral tuning for 2020 Toyota Rav 4 (hybrid)
 
 Version 0.7.4 (2020-03-20)
