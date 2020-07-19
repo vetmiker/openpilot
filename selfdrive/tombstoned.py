@@ -29,13 +29,6 @@ def report_tombstone(fn, client):
 
   # Get summary for sentry title
   message = " ".join(contents.split('\n')[5:7])
-<<<<<<< HEAD
-
-  # Cut off pid/tid, since that varies per run
-  name_idx = message.find('name')
-  if name_idx >= 0:
-    message = message[name_idx:]
-=======
 
   # Cut off pid/tid, since that varies per run
   name_idx = message.find('name')
@@ -46,7 +39,6 @@ def report_tombstone(fn, client):
   fault_idx = message.find(', fault addr')
   if fault_idx >= 0:
     message = message[:fault_idx]
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   cloudlog.error({'tombstone': message})
   client.captureMessage(
@@ -69,11 +61,8 @@ def main():
   while True:
     now_tombstones = set(get_tombstones())
 
-<<<<<<< HEAD
+
     for fn, ctime in (now_tombstones - initial_tombstones):
-=======
-    for fn, _ in (now_tombstones - initial_tombstones):
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       try:
         cloudlog.info(f"reporting new tombstone {fn}")
         report_tombstone(fn, client)
