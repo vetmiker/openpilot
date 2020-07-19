@@ -9,14 +9,8 @@ import shutil
 import subprocess
 import datetime
 import textwrap
-<<<<<<< HEAD
-from selfdrive.swaglog import cloudlog, add_logentries_handler
-=======
 from typing import Dict, List
 from selfdrive.swaglog import cloudlog, add_logentries_handler
-
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
-
 from common.basedir import BASEDIR, PARAMS
 from common.android import ANDROID
 WEBCAM = os.getenv("WEBCAM") is not None
@@ -80,12 +74,10 @@ if __name__ == "__main__" and ANDROID:
 else:
   from common.spinner import FakeSpinner as Spinner
   from common.text_window import FakeTextWindow as TextWindow
-<<<<<<< HEAD
 
 if not (os.system("python3 -m pip list | grep 'scipy' ") == 0):
   os.system("cd /data/openpilot/installer/scipy_installer/ && ./scipy_installer")
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+
 
 import importlib
 import traceback
@@ -129,11 +121,8 @@ if not prebuilt:
 
     if scons.returncode != 0:
       # Read remaining output
-<<<<<<< HEAD
-      r = scons.stderr.read().split(b'\n')
-=======
       r = scons.stderr.read().split(b'\n')   # type: ignore
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+
       compile_output += r
 
       if retry:
@@ -157,16 +146,8 @@ if not prebuilt:
 
         # Show TextWindow
         error_s = "\n \n".join(["\n".join(textwrap.wrap(e, 65)) for e in errors])
-<<<<<<< HEAD
-        with TextWindow("Openpilot failed to build\n \n" + error_s) as t:
-          t.wait_for_exit()
-        process = subprocess.check_output(['git', 'pull'])
-        os.system('reboot')
-=======
         with TextWindow("openpilot failed to build\n \n" + error_s) as t:
           t.wait_for_exit()
-
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
         exit(1)
     else:
       break
@@ -216,12 +197,8 @@ managed_processes = {
   "updated": "selfdrive.updated",
   "dmonitoringmodeld": ("selfdrive/modeld", ["./dmonitoringmodeld"]),
   "modeld": ("selfdrive/modeld", ["./modeld"]),
-<<<<<<< HEAD
   "mapd": ("selfdrive/mapd", ["./mapd.py"]),
   "driverview": "selfdrive.controls.lib.driverview",
-=======
-  "driverview": "selfdrive.monitoring.driverview",
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 }
 
 daemon_processes = {
@@ -537,7 +514,6 @@ def manager_thread():
     if params.get("DoUninstall", encoding='utf8') == "1":
       break
 
-<<<<<<< HEAD
     if os.getenv("GET_CPU_USAGE"):
       dt = time.time() - start_t
 
@@ -552,8 +528,6 @@ def manager_thread():
         cleanup_all_processes(None, None)
         sys.exit(print_cpu_usage(first_proc, last_proc))
 
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 def manager_prepare(spinner=None):
   # build all processes
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -606,10 +580,7 @@ def main():
     ("VisionRadarToggle", "0"),
     ("LaneChangeEnabled", "1"),
     ("IsDriverViewEnabled", "0"),
-<<<<<<< HEAD
     ("DisablePowerDownTime", "30"),
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   ]
 
   # set unset params
@@ -661,13 +632,8 @@ if __name__ == "__main__":
     error = "Manager failed to start\n \n" + error
     with TextWindow(error) as t:
       t.wait_for_exit()
-<<<<<<< HEAD
     process = subprocess.check_output(['git', 'pull'])
     os.system('reboot')
-=======
-
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
-    raise
 
   # manual exit because we are forked
   sys.exit(0)
