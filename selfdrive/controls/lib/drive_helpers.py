@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 from cereal import car, arne182
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 from common.numpy_fast import clip, interp
 from selfdrive.config import Conversions as CV
 from cereal import car
