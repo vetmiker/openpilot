@@ -456,7 +456,7 @@ class CarInterface(CarInterfaceBase):
         events.add(EventName.speedTooLow)
       if ret.vEgo < 0.001:
         # while in standstill, send a user alert
-        events.add(EventName.manualRestart [ET.WARNING])
+        events.add(EventName.manualRestart)
     ret.events = events
     ret_arne182.events = eventsArne182
 
