@@ -286,13 +286,8 @@ def attempt_update(time_offroad, need_reboot):
   upstream_hash = run(["git", "rev-parse", "@{u}"], OVERLAY_MERGED).rstrip()
   new_version = cur_hash != upstream_hash
 
-<<<<<<< HEAD
-  git_fetch_result = len(git_fetch_output) > 0 and (
-            git_fetch_output != "Failed to add the host to the list of known hosts (/data/data/com.termux/files/home/.ssh/known_hosts).\n")
-=======
   err_msg = "Failed to add the host to the list of known hosts (/data/data/com.termux/files/home/.ssh/known_hosts).\n"
   git_fetch_result = len(git_fetch_output) > 0 and (git_fetch_output != err_msg)
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   cloudlog.info("comparing %s to %s" % (cur_hash, upstream_hash))
   if new_version or git_fetch_result:
@@ -360,16 +355,12 @@ def main():
   except IOError:
     raise RuntimeError("couldn't get overlay lock; is another updated running?")
 
-<<<<<<< HEAD
   time_offroad = time.time()
   need_reboot = False
-=======
   # Wait a short time before our first update attempt
   # Avoids race with IsOffroad not being set, reduces manager startup load
   time.sleep(30)
   wait_helper = WaitTimeHelper()
-
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   while True:
     update_failed_count += 1
     time_wrong = datetime.datetime.utcnow().year < 2019
