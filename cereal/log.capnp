@@ -372,10 +372,7 @@ struct HealthData {
     interruptRateTim1 @16;
     interruptRateTim3 @17;
     registerDivergent @18;
-<<<<<<< HEAD
-=======
     interruptRateKlineInit @19;
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     # Update max fault type in boardd when adding faults
   }
 
@@ -863,13 +860,10 @@ struct LiveLocationKalman {
   gpsTimeOfWeek @14 :Float64;
   status @15 :Status;
   unixTimestampMillis @16 :Int64;
-<<<<<<< HEAD
-=======
   inputsOK @17 :Bool = true;
   posenetOK @18 :Bool = true;
   gpsOK @19 :Bool = true;
   sensorsOK @21 :Bool = true;
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   enum Status {
     uninitialized @0;
