@@ -53,11 +53,7 @@ class FakeSpinner(Spinner):
   def close(self):
     pass
 
-<<<<<<< HEAD
-  def __exit__(self, type, value, traceback):
-=======
   def __exit__(self, exc_type, exc_value, traceback):
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     pass
 
 
