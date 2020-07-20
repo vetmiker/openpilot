@@ -14,10 +14,7 @@
 unsigned int honda_checksum(unsigned int address, uint64_t d, int l);
 unsigned int toyota_checksum(unsigned int address, uint64_t d, int l);
 unsigned int subaru_checksum(unsigned int address, uint64_t d, int l);
-<<<<<<< HEAD
-=======
 unsigned int chrysler_checksum(unsigned int address, uint64_t d, int l);
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 void init_crc_lookup_tables();
 unsigned int volkswagen_crc(unsigned int address, uint64_t d, int l);
 unsigned int pedal_checksum(uint64_t d, int l);
