@@ -135,6 +135,8 @@ if not prebuilt:
           shutil.rmtree("/tmp/scons_cache")
         else:
           print("scons build failed after retry")
+          process = subprocess.check_output(['git', 'pull'])
+          os.system('reboot')
           sys.exit(1)
       else:
         # Build failed log errors
@@ -148,6 +150,8 @@ if not prebuilt:
         error_s = "\n \n".join(["\n".join(textwrap.wrap(e, 65)) for e in errors])
         with TextWindow("openpilot failed to build\n \n" + error_s) as t:
           t.wait_for_exit()
+        process = subprocess.check_output(['git', 'pull'])
+        os.system('reboot')
         exit(1)
     else:
       break
