@@ -664,7 +664,9 @@ void *can_health_thread(void *crap) {
   // health = 8011
   float hours = 30;
   char *s;
-  const int result = read_db_value(NULL, "DisablePowerDownTime", &s, NULL);
+  size_t sz;
+  bool persistent_param = false
+  const int result = read_db_value("DisablePowerDownTime", &s, &sz, persistent_param);
   if (result == 0) {
     hours = strtod(s, NULL);
   }
