@@ -19,12 +19,8 @@ cdef extern from "common_dbc.h":
     PEDAL_COUNTER,
     VOLKSWAGEN_CHECKSUM,
     VOLKSWAGEN_COUNTER,
-<<<<<<< HEAD
-    SUBARU_CHECKSUM
-=======
     SUBARU_CHECKSUM,
     CHRYSLER_CHECKSUM
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   cdef struct Signal:
     const char* name
