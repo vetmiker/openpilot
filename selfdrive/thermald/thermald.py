@@ -19,14 +19,9 @@ from selfdrive.swaglog import cloudlog
 import cereal.messaging as messaging
 import cereal.messaging_arne as messaging_arne
 from selfdrive.loggerd.config import get_available_percent
-<<<<<<< HEAD
-from selfdrive.pandad import get_expected_version
-from selfdrive.thermald.power_monitoring import PowerMonitoring, get_battery_capacity, get_battery_status, get_battery_current, get_battery_voltage, get_usb_present
-=======
 from selfdrive.pandad import get_expected_signature
 from selfdrive.thermald.power_monitoring import PowerMonitoring, get_battery_capacity, get_battery_status, \
                                                 get_battery_current, get_battery_voltage, get_usb_present
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
 FW_SIGNATURE = get_expected_version()
 
@@ -35,13 +30,8 @@ NetworkType = log.ThermalData.NetworkType
 NetworkStrength = log.ThermalData.NetworkStrength
 CURRENT_TAU = 15.   # 15s time constant
 CPU_TEMP_TAU = 5.   # 5s time constant
-<<<<<<< HEAD
 DAYS_NO_CONNECTIVITY_MAX = 14  # do not allow to engage after a week without internet
 DAYS_NO_CONNECTIVITY_PROMPT = 8  # send an offroad prompt after 4 days with no internet
-=======
-DAYS_NO_CONNECTIVITY_MAX = 7  # do not allow to engage after a week without internet
-DAYS_NO_CONNECTIVITY_PROMPT = 4  # send an offroad prompt after 4 days with no internet
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 DISCONNECT_TIMEOUT = 5.  # wait 5 seconds before going offroad after disconnect so you get an alert
 
 LEON = False
@@ -197,7 +187,7 @@ def thermald_thread():
   should_start_prev = False
   handle_fan = None
   is_uno = False
-<<<<<<< HEAD
+  has_relay = False
 
   ts_last_ip = None
   ip_addr = '255.255.255.255'
@@ -208,35 +198,27 @@ def thermald_thread():
   else:
     setup_eon_fan()
     handle_fan = handle_fan_eon
-=======
-  has_relay = False
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   params = Params()
   pm = PowerMonitoring()
   no_panda_cnt = 0
-<<<<<<< HEAD
-  arne_pm = messaging_arne.PubMaster(['ipAddress'])
-=======
 
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+  arne_pm = messaging_arne.PubMaster(['ipAddress'])
+
   while 1:
     health = messaging.recv_sock(health_sock, wait=True)
     location = messaging.recv_sock(location_sock)
     location = location.gpsLocation if location else None
     msg = read_thermal()
 
-<<<<<<< HEAD
     # clear car params when panda gets connected
     if health is not None and health_prev is None:
       params.panda_disconnect()
     health_prev = health
 
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     if health is not None:
       usb_power = health.health.usbPowerMode != log.HealthData.UsbPowerMode.client
-      
+
       # If we lose connection to the panda, wait 5 seconds before going offroad
       if health.health.hwType == log.HealthData.HwType.unknown:
         no_panda_cnt += 1
@@ -358,11 +340,7 @@ def thermald_thread():
     if max_cpu_temp > 107. or bat_temp >= 63. or (has_relay and (started_ts is None) and max_cpu_temp > 70.0):
       # onroad not allowed
       thermal_status = ThermalStatus.danger
-<<<<<<< HEAD
     elif max_comp_temp > 96.0 or bat_temp > 60.:  # CPU throttling starts around ~90C
-=======
-    elif max_comp_temp > 96.0 or bat_temp > 60.:
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       # hysteresis between onroad not allowed and engage not allowed
       thermal_status = clip(thermal_status, ThermalStatus.red, ThermalStatus.danger)
     elif max_cpu_temp > 94.0:
