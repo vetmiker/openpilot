@@ -183,7 +183,7 @@ bool usb_connect() {
   if (err > 0) {
     fw_ver = (const char *)fw_ver_buf;
     fw_ver_sz = err3;
-    write_db_value(NULL, "PandaFirmware", fw_ver, fw_ver_sz);
+    write_db_value("PandaFirmware", fw_ver, fw_ver_sz);
     printf("panda fw: %.*s\n", fw_ver_sz, fw_ver);
   }
   else { goto fail; }
