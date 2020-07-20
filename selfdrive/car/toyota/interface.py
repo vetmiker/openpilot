@@ -236,7 +236,6 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.68986
       ret.steerRatio = 14.3
       tire_stiffness_factor = 0.7933
-<<<<<<< HEAD
       ret.longitudinalTuning.kpV = [0.2, 0.25, 0.325]
       ret.longitudinalTuning.kiV = [0.10, 0.10]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.12], [0.04]]
@@ -457,7 +456,7 @@ class CarInterface(CarInterfaceBase):
         events.add(EventName.speedTooLow)
       if ret.vEgo < 0.001:
         # while in standstill, send a user alert
-        events.add(EventName.manualRestart [ET.WARNING]))
+        events.add(EventName.manualRestart [ET.WARNING])
     ret.events = events
     ret_arne182.events = eventsArne182
 
