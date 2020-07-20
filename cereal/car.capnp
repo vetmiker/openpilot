@@ -95,8 +95,6 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     speedTooHigh @70;
     laneChangeBlocked @71;
     relayMalfunction @72;
-<<<<<<< HEAD
-=======
     gasPressed @73;
     stockFcw @74;
     startup @75;
@@ -114,7 +112,6 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     wrongCruiseMode @87;
     neosUpdateRequired @88;
     modeldLagging @89;
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   }
 }
 
@@ -147,13 +144,8 @@ struct CarState {
   steeringRate @15 :Float32;       # deg/s
   steeringTorque @8 :Float32;      # TODO: standardize units
   steeringTorqueEps @27 :Float32;  # TODO: standardize units
-<<<<<<< HEAD
-  steeringPressed @9 :Bool;    # if the user is using the steering wheel
-  steeringRateLimited @29 :Bool;    # if the torque is limited by the rate limiter
-=======
   steeringPressed @9 :Bool;        # if the user is using the steering wheel
   steeringRateLimited @29 :Bool;   # if the torque is limited by the rate limiter
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   steerWarning @35 :Bool;          # temporary steer unavailble
   steerError @36 :Bool;            # permanent steer error
   stockAeb @30 :Bool;
