@@ -1,17 +1,12 @@
 Import('env', 'arch', 'common', 'messaging', 'gpucommon', 'visionipc', 'cereal')
 
-<<<<<<< HEAD
 src = ['ui.cc', 'paint.cc', 'sidebar.cc', '#phonelibs/nanovg/nanovg.c', '#cereal/gen/c/log.capnp.c', '#cereal/gen/c/car.capnp.c']
-libs = [common, 'zmq', 'czmq', 'capnp', 'capnp_c', 'm', cereal, 'json', messaging, 'OpenCL', gpucommon, visionipc]
-linkflags = ['-Wl,-rpath=/system/lib64,-rpath=/system/comma/usr/lib']
-=======
-src = ['ui.cc', 'paint.cc', 'sidebar.cc', '#phonelibs/nanovg/nanovg.c']
-libs = [common, 'zmq', 'czmq', 'capnp', 'kj', 'm', cereal, messaging, gpucommon, visionipc]
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+libs = [common, 'zmq', 'czmq', 'capnp', 'kj', 'm', cereal, 'json', messaging, gpucommon, visionipc]
 
 if arch == "aarch64":
   src += ['sound.cc']
   libs += ['EGL', 'GLESv3', 'gnustl_shared', 'log', 'utils', 'gui', 'hardware', 'ui', 'CB', 'gsl', 'adreno_utils', 'OpenSLES', 'cutils', 'uuid', 'OpenCL']
+  linkflags = ['-Wl,-rpath=/system/lib64,-rpath=/system/comma/usr/lib']
 else:
   src += ['linux.cc']
   libs += ['EGL', 'pthread', 'X11-xcb', 'xcb', 'X11', 'glfw']
