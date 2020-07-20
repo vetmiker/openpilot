@@ -418,7 +418,7 @@ class CarInterface(CarInterfaceBase):
       ret.cruiseState.enabled = self.CS.pcm_acc_active
       if self.CS.out.cruiseState.enabled and not self.CS.pcm_acc_active:
         self.disengage_due_to_slow_speed = True
-    if self.disengage_due_to_slow_speed and ret.vEgo > 1:
+    if self.disengage_due_to_slow_speed and ret.vEgo > 1 and ret.gearShifter != GearShifter.reverse:
       self.disengage_due_to_slow_speed = False
       ret.cruiseState.enabled = bool(self.CS.main_on)
 
