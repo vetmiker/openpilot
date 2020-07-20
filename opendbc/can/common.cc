@@ -20,20 +20,6 @@ unsigned int toyota_checksum(unsigned int address, uint64_t d, int l) {
   unsigned int s = l;
   while (address) { s += address & 0xFF; address >>= 8; }
   while (d) { s += d & 0xFF; d >>= 8; }
-<<<<<<< HEAD
-
-  return s & 0xFF;
-}
-
-unsigned int subaru_checksum(unsigned int address, uint64_t d, int l) {
-  d >>= ((8-l)*8); // remove padding
-
-  unsigned int s = 0;
-  while (address) { s += address & 0xFF; address >>= 8; }
-  l -= 1; // checksum is first byte
-  while (l) { s += d & 0xFF; d >>= 8; l -= 1; }
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   return s & 0xFF;
 }
