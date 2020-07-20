@@ -5,10 +5,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sched.h>
-<<<<<<< HEAD
-=======
 #include <errno.h>
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -65,13 +62,6 @@ bool fake_send = false;
 bool loopback_can = false;
 cereal::HealthData::HwType hw_type = cereal::HealthData::HwType::UNKNOWN;
 bool is_pigeon = false;
-<<<<<<< HEAD
-
-
-const float VBATT_START_CHARGING = 11.5;
-const float VBATT_PAUSE_CHARGING = 10.5;
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 float voltage_f = 12.5;  // filtered voltage
 uint32_t no_ignition_cnt = 0;
 bool connected_once = false;
@@ -80,7 +70,7 @@ bool ignition_last = false;
 #ifndef __x86_64__
 const uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * 30;  // turn off charge after 30 hrs
 const float VBATT_START_CHARGING = 11.5;
-const float VBATT_PAUSE_CHARGING = 11.0;
+const float VBATT_PAUSE_CHARGING = 10.5;
 #endif
 
 bool safety_setter_thread_initialized = false;
@@ -113,11 +103,6 @@ void *safety_setter_thread(void *s) {
     }
     usleep(100*1000);
   }
-<<<<<<< HEAD
-  LOGW("got CarVin %s", value_vin);
-  free(value_vin);
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
   // VIN query done, stop listening to OBDII
   pthread_mutex_lock(&usb_lock);
@@ -204,11 +189,7 @@ bool usb_connect() {
   else { goto fail; }
   if ((err == 64) && (err2 == 64)) {
     printf("FW signature read\n");
-<<<<<<< HEAD
-    //write_db_value(NULL, "PandaFirmware", (const char *)fw_sig_buf, 128);
-=======
-    write_db_value("PandaFirmware", (const char *)fw_sig_buf, 128);
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+    //write_db_value("PandaFirmware", (const char *)fw_sig_buf, 128);
 
     for (size_t i = 0; i < 8; i++){
       fw_sig_hex_buf[2*i] = NIBBLE_TO_HEX(fw_sig_buf[i] >> 4);
@@ -361,11 +342,7 @@ void can_recv(PubMaster &pm) {
   pm.send("can", msg);
 }
 
-<<<<<<< HEAD
-void can_health(PubSocket *publisher, float hours) {
-=======
-void can_health(PubMaster &pm) {
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+void can_health(PubMaster &pm, float hours) {
   int cnt;
   int err;
 
@@ -410,14 +387,7 @@ void can_health(PubMaster &pm) {
   // No panda connected, send empty health packet
   if (!received){
     healthData.setHwType(cereal::HealthData::HwType::UNKNOWN);
-<<<<<<< HEAD
-
-    auto words = capnp::messageToFlatArray(msg);
-    auto bytes = words.asBytes();
-    publisher->send((char*)bytes.begin(), bytes.size());
-=======
     pm.send("health", msg);
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
     return;
   }
 
@@ -551,22 +521,6 @@ void can_health(PubMaster &pm) {
   // Convert faults bitset to capnp list
   std::bitset<sizeof(health.faults) * 8> fault_bits(health.faults);
   auto faults = healthData.initFaults(fault_bits.count());
-<<<<<<< HEAD
-
-  size_t i = 0;
-  for (size_t f = size_t(cereal::HealthData::FaultType::RELAY_MALFUNCTION);
-       f <= size_t(cereal::HealthData::FaultType::REGISTER_DIVERGENT); f++){
-    if (fault_bits.test(f)) {
-      faults.set(i, cereal::HealthData::FaultType(f));
-      i++;
-    }
-  }
-  // send to health
-  auto words = capnp::messageToFlatArray(msg);
-  auto bytes = words.asBytes();
-  publisher->send((char*)bytes.begin(), bytes.size());
-
-=======
 
   size_t i = 0;
   for (size_t f = size_t(cereal::HealthData::FaultType::RELAY_MALFUNCTION);
@@ -579,7 +533,6 @@ void can_health(PubMaster &pm) {
   // send to health
   pm.send("health", msg);
 
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   // send heartbeat back to panda
   pthread_mutex_lock(&usb_lock);
   libusb_control_transfer(dev_handle, 0x40, 0xf3, 1, 0, NULL, 0, TIMEOUT);
@@ -709,10 +662,6 @@ void *can_recv_thread(void *crap) {
 void *can_health_thread(void *crap) {
   LOGD("start health thread");
   // health = 8011
-<<<<<<< HEAD
-  Context * c = Context::create();
-  PubSocket * publisher = PubSocket::create(c, "health");
-  assert(publisher != NULL);
   float hours = 30;
   char *s;
   const int result = read_db_value(NULL, "DisablePowerDownTime", &s, NULL);
@@ -720,16 +669,11 @@ void *can_health_thread(void *crap) {
     hours = strtod(s, NULL);
   }
   free(s);
-  // run at 2hz
-  while (!do_exit) {
-    can_health(publisher, hours);
-=======
   PubMaster pm({"health"});
 
   // run at 2hz
   while (!do_exit) {
-    can_health(pm);
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+    can_health(pm, hours);
     usleep(500*1000);
   }
 
