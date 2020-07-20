@@ -816,12 +816,12 @@ static void ui_draw_vision_footer(UIState *s) {
   if (s->scene.dpUiFace) {
   ui_draw_vision_face(s);
   }
-  //if ((int)s->scene.dpDynamicFollow > 0) {
+  if ((int)s->scene.dpDynamicFollow > 0) {
     ui_draw_df_button(s);
-  //}
-  //if ((int)s->scene.dpAccelProfile > 0) {
+  }
+  if ((int)s->scene.dpAccelProfile > 0) {
     ui_draw_ap_button(s);
-  //}
+  }
   if (s->scene.dpUiDev || s->scene.dpDashcam || s->scene.dpAppWaze) {
     ui_draw_infobar(s);
   }
