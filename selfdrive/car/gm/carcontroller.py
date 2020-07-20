@@ -57,7 +57,7 @@ class CarController():
     self.blinker_end_frame = 0.
 
   def update(self, enabled, CS, frame, actuators,
-             hud_v_cruise, hud_show_lanes, hud_show_car, hud_alert):
+             hud_v_cruise, hud_show_lanes, hud_show_car, hud_alert, dragonpilot):
 
     P = self.params
 
