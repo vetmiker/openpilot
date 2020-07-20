@@ -39,6 +39,7 @@ confs = [
   {'name': 'dp_max_ctrl_speed', 'default': 92, 'type': 'Float32', 'conf_type': ['param', 'struct']},
   {'name': 'dp_lead_car_alert', 'default': False, 'type': 'Bool', 'conf_type': ['param', 'struct']},
   {'name': 'dp_dynamic_follow', 'default': 0, 'type': 'UInt8', 'min': 0, 'max': 4, 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
+  {'name': 'dp_accel_profile', 'default': 0, 'type': 'UInt8', 'min': 0, 'max': 3, 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
   # safety
   {'name': 'dp_driver_monitor', 'default': True, 'type': 'Bool', 'conf_type': ['param', 'struct']},
   {'name': 'dp_steering_monitor', 'default': True, 'type': 'Bool', 'depends': [{'name': 'dp_driver_monitor', 'vals': [False]}], 'conf_type': ['param', 'struct']},

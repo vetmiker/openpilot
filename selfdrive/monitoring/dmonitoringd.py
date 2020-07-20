@@ -36,6 +36,8 @@ def dmonitoringd_thread(sm=None, pm=None):
   sm['carState'].cruiseState.speed = 0.
   sm['carState'].buttonEvents = []
   sm['carState'].steeringPressed = False
+  sm['carState'].gasPressed = False
+  sm['carState'].brakePressed = False
   sm['carState'].standstill = True
 
   cal_rpy = [0, 0, 0]
@@ -43,26 +45,22 @@ def dmonitoringd_thread(sm=None, pm=None):
   driver_engaged = False
 
   # dp
-  dp_driver_monitor = True
-  dp_steering_monitor = True
-  dp_steering_monitor_timer = 70
+  sm['dragonConf'].dpDriverMonitor = True
+  sm['dragonConf'].dpSteeringMonitor = True
+  sm['dragonConf'].dpSteeringMonitorTimer = 70
 
   # 10Hz <- dmonitoringmodeld
   while True:
     sm.update()
 
     # dp
-    if sm.updated['dragonConf']:
-      dp_driver_monitor = sm['dragonConf'].dpDriverMonitor
-      dp_steering_monitor = sm['dragonConf'].dpSteeringMonitor
-      dp_steering_monitor_timer = sm['dragonConf'].dpSteeringMonitorTimer if sm['dragonConf'].dpSteeringMonitorTimer >= 70 else 70
-    if not dp_driver_monitor:
+    if not sm['dragonConf'].dpDriverMonitor:
       driver_status.active_monitoring_mode = False
       driver_status.face_detected = False
-      driver_status.threshold_pre = 15. / dp_steering_monitor_timer
-      driver_status.threshold_prompt = 6. / dp_steering_monitor_timer
-      driver_status.step_change = DT_DMON / dp_steering_monitor_timer
-      if not dp_steering_monitor:
+      driver_status.threshold_pre = 15. / sm['dragonConf'].dpSteeringMonitorTimer
+      driver_status.threshold_prompt = 6. / sm['dragonConf'].dpSteeringMonitorTimer
+      driver_status.step_change = DT_DMON / sm['dragonConf'].dpSteeringMonitorTimer
+      if not sm['dragonConf'].dpSteeringMonitor:
         driver_status.awareness = 1.
         driver_status.awareness_active = 1.
         driver_status.awareness_passive = 1.
@@ -94,7 +92,7 @@ def dmonitoringd_thread(sm=None, pm=None):
     # Get data from dmonitoringmodeld
     if sm.updated['driverState']:
       events = Events()
-      if dp_driver_monitor:
+      if sm['dragonConf'].dpDriverMonitor:
         driver_status.get_pose(sm['driverState'], cal_rpy, sm['carState'].vEgo, sm['carState'].cruiseState.enabled)
       # Block any engage after certain distrations
       if driver_status.terminal_alert_cnt >= MAX_TERMINAL_ALERTS or driver_status.terminal_time >= MAX_TERMINAL_DURATION:

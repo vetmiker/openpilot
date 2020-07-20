@@ -94,6 +94,11 @@ const int df_btn_h = 180;
 const int df_btn_w = 180;
 const int df_btn_x = 1650;
 const int df_btn_y = 750;
+// dp - accel profile btn
+const int ap_btn_h = 180;
+const int ap_btn_w = 180;
+const int ap_btn_x = 1450;
+const int ap_btn_y = 750;
 
 typedef struct UIScene {
   int frontview;
@@ -174,6 +179,7 @@ typedef struct UIScene {
   bool dpIsUpdating;
   bool dpAthenad;
   int dpDynamicFollow;
+  int dpAccelProfile;
 } UIScene;
 
 typedef struct {

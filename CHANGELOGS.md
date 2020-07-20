@@ -1,5 +1,7 @@
 2020-07-20 (0.7.7.0)
 ========================
+* 加回 加速模式 開關。
+* Re-added Accel Profile toggle.
 * 修正 gm 錯誤。
 * Fixed bugs in gm cars.
 

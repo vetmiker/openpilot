@@ -160,6 +160,7 @@ def confd_thread():
     if msg.dragonConf.dpAtl:
       msg.dragonConf.dpAllowGas = True
       msg.dragonConf.dpDynamicFollow = 0
+      msg.dragonConf.dpAccelProfile = 0
       msg.dragonConf.dpGearCheck = False
     if msg.dragonConf.dpAppWaze:
       msg.dragonConf.dpDrivingUi = False

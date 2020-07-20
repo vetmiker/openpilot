@@ -619,6 +619,35 @@ static void ui_draw_df_button(UIState *s) {
   NULL);
 }
 
+static void ui_draw_ap_button(UIState *s) {
+  const UIScene *scene = &s->scene;
+  nvgBeginPath(s->vg);
+  nvgRoundedRect(s->vg, ap_btn_x, ap_btn_y, ap_btn_w, ap_btn_h, 20);
+  nvgStrokeColor(s->vg, COLOR_WHITE_ALPHA(80));
+  nvgStrokeWidth(s->vg, 6);
+  nvgStroke(s->vg);
+
+  nvgFontFaceId(s->vg,  s->font_sans_regular);
+  nvgFillColor(s->vg, COLOR_WHITE_ALPHA(200));
+  nvgFontSize(s->vg, (scene->dpLocale == "zh-TW"? 96 : scene->dpLocale == "zh-CN"? 96 : 48));
+  nvgTextAlign(s->vg, NVG_ALIGN_CENTER);
+
+  nvgText(s->vg, ap_btn_x + ap_btn_w / 2, ap_btn_y + ap_btn_h / 2,
+  scene->dpAccelProfile == 3? (scene->dpLocale == "zh-TW"? "運動" : scene->dpLocale == "zh-CN"? "运动" : "SPORT") :
+  scene->dpAccelProfile == 2? (scene->dpLocale == "zh-TW"? "正常" : scene->dpLocale == "zh-CN"? "正常" : "NORMAL") :
+  (scene->dpLocale == "zh-TW"? "節能" : scene->dpLocale == "zh-CN"? "节能" : "ECO"),
+  NULL);
+
+  nvgFontFaceId(s->vg,  s->font_sans_regular);
+  nvgFillColor(s->vg, COLOR_WHITE_ALPHA(200));
+  nvgFontSize(s->vg, 37.5);
+  nvgTextAlign(s->vg, NVG_ALIGN_CENTER);
+
+  nvgText(s->vg, ap_btn_x + ap_btn_w / 2, ap_btn_y + ap_btn_h - 10,
+  (scene->dpLocale == "zh-TW"? "加速" : scene->dpLocale == "zh-CN"? "加速" : "ACCEL"),
+  NULL);
+}
+
 static void ui_draw_driver_view(UIState *s) {
   const UIScene *scene = &s->scene;
   s->scene.uilayout_sidebarcollapsed = true;
@@ -787,10 +816,12 @@ static void ui_draw_vision_footer(UIState *s) {
   if (s->scene.dpUiFace) {
   ui_draw_vision_face(s);
   }
-  if ((int)s->scene.dpDynamicFollow > 0) {
+  //if ((int)s->scene.dpDynamicFollow > 0) {
     ui_draw_df_button(s);
-  }
-
+  //}
+  //if ((int)s->scene.dpAccelProfile > 0) {
+    ui_draw_ap_button(s);
+  //}
   if (s->scene.dpUiDev || s->scene.dpDashcam || s->scene.dpAppWaze) {
     ui_draw_infobar(s);
   }

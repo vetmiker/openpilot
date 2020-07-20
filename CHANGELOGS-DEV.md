@@ -6,6 +6,8 @@ dragonpilot 0.7.7.0
 * When Manager failed, display IP address. (Thanks to  @dingliangxue)
 * 加回 sr learner 開關。
 * Re-added sr learner toggle.
+* 加回 加速模式 開關。
+* Re-added Accel Profile toggle.
 
 dragonpilot 0.7.6.2
 ========================

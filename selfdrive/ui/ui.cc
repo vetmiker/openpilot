@@ -125,6 +125,22 @@ static bool handle_dp_btn_touch(UIState *s, int touch_x, int touch_y) {
       snprintf(time_str, 11, "%lu", time(NULL));
       write_db_value("dp_last_modified", time_str, 11);
       return true;
+    } else if (s->scene.dpAccelProfile > 0 && touch_x >= ap_btn_x && touch_x <= (ap_btn_x + ap_btn_w) && touch_y >= ap_btn_y && touch_y <= (ap_btn_y + ap_btn_h)) {
+      s->scene.uilayout_sidebarcollapsed = true;  // collapse sidebar when tapping df button
+      int val = s->scene.dpAccelProfile;
+      val++;
+      if (val >= 4) {
+        val = 1;
+      }
+
+      char str[1];
+      sprintf(str, "%d", val);
+      write_db_value("dp_accel_profile", str, 1);
+
+      char time_str[11];
+      snprintf(time_str, 11, "%lu", time(NULL));
+      write_db_value("dp_last_modified", time_str, 11);
+      return true;
     }
   }
   return false;
@@ -434,6 +450,7 @@ void handle_message(UIState *s, SubMaster &sm) {
     scene.dpUiBrightness = data.getDpUiBrightness();
     scene.dpUiVolumeBoost = data.getDpUiVolumeBoost();
     scene.dpDynamicFollow = data.getDpDynamicFollow();
+    scene.dpAccelProfile = data.getDpAccelProfile();
 
     scene.dpIpAddr = data.getDpIpAddr();
     scene.dpLocale = data.getDpLocale();
