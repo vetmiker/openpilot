@@ -195,10 +195,7 @@ def thermald_thread():
   pm = PowerMonitoring()
   no_panda_cnt = 0
 
-  if params.get('dp_full_speed_fan') == b'1':
-    setup_eon_fan()
-    handle_fan = handle_fan_eon
-
+  # dp
   dp_temp_monitor = True
 
   while 1:
