@@ -138,6 +138,7 @@ class Controls:
     self.saturated_count = 0
     self.distance_traveled = 0
     self.distance_traveled_override = 0
+    self.distance_traveled_engaged = 0
     self.events_prev = []
     self.current_alert_types = [ET.PERMANENT]
 
@@ -279,8 +280,10 @@ class Controls:
       self.mismatch_counter += 1
 
     self.distance_traveled += CS.vEgo * DT_CTRL
-    if CS.steeringPressed:
-      self.distance_traveled_override += CS.vEgo * DT_CTRL
+    if self.enabled:
+      self.distance_traveled_engaged += CS.vEgo * DT_CTRL
+      if CS.steeringPressed:
+        self.distance_traveled_override += CS.vEgo * DT_CTRL
 
     return CS, CS_arne182
 
