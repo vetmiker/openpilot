@@ -78,13 +78,6 @@ RUN pyenv install 3.8.2 && \
       pre-commit==2.4.0 \
       parameterized==0.7.4
 
-
-RUN python --version
-RUN cd /tmp && pipenv install --system --deploy
-
-COPY phonelibs/install_capnp.sh /tmp/install_capnp.sh
-RUN /tmp/install_capnp.sh
-
 ENV PATH="/tmp/openpilot/external/bin:${PATH}"
 
 ENV PYTHONPATH /tmp/openpilot:${PYTHONPATH}
