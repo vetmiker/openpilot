@@ -534,7 +534,7 @@ void handle_message(UIState *s, SubMaster &sm) {
       s->controls_seen = false;
       s->active_app = cereal::UiLayoutState::App::HOME;
 
-<<<<<<< HEAD
+
     for (int i = 0; i < 50; i++){
       s->scene.mpc_y[i] = capn_to_f32(capn_get32(y_list, i));
     }
@@ -624,25 +624,7 @@ void handle_message(UIState *s, SubMaster &sm) {
   }
 
   s->started = s->thermal_started || s->preview_started ;
-  // Handle onroad/offroad transition
-  if (!s->started) {
-    if (s->status != STATUS_STOPPED) {
-      update_status(s, STATUS_STOPPED);
-      s->alert_sound_timeout = 0;
-      s->vision_seen = false;
-      s->controls_seen = false;
-      s->active_app = cereal_UiLayoutState_App_home;
-      update_offroad_layout_state(s);
-    }
-  } else if (s->status == STATUS_STOPPED) {
-    update_status(s, STATUS_DISENGAGED);
 
-    s->active_app = cereal_UiLayoutState_App_none;
-    update_offroad_layout_state(s);
-  }
-
-  capn_free(&ctx);
-=======
       #ifndef QCOM
       // disconnect from visionipc on PC
       close(s->ipc_fd);
@@ -653,7 +635,6 @@ void handle_message(UIState *s, SubMaster &sm) {
     update_status(s, STATUS_DISENGAGED);
     s->active_app = cereal::UiLayoutState::App::NONE;
   }
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 }
 
 void handle_message_arne182(UIState *s, Message * msg) {
@@ -936,32 +917,7 @@ static void* vision_connect_thread(void *args) {
     s->vision_connect_firstrun = true;
 
     // Drain sockets
-<<<<<<< HEAD
-    while (true){
-      auto polls = s->poller->poll(0);
-      if (polls.size() == 0)
-        break;
-
-      for (auto sock : polls){
-        Message * msg = sock->receive();
-        if (msg == NULL) continue;
-        delete msg;
-      }
-    }
-    while (true){
-      auto polls = s->pollerarne182->poll(0);
-      if (polls.size() == 0)
-        break;
-
-      for (auto sock : polls){
-        Message * msg = sock->receive();
-        if (msg == NULL) continue;
-        delete msg;
-      }
-    }
-=======
     s->sm->drain();
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     pthread_mutex_unlock(&s->lock);
   }
@@ -1075,13 +1031,10 @@ int main(int argc, char* argv[]) {
 
   int draws = 0;
 
-<<<<<<< HEAD
   s->scene.satelliteCount = -1;
   s->started = false;
   s->vision_seen = false;
 
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   while (!do_exit) {
     bool should_swap = false;
     if (!s->started) {
@@ -1124,16 +1077,12 @@ int main(int argc, char* argv[]) {
         s->controls_timeout = 5 * UI_FREQ;
       }
     } else {
-<<<<<<< HEAD
       // blank screen on reverse gear
       if (s->scene.gear == 4) {
         set_awake(s, false);
       } else {
         set_awake(s, true);
       }
-=======
-      set_awake(s, true);
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
       // Car started, fetch a new rgb image from ipc
       if (s->vision_connected){
         ui_update(s);
@@ -1143,10 +1092,7 @@ int main(int argc, char* argv[]) {
 
       // Visiond process is just stopped, force a redraw to make screen blank again.
       if (!s->started) {
-<<<<<<< HEAD
         s->scene.satelliteCount = -1;
-=======
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
         s->scene.uilayout_sidebarcollapsed = false;
         update_offroad_layout_state(s);
         ui_draw(s);
@@ -1182,48 +1128,6 @@ int main(int argc, char* argv[]) {
     // If car is started and controlsState times out, display an alert
     if (s->controls_timeout > 0) {
       s->controls_timeout--;
-<<<<<<< HEAD
-    } else {
-      if (s->started && s->controls_seen && strcmp(s->scene.alert_text2, "Controls Unresponsive") != 0) {
-        LOGE("Controls unresponsive");
-        s->scene.alert_size = ALERTSIZE_FULL;
-        update_status(s, STATUS_ALERT);
-
-        snprintf(s->scene.alert_text1, sizeof(s->scene.alert_text1), "%s", "TAKE CONTROL IMMEDIATELY");
-        snprintf(s->scene.alert_text2, sizeof(s->scene.alert_text2), "%s", "Controls Unresponsive");
-        ui_draw_vision_alert(s, s->scene.alert_size, s->status, s->scene.alert_text1, s->scene.alert_text2);
-
-        s->alert_sound_timeout = 2 * UI_FREQ;
-        s->alert_sound = cereal_CarControl_HUDControl_AudibleAlert_chimeWarningRepeat;
-        play_alert_sound(s->alert_sound);
-      }
-
-      s->alert_sound_timeout--;
-      s->controls_seen = false;
-    }
-
-    // stop playing alert sound
-    if ((!s->started || (s->started && s->alert_sound_timeout == 0)) &&
-        s->alert_sound != cereal_CarControl_HUDControl_AudibleAlert_none) {
-      stop_alert_sound(s->alert_sound);
-      s->alert_sound = cereal_CarControl_HUDControl_AudibleAlert_none;
-    }
-
-    read_param_bool_timeout(&s->is_metric, "IsMetric", &s->is_metric_timeout);
-    read_param_bool_timeout(&s->longitudinal_control, "LongitudinalControl", &s->longitudinal_control_timeout);
-    read_param_bool_timeout(&s->limit_set_speed, "LimitSetSpeed", &s->limit_set_speed_timeout);
-    read_param_float_timeout(&s->speed_lim_off, "SpeedLimitOffset", &s->limit_set_speed_timeout);
-    int param_read = read_param_uint64_timeout(&s->last_athena_ping, "LastAthenaPingTime", &s->last_athena_ping_timeout);
-    if (param_read != 0) {
-      s->scene.athenaStatus = NET_DISCONNECTED;
-    } else if (nanos_since_boot() - s->last_athena_ping < 70e9) {
-      s->scene.athenaStatus = NET_CONNECTED;
-    } else {
-      s->scene.athenaStatus = NET_ERROR;
-    }
-    update_offroad_layout_timeout(s, &s->offroad_layout_timeout);
-    //read_param_str_timeout(s->ipAddr, "IPAddress", &s->ipAddr_timeout);
-=======
     } else if (s->started) {
       if (!s->controls_seen) {
         // car is started, but controlsState hasn't been seen at all
@@ -1261,7 +1165,6 @@ int main(int argc, char* argv[]) {
       }
     }
     update_offroad_layout_state(s);
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
 
     pthread_mutex_unlock(&s->lock);
 
