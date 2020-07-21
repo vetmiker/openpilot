@@ -106,8 +106,8 @@ static void send_df(UIState *s, int status) {
 
 static bool handle_df_touch(UIState *s, int touch_x, int touch_y) {
   //dfButton manager  // code below thanks to kumar: https://github.com/arne182/openpilot/commit/71d5aac9f8a3f5942e89634b20cbabf3e19e3e78
-   if (s->awake && s->vision_connected && s->status != STATUS_STOPPED) {
-    int padding = 40;
+  if (s->awake && s->vision_connected && s->status != STATUS_STOPPED) {
+   int padding = 40;
    if (touch_x >= 1212 && touch_x <= 1310 && touch_y >= 902 && touch_y <= 1013) {
       s->scene.uilayout_sidebarcollapsed = true;  // collapse sidebar when tapping df button
       s->scene.dfButtonStatus++;
@@ -293,12 +293,12 @@ static void ui_init(UIState *s) {
                                     , "liveMapData"
 #endif
   });
-  s->pm = new PubMaster({"offroadLayout"});
+  //s->pm = new PubMaster({"offroadLayout"});
 
-  s->ipc_fd = -1;
-  s->scene.satelliteCount = -1;
-  s->started = false;
-  s->vision_seen = false;
+  //s->ipc_fd = -1;
+  //s->scene.satelliteCount = -1;
+  //s->started = false;
+  //s->vision_seen = false;
 
   // init display
   s->fb = framebuffer_init("ui", 0, true, &s->fb_w, &s->fb_h);
