@@ -138,7 +138,6 @@ typedef struct UIScene {
   bool monitoring_active;
 
   bool is_rhd;
-  bool map_valid;
   bool uilayout_sidebarcollapsed;
   bool uilayout_mapenabled;
   bool uilayout_mockengaged;
