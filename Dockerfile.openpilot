@@ -82,6 +82,9 @@ ENV PATH="/tmp/openpilot/external/bin:${PATH}"
 
 ENV PYTHONPATH /tmp/openpilot:${PYTHONPATH}
 
+COPY phonelibs/install_capnp.sh /tmp/install_capnp.sh	
+RUN /tmp/install_capnp.sh
+
 RUN mkdir -p /tmp/openpilot
 COPY ./flake8_openpilot.sh /tmp/openpilot/
 COPY ./pylint_openpilot.sh /tmp/openpilot/
