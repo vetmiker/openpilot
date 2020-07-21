@@ -85,6 +85,7 @@ COPY ./panda /tmp/openpilot/panda
 COPY ./external /tmp/openpilot/external
 COPY ./tools /tmp/openpilot/tools
 COPY ./laika /tmp/openpilot/laika
+COPY ./rednose /tmp/openpilot/rednose
 
 COPY SConstruct /tmp/openpilot/SConstruct
 
