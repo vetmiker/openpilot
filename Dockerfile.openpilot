@@ -6,8 +6,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     autoconf \
     build-essential \
     bzip2 \
-    capnproto \
-    libcapnp-dev \
     clang \
     cmake \
     curl \
