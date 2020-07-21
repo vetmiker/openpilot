@@ -76,7 +76,6 @@ DMonitoringResult dmonitoring_eval_frame(DMonitoringModelState* s, void* stream_
                        cropped_u_buf, cropped_width/2,
                        cropped_v_buf, cropped_width/2,
                        cropped_width, cropped_height);
-    delete[] premirror_cropped_buf;
   }
 
   uint8_t *resized_buf = get_buffer(s->resized_buf, resized_width*resized_height*3/2);
