@@ -1,6 +1,5 @@
 FROM ubuntu:16.04
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH /tmp/openpilot:${PYTHONPATH}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     autoconf \
@@ -76,12 +75,12 @@ RUN pyenv install 3.8.2 && \
       pre-commit==2.4.0 \
       parameterized==0.7.4
 
+COPY phonelibs/install_capnp.sh /tmp/install_capnp.sh	
+RUN /tmp/install_capnp.sh
+
 ENV PATH="/tmp/openpilot/external/bin:${PATH}"
 
 ENV PYTHONPATH /tmp/openpilot:${PYTHONPATH}
-
-COPY phonelibs/install_capnp.sh /tmp/install_capnp.sh	
-RUN /tmp/install_capnp.sh
 
 RUN mkdir -p /tmp/openpilot
 COPY ./flake8_openpilot.sh /tmp/openpilot/
