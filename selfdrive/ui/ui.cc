@@ -224,7 +224,6 @@ static void update_offroad_layout_timeout(UIState *s, int* timeout) {
 static void ui_init(UIState *s) {
 
   pthread_mutex_init(&s->lock, NULL);
-<<<<<<< HEAD
 
   s->ctx = Context::create();
   s->ctxarne182 = Context::create();
@@ -288,10 +287,8 @@ static void ui_init(UIState *s) {
                               s->ipaddress_sock
                              });
 
-=======
-  s->sm = new SubMaster({"model", "controlsState", "uiLayoutState", "liveCalibration", "radarState", "thermal",
-                         "health", "ubloxGnss", "driverState", "dMonitoringState"
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+  //s->sm = new SubMaster({"model", "controlsState", "uiLayoutState", "liveCalibration", "radarState", "thermal",
+                        // "health", "ubloxGnss", "driverState", "dMonitoringState"
 #ifdef SHOW_SPEEDLIMIT
                                     , "liveMapData"
 #endif
