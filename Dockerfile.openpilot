@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
     autoconf \
     build-essential \
     bzip2 \
@@ -38,8 +38,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     screen \
     sudo \
     vim \
-    wget \
-  && rm -rf /var/lib/apt/lists/*
+    wget
+
 
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 ENV LANG en_US.UTF-8
@@ -47,16 +47,18 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 RUN curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+
 ENV PATH="/root/.pyenv/bin:/root/.pyenv/shims:${PATH}"
 
-COPY Pipfile Pipfile.lock /tmp/
 RUN pyenv install 3.8.2 && \
     pyenv global 3.8.2 && \
     pyenv rehash && \
     pip install --no-cache-dir pipenv==2018.11.26 && \
+    COPY Pipfile Pipfile.lock /tmp/ && \
+    RUN python --version && \
     cd /tmp && \
-    pipenv install --system --deploy --clear && \
-    pip uninstall -y pipenv && \
+    pipenv install --system --deploy && \
+
     pip install --no-cache-dir \
       matplotlib==3.1.1 \
       dictdiffer==0.8.0 \
