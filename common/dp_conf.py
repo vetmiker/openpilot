@@ -78,6 +78,9 @@ confs = [
   # toyota
   {'name': 'dp_toyota_ldw', 'default': True, 'type': 'Bool', 'conf_type': ['param', 'struct']},
   {'name': 'dp_toyota_sng', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
+  {'name': 'dp_toyota_lowest_cruise_override', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
+  {'name': 'dp_toyota_lowest_cruise_override_at', 'default': 46, 'type': 'UInt8', 'depends': [{'name': 'dp_toyota_lowest_cruise_override', 'vals': [True]}], 'min': 46, 'max': 46, 'conf_type': ['param', 'struct']},
+  {'name': 'dp_toyota_lowest_cruise_override_speed', 'default': 32, 'type': 'UInt8', 'depends': [{'name': 'dp_toyota_lowest_cruise_override_speed', 'vals': [True]}], 'min': 27, 'max': 44, 'conf_type': ['param', 'struct']},
   # custom car
   {'name': 'dp_car_selected', 'default': '', 'type': 'Text', 'conf_type': ['param']},
   {'name': 'dp_car_list', 'default': '', 'type': 'Text', 'conf_type': ['param']},

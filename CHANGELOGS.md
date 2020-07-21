@@ -1,3 +1,10 @@
+2020-07-21 (0.7.7.0)
+========================
+* Toyota 加入改寫最低巡航速度功能。(感謝 @Mojo)
+* Added Toyota to override lowerest cruise speed. (Thanks to @Mojo)
+* 修正 gm 錯誤。
+* Fixed bugs in gm cars.
+
 2020-07-20 (0.7.7.0)
 ========================
 * 加回 加速模式 開關。

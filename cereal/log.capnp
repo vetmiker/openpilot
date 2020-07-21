@@ -2125,13 +2125,16 @@ struct DragonConf {
   dpAppMixplorerManual @56 :Int8;
   dpToyotaLdw @57 :Bool;
   dpToyotaSng @58 :Bool;
-  dpIpAddr @59 :Text;
-  dpCameraOffset @60 :Int8;
-  dpLocale @61 :Text;
-  dpChargingCtrl @62 :Bool;
-  dpChargingAt @63 :UInt8;
-  dpDischargingAt @64 :UInt8;
-  dpIsUpdating @65 :Bool;
-  dpThermalStarted @66 :Bool;
-  dpThermalOverheat @67 :Bool;
+  dpToyotaLowestCruiseOverride @59 :Bool;
+  dpToyotaLowestCruiseOverrideAt @60 :UInt8;
+  dpToyotaLowestCruiseOverrideSpeed @61 :UInt8;
+  dpIpAddr @62 :Text;
+  dpCameraOffset @63 :Int8;
+  dpLocale @64 :Text;
+  dpChargingCtrl @65 :Bool;
+  dpChargingAt @66 :UInt8;
+  dpDischargingAt @67 :UInt8;
+  dpIsUpdating @68 :Bool;
+  dpThermalStarted @69 :Bool;
+  dpThermalOverheat @70 :Bool;
 }

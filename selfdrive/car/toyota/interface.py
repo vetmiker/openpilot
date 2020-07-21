@@ -345,6 +345,8 @@ class CarInterface(CarInterfaceBase):
     # dp
     self.dragonconf = dragonconf
     ret.cruiseState.enabled = common_interface_atl(ret, dragonconf.dpAtl)
+    if dragonconf.dpToyotaLowestCruiseOverride and ret.cruiseState.speed < dragonconf.dpToyotaLowestCruiseOverrideAt * CV.KPH_TO_MS:
+      ret.cruiseState.speed = dragonconf.dpToyotaLowestCruiseOverrideSpeed * CV.KPH_TO_MS
 
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False

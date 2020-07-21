@@ -8,6 +8,8 @@ dragonpilot 0.7.7.0
 * Re-added sr learner toggle.
 * 加回 加速模式 開關。
 * Re-added Accel Profile toggle.
+* Toyota 加入改寫最低巡航速度功能。(感謝 @Mojo)
+* Added Toyota to override lowerest cruise speed. (Thanks to @Mojo)
 
 dragonpilot 0.7.6.2
 ========================
