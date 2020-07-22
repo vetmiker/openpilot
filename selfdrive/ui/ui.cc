@@ -8,8 +8,8 @@
 #include <string>
 #include <sstream>
 #include <sys/resource.h>
-#include <capnp/serialize.h>
-#include "cereal/gen/cpp/arne182.capnp.h"
+//#include <capnp/serialize.h>
+//#include "cereal/gen/cpp/arne182.capnp.h"
 //#include <json.h> // Might not be needed
 #include <czmq.h>
 #include "common/util.h"
@@ -99,9 +99,10 @@ static void send_df(UIState *s, int status) {
   auto dfStatus = event.initDynamicFollowButton();
   dfStatus.setStatus(status);
 
-  auto words = capnp::messageToFlatArray(msg);
-  auto bytes = words.asBytes();
-  s->dynamicfollowbutton_sock->send((char*)bytes.begin(), bytes.size());
+  //auto words = capnp::messageToFlatArray(msg);
+  //auto bytes = words.asBytes();
+  //s->dynamicfollowbutton_sock->send((char*)bytes.begin(), bytes.size());
+  s->pm->send("offroadLayout", msg);
 }
 
 static bool handle_df_touch(UIState *s, int touch_x, int touch_y) {
@@ -224,7 +225,7 @@ static void ui_init(UIState *s) {
 
   pthread_mutex_init(&s->lock, NULL);
 
-  s->ctx = Context::create();
+  /*s->ctx = Context::create();
   s->ctxarne182 = Context::create();
   s->model_sock = SubSocket::create(s->ctx, "model");
   s->controlsstate_sock = SubSocket::create(s->ctx, "controlsState");
@@ -287,14 +288,15 @@ static void ui_init(UIState *s) {
                              });
 
   //s->sm = new SubMaster({"model", "controlsState", "uiLayoutState", "liveCalibration", "radarState", "thermal",
-                        // "health", "ubloxGnss", "driverState", "dMonitoringState"
+                        // "health", "ubloxGnss", "driverState", "dMonitoringState"*/
+   s->sm = new SubMaster({"gpsLocationExternal", "carState", "liveMpc", "model", "controlsState", "uiLayoutState", "liveCalibration", "radarState", "thermal", "health", "ubloxGnss", "driverState", "dMonitoringState", "offroadLayout"
 #ifdef SHOW_SPEEDLIMIT
                                     , "liveMapData"
 #endif
   });
-  //s->pm = new PubMaster({"offroadLayout"});
+  s->pm = new PubMaster({"offroadLayout"});
 
-  //s->ipc_fd = -1;
+  s->ipc_fd = -1;
   //s->scene.satelliteCount = -1;
   //s->started = false;
   //s->vision_seen = false;
@@ -406,19 +408,24 @@ void handle_message(UIState *s, SubMaster &sm) {
   if (s->started && sm.updated("controlsState")) {
     auto event = sm["controlsState"];
     scene.controls_state = event.getControlsState();
-  // neeed to rewrite it
+    scene.v_cruise = scene.controls_state.getVCruise();
+    scene.angleSteers = scene.controls_state.getAngleSteers;
+    scene.v_ego = scene.controls_state.getVEgo;
+    scene.angleSteers = scene.controls_state.getAngleSteers;
+    scene.curvature = scene.controls_state.getCurvature;
+    scene.engaged = scene.controls_state.getEnabled;
+    scene.engageable = scene.controls_state.getEngageable;
+    scene.gps_planner_active = scene.controls_state.getGpsPlannerActive;
+    scene.monitoring_active = scene.controls_state.getDriverMonitoringOn;
+    scene.steerOverride = scene.controls_state.getSteerOverride;
+    auto datad = scene.controls_state.getLateralControlState();
+    auto qdata = datad.getPidState();
+    auto rdata = datad.getLqrState();
+    pdata = datad.getIndiState();
+    scene.output_scale = qdata.getOutput() + rdata.getOutput() + pdata.getOutput();
+    scene.decel_for_model = scene.controls_state.getDecelForModel;
+    scene.angleSteersDes = scene.controls_state.getAngleSteersDes;    
 
-    //struct cereal_ControlsState datad;
-    //cereal_read_ControlsState(&datad, eventd.controlsState);
-
-    //struct cereal_ControlsState_LateralPIDState pdata;
-    //cereal_read_ControlsState_LateralPIDState(&pdata, datad.lateralControlState.pidState);
-
-    //struct cereal_ControlsState_LateralLQRState qdata;
-    //cereal_read_ControlsState_LateralLQRState(&qdata, datad.lateralControlState.lqrState);
-
-    //struct cereal_ControlsState_LateralINDIState rdata;
-    //cereal_read_ControlsState_LateralINDIState(&rdata, datad.lateralControlState.indiState);
     s->controls_timeout = 1 * UI_FREQ;
     scene.frontview = scene.controls_state.getRearViewCam();
     if (!scene.frontview){ s->controls_seen = true; }
@@ -478,21 +485,27 @@ void handle_message(UIState *s, SubMaster &sm) {
   }
   if (sm.updated("model")) {
     read_model(scene.model, sm["model"].getModel());
-  }
-  // else if (which == cereal::Event::LIVE_MPC) {
-  //   auto data = event.getLiveMpc();
-  //   auto x_list = data.getX();
-  //   auto y_list = data.getY();
-  //   for (int i = 0; i < 50; i++){
-  //     scene.mpc_x[i] = x_list[i];
-  //     scene.mpc_y[i] = y_list[i];
-  //   }
-  //   s->livempc_or_radarstate_changed = true;
-  // }
   if (sm.updated("uiLayoutState")) {
     auto data = sm["uiLayoutState"].getUiLayoutState();
     s->active_app = data.getActiveApp();
     scene.uilayout_sidebarcollapsed = data.getSidebarCollapsed();
+  }
+  if (sm.updated("liveMpc")) {
+    auto datad = sm["liveMpc"].getLiveMpc();
+    capn_list32 x_list = datad.getX();
+    capn_resolve(&x_list.p);
+
+    for (int i = 0; i < 50; i++){
+      scene.mpc_x[i] = capn_to_f32(capn_get32(x_list, i));
+    }
+
+    capn_list32 y_list = datad.getY();
+    capn_resolve(&y_list.p);
+
+    for (int i = 0; i < 50; i++){
+      scene.mpc_y[i] = capn_to_f32(capn_get32(y_list, i));
+    }
+    s->livempc_or_radarstate_changed = true;
   }
 #ifdef SHOW_SPEEDLIMIT
   if (sm.updated("liveMapData")) {
@@ -529,13 +542,8 @@ void handle_message(UIState *s, SubMaster &sm) {
       s->vision_seen = false;
       s->controls_seen = false;
       s->active_app = cereal::UiLayoutState::App::HOME;
-
-
-    for (int i = 0; i < 50; i++){
-      s->scene.mpc_y[i] = capn_to_f32(capn_get32(y_list, i));
-    }
-    s->livempc_or_radarstate_changed = true;
-  } else if (eventd.which == cereal_Event_uiLayoutState) {
+/*
+  } if (eventd.which == cereal_Event_uiLayoutState) {
     struct cereal_UiLayoutState datad;
     cereal_read_UiLayoutState(&datad, eventd.uiLayoutState);
     s->active_app = datad.activeApp;
@@ -620,7 +628,7 @@ void handle_message(UIState *s, SubMaster &sm) {
   }
 
   s->started = s->thermal_started || s->preview_started ;
-
+*/
       #ifndef QCOM
       // disconnect from visionipc on PC
       close(s->ipc_fd);
