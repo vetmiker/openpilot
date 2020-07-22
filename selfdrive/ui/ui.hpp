@@ -265,6 +265,7 @@ typedef struct UIState {
 
   //from 077 update
   SubMaster *sm;
+  SubMaster *arne_sm;
   PubMaster *pm;
 
   cereal::UiLayoutState::App active_app;
