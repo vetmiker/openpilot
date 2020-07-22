@@ -1,5 +1,7 @@
 2020-07-22 (0.7.7.0)
 ========================
+* 刪除部分設定對 dp_steering_on_signal 的依賴。
+* Removed dp_steering_on_signal dependencies.
 * 介面加入盲點偵測顯示。(感謝 @wabes)
 * Added BSM indicator to UI. (Thanks to @wabes)
 

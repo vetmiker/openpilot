@@ -27,10 +27,10 @@ confs = [
   {'name': 'dp_lat_ctrl', 'default': True, 'type': 'Bool', 'conf_type': ['param', 'struct']},
   {'name': 'dp_steering_limit_alert', 'default': True, 'type': 'Bool', 'depends': [{'name': 'dp_lat_ctrl', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_steering_on_signal', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_lat_ctrl', 'vals': [True]}], 'conf_type': ['param', 'struct']},
-  {'name': 'dp_signal_off_delay', 'default': 0, 'type': 'UInt8', 'min': 0, 'max': 10, 'depends': [{'name': 'dp_steering_on_signal', 'vals': [True]}], 'conf_type': ['param', 'struct']},
+  {'name': 'dp_signal_off_delay', 'default': 0, 'type': 'UInt8', 'min': 0, 'max': 10, 'conf_type': ['param', 'struct']},
   # assist/auto lane change
-  {'name': 'dp_assisted_lc_min_mph', 'default': 45, 'type': 'UInt8', 'min': 0, 'max': 255, 'depends': [{'name': 'dp_steering_on_signal', 'vals': [False]}], 'conf_type': ['param', 'struct']},
-  {'name': 'dp_auto_lc', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_steering_on_signal', 'vals': [False]}], 'conf_type': ['param', 'struct']},
+  {'name': 'dp_assisted_lc_min_mph', 'default': 45, 'type': 'UInt8', 'min': 0, 'max': 255, 'conf_type': ['param', 'struct']},
+  {'name': 'dp_auto_lc', 'default': False, 'type': 'Bool', 'conf_type': ['param', 'struct']},
   {'name': 'dp_auto_lc_cont', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_auto_lc', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_auto_lc_min_mph', 'default': 60, 'type': 'UInt8', 'min': 0, 'max': 255, 'depends': [{'name': 'dp_auto_lc', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_auto_lc_delay', 'default': 3, 'type': 'UInt8', 'min': 0, 'max': 10, 'depends': [{'name': 'dp_auto_lc', 'vals': [True]}], 'conf_type': ['param', 'struct']},
