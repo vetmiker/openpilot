@@ -706,6 +706,7 @@ static void ui_draw_driver_view(UIState *s) {
 
 static void ui_draw_vision_header(UIState *s) {
   const UIScene *scene = &s->scene;
+  if (!s->scene.dpAppWaze) {
   int ui_viz_rx = scene->ui_viz_rx;
   int ui_viz_rw = scene->ui_viz_rw;
 
@@ -714,6 +715,7 @@ static void ui_draw_vision_header(UIState *s) {
                         ui_viz_rx, box_y+header_h,
                         nvgRGBAf(0,0,0,0.45), nvgRGBAf(0,0,0,0));
   ui_draw_rect(s->vg, ui_viz_rx, box_y, ui_viz_rw, header_h, gradient);
+  }
   if (scene->dpUiMaxSpeed) {
   ui_draw_vision_maxspeed(s);
   }

@@ -1,5 +1,7 @@
 2020-07-22 (0.7.7.0)
 ========================
+* 修正 waze 顯示。(感謝 @Mojo)
+* Fixed waze display. (Thanks to @Mojo)
 * 加入日文支援。(特別感謝 @ponzu07 提供)
 * Added Japanese support. (Special thanks to @ponzu07)
 * 刪除部分設定對 dp_steering_on_signal 的依賴。
