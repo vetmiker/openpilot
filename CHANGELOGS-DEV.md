@@ -12,6 +12,8 @@ dragonpilot 0.7.7.0
 * Added Toyota to override lowerest cruise speed. (Thanks to @Mojo)
 * 介面加入盲點偵測顯示。(感謝 @wabes)
 * Added BSM indicator to UI. (Thanks to @wabes)
+* 加回彎道減速功能。(感謝 @Mojo)
+* re-added Slow On Curve functionality. (Thanks to @Mojo)
 
 dragonpilot 0.7.6.2
 ========================
