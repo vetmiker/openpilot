@@ -735,9 +735,8 @@ static void ui_draw_infobar(UIState *s) {
   int ui_viz_rx = scene->ui_viz_rx;
   bool hasSidebar = !s->scene.uilayout_sidebarcollapsed;
   int rect_w = vwp_w - ui_viz_rx - bdr_s;
-  int rect_h = 80;
   int rect_x = (hasSidebar? (bdr_s+sbr_w) : ui_viz_rx);
-  int rect_y = vwp_h - bdr_s - rect_h;
+  int rect_y = vwp_h - bdr_s - info_bar_h;
   int text_x = rect_w / 2 + ui_viz_rx;
   int text_y = rect_y + 55;
 
@@ -798,8 +797,8 @@ static void ui_draw_infobar(UIState *s) {
   }
 
   nvgBeginPath(s->vg);
-  nvgRect(s->vg, rect_x, rect_y, rect_w, rect_h);
-  nvgFillColor(s->vg, (scene->brakeLights? COLOR_RED_ALPHA(scene->dpAppWaze? 150 : 100) : COLOR_BLACK_ALPHA(scene->dpAppWaze? 150 : 100)));
+  nvgRect(s->vg, rect_x, rect_y, rect_w, info_bar_h);
+  nvgFillColor(s->vg, (scene->brakeLights? COLOR_RED_ALPHA(200) : COLOR_BLACK_ALPHA(scene->dpAppWaze? 150 : 100)));
   nvgFill(s->vg);
 
   nvgFontSize(s->vg, hasSidebar? 35:42);
@@ -807,6 +806,34 @@ static void ui_draw_infobar(UIState *s) {
   nvgFillColor(s->vg, COLOR_WHITE_ALPHA(200));
   nvgTextAlign(s->vg, NVG_ALIGN_CENTER);
   nvgText(s->vg, text_x, text_y, infobar, NULL);
+}
+
+static void ui_draw_blindspots(UIState *s) {
+  const UIScene *scene = &s->scene;
+  bool hasSidebar = !scene->uilayout_sidebarcollapsed;
+  int ui_viz_rx = scene->ui_viz_rx;
+  int left_x = (hasSidebar? (bdr_s+sbr_w) : ui_viz_rx);
+  int y = vwp_h - bdr_s - info_bar_h - 100;
+  int right_x = vwp_w - bdr_s;
+
+  if (scene->leftBlindspot) {
+    nvgBeginPath(s->vg);
+    nvgMoveTo(s->vg, left_x, y);
+    nvgLineTo(s->vg, left_x, y+100);
+    nvgLineTo(s->vg, left_x+100, y+100);
+    nvgClosePath(s->vg);
+    nvgFillColor(s->vg, COLOR_RED_ALPHA(200));
+    nvgFill(s->vg);
+  }
+  if (scene->rightBlindspot) {
+    nvgBeginPath(s->vg);
+    nvgMoveTo(s->vg, right_x, y);
+    nvgLineTo(s->vg, right_x, y+100);
+    nvgLineTo(s->vg, right_x-100, y+100);
+    nvgClosePath(s->vg);
+    nvgFillColor(s->vg, COLOR_RED_ALPHA(200));
+    nvgFill(s->vg);
+  }
 }
 ////////////////////////////////////////////////////// DP END //////////////////////////////////////////////////////
 
@@ -902,6 +929,10 @@ static void ui_draw_vision(UIState *s) {
     ui_draw_vision_header(s);
   } else {
     ui_draw_driver_view(s);
+  }
+
+  if (scene->leftBlindspot || scene->rightBlindspot) {
+    ui_draw_blindspots(s);
   }
 
   if (scene->alert_size != cereal::ControlsState::AlertSize::NONE) {

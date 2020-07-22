@@ -1,7 +1,12 @@
+2020-07-22 (0.7.7.0)
+========================
+* 介面加入盲點偵測顯示。(感謝 @wabes)
+* Added BSM indicator to UI. (Thanks to @wabes)
+
 2020-07-21 (0.7.7.0)
 ========================
 * Toyota 加入改寫最低巡航速度功能。(感謝 @Mojo)
-* Added Toyota to override lowerest cruise speed. (Thanks to @Mojo)
+* Added Toyota to override lowest cruise speed. (Thanks to @Mojo)
 * 修正 gm 錯誤。
 * Fixed bugs in gm cars.
 

@@ -10,6 +10,8 @@ dragonpilot 0.7.7.0
 * Re-added Accel Profile toggle.
 * Toyota 加入改寫最低巡航速度功能。(感謝 @Mojo)
 * Added Toyota to override lowerest cruise speed. (Thanks to @Mojo)
+* 介面加入盲點偵測顯示。(感謝 @wabes)
+* Added BSM indicator to UI. (Thanks to @wabes)
 
 dragonpilot 0.7.6.2
 ========================

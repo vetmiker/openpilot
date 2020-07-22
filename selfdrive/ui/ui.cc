@@ -466,6 +466,8 @@ void handle_message(UIState *s, SubMaster &sm) {
     scene.rightBlinker = data.getRightBlinker();
     scene.brakeLights = data.getBrakeLights();
     scene.isReversing = data.getGearShifter() == cereal::CarState::GearShifter::REVERSE;
+    scene.leftBlindspot = data.getLeftBlindspot();
+    scene.rightBlindspot = data.getRightBlindspot();
   }
 
   s->started = scene.thermal.getStarted() || s->preview_started;

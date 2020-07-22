@@ -99,6 +99,7 @@ const int ap_btn_h = 180;
 const int ap_btn_w = 180;
 const int ap_btn_x = 1450;
 const int ap_btn_y = 750;
+const int info_bar_h = 80;
 
 typedef struct UIScene {
   int frontview;
@@ -172,6 +173,10 @@ typedef struct UIScene {
   bool rightBlinker;
   bool brakeLights;
   int blinker_blinkingrate;
+  // for blind spot
+  bool leftBlindspot;
+  bool rightBlindspot;
+
   // for updating icon
   int dp_alert_rate;
   int dp_alert_type;
