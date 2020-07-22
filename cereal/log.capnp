@@ -2126,8 +2126,8 @@ struct DragonConf {
   dpToyotaLdw @57 :Bool;
   dpToyotaSng @58 :Bool;
   dpToyotaLowestCruiseOverride @59 :Bool;
-  dpToyotaLowestCruiseOverrideAt @60 :UInt8;
-  dpToyotaLowestCruiseOverrideSpeed @61 :UInt8;
+  dpToyotaLowestCruiseOverrideAt @60 :Float32;
+  dpToyotaLowestCruiseOverrideSpeed @61 :Float32;
   dpIpAddr @62 :Text;
   dpCameraOffset @63 :Int8;
   dpLocale @64 :Text;

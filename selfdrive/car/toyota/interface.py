@@ -272,7 +272,7 @@ class CarInterface(CarInterfaceBase):
       stop_and_go = True # set to true because it's a hybrid
       ret.safetyParam = 130
       ret.wheelbase = 2.84988
-      ret.steerRatio = 13.3
+      ret.steerRatio = 14.35 # range from 11.5 - 17.2, lets try 14.35
       tire_stiffness_factor = 0.444
       ret.mass = 4112 * CV.LB_TO_KG + STD_CARGO_KG
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.05]]
