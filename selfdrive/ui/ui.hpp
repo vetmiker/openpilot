@@ -261,13 +261,13 @@ typedef struct UIState {
   PubSocket *offroad_sock;
   Poller * ublox_poller;
 
-  int active_app;
+  //int active_app;
 
-//from 077 update
-  //SubMaster *sm;
-  //PubMaster *pm;
+  //from 077 update
+  SubMaster *sm;
+  PubMaster *pm;
 
-  //cereal::UiLayoutState::App active_app;
+  cereal::UiLayoutState::App active_app;
 
   // vision state
   bool vision_connected;
