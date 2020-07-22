@@ -330,6 +330,10 @@ typedef struct UIState {
   std::atomic<float> light_sensor;
 
   int touch_fd;
+  
+  // Hints for re-calculations and redrawing
+  //bool model_changed;
+  bool livempc_or_radarstate_changed;
 
   GLuint frame_vao[2], frame_vbo[2], frame_ibo[2];
   mat4 rear_frame_mat, front_frame_mat;
