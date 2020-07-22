@@ -20,9 +20,9 @@
 #include "common/visionimg.h"
 #include "common/framebuffer.h"
 #include "common/modeldata.h"
-#include "messaging.hpp"
-#include "cereal/gen/c/log.capnp.h"
-#include "cereal/gen/c/arne182.capnp.h"
+//#include "messaging.hpp"
+//#include "cereal/gen/c/log.capnp.h"
+//#include "cereal/gen/c/arne182.capnp.h"
 #include "sound.hpp"
 
 #define STATUS_STOPPED 0
