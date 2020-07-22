@@ -95,7 +95,7 @@ static void update_offroad_layout_state(UIState *s) {
 
 static void send_df(UIState *s, int status) {
   capnp::MallocMessageBuilder msg;
-  cereal::EventArne182::Builder event = msg.initRoot<cereal::EventArne182>();
+  auto event = msg.initRoot<cereal::EventArne182>();
   auto dfStatus = event.initDynamicFollowButton();
   dfStatus.setStatus(status);
 
