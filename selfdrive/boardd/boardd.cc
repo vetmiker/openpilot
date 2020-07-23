@@ -52,7 +52,6 @@ struct __attribute__((packed)) timestamp_t {
     uint8_t second;
 };
 
-   
 libusb_context *ctx = NULL;
 libusb_device_handle *dev_handle = NULL;
 pthread_mutex_t usb_lock;
@@ -145,15 +144,12 @@ void *safety_setter_thread(void *s) {
 
 // must be called before threads or with mutex
 bool usb_connect() {
-  int err, err2, err3;
+  int err, err2;
   unsigned char hw_query[1] = {0};
   unsigned char fw_sig_buf[128];
   unsigned char fw_sig_hex_buf[16];
-  unsigned char fw_ver_buf[64];
   unsigned char serial_buf[16];
-  const char *fw_ver;
   const char *serial;
-  int fw_ver_sz = 0;
   int serial_sz = 0;
 
   ignition_last = false;
@@ -179,17 +175,9 @@ bool usb_connect() {
   // get panda fw
   err = libusb_control_transfer(dev_handle, 0xc0, 0xd3, 0, 0, fw_sig_buf, 64, TIMEOUT);
   err2 = libusb_control_transfer(dev_handle, 0xc0, 0xd4, 0, 0, fw_sig_buf + 64, 64, TIMEOUT);
-  err3 = libusb_control_transfer(dev_handle, 0xc0, 0xd6, 0, 0, fw_ver_buf, 64, TIMEOUT);
-  if (err > 0) {
-    fw_ver = (const char *)fw_ver_buf;
-    fw_ver_sz = err3;
-    write_db_value("PandaFirmware", fw_ver, fw_ver_sz);
-    printf("panda fw: %.*s\n", fw_ver_sz, fw_ver);
-  }
-  else { goto fail; }
   if ((err == 64) && (err2 == 64)) {
     printf("FW signature read\n");
-    //write_db_value("PandaFirmware", (const char *)fw_sig_buf, 128);
+    write_db_value("PandaFirmware", (const char *)fw_sig_buf, 128);
 
     for (size_t i = 0; i < 8; i++){
       fw_sig_hex_buf[2*i] = NIBBLE_TO_HEX(fw_sig_buf[i] >> 4);
@@ -342,7 +330,7 @@ void can_recv(PubMaster &pm) {
   pm.send("can", msg);
 }
 
-void can_health(PubMaster &pm, float hours) {
+void can_health(PubMaster &pm, hours) {
   int cnt;
   int err;
 
@@ -414,7 +402,7 @@ void can_health(PubMaster &pm, float hours) {
 
 #ifndef __x86_64__
   bool cdp_mode = health.usb_power_mode == (uint8_t)(cereal::HealthData::UsbPowerMode::CDP);
-  uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;  // turn off charge after 30 hrs or DisablePowerDownTime Param
+  uint32_t NO_IGNITION_CNT_MAX = 2 * 60 * 60 * hours;
   bool no_ignition_exp = no_ignition_cnt > NO_IGNITION_CNT_MAX;
   if ((no_ignition_exp || (voltage_f < VBATT_PAUSE_CHARGING)) && cdp_mode && !ignition) {
     std::vector<char> disable_power_down = read_db_bytes("DisablePowerDown");
@@ -572,7 +560,6 @@ void can_send(cereal::Event::Reader &event) {
   // send to board
   int sent;
   pthread_mutex_lock(&usb_lock);
-
 
   if (!fake_send) {
     do {
