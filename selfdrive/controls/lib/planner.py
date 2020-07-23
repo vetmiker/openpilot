@@ -125,10 +125,18 @@ class Planner():
 
     # dp
     self.dp_profile = DP_OFF
+    # dp - slow on curve from 0.7.6.1
+    self.dp_slow_on_curve = False
+    self.v_model = 0.0
+    self.a_model = 0.0
 
   def choose_solution(self, v_cruise_setpoint, enabled):
     if enabled:
-      solutions = {'cruise': self.v_cruise}
+      # dp - slow on curve from 0.7.6.1
+      if self.dp_slow_on_curve:
+        solutions = {'model': self.v_model, 'cruise': self.v_cruise}
+      else:
+        solutions = {'cruise': self.v_cruise}
       if self.mpc1.prev_lead_status:
         solutions['mpc1'] = self.mpc1.v_mpc
       if self.mpc2.prev_lead_status:
@@ -147,6 +155,10 @@ class Planner():
       elif slowest == 'cruise':
         self.v_acc = self.v_cruise
         self.a_acc = self.a_cruise
+      # dp - slow on curve from 0.7.6.1
+      elif self.dp_slow_on_curve and slowest == 'model':
+        self.v_acc = self.v_model
+        self.a_acc = self.a_model
 
     self.v_acc_future = min([self.mpc1.v_mpc_future, self.mpc2.v_mpc_future, v_cruise_setpoint])
 
@@ -171,6 +183,26 @@ class Planner():
     # dp
     if sm.updated['dragonConf']:
       self.dp_profile = sm['dragonConf'].dpAccelProfile
+      self.dp_slow_on_curve = sm['dragonConf'].dpSlowOnCurve
+
+    # dp - slow on curve from 0.7.6.1
+    if self.dp_slow_on_curve and len(sm['model'].path.poly):
+      path = list(sm['model'].path.poly)
+
+      # Curvature of polynomial https://en.wikipedia.org/wiki/Curvature#Curvature_of_the_graph_of_a_function
+      # y = a x^3 + b x^2 + c x + d, y' = 3 a x^2 + 2 b x + c, y'' = 6 a x + 2 b
+      # k = y'' / (1 + y'^2)^1.5
+      # TODO: compute max speed without using a list of points and without numpy
+      y_p = 3 * path[0] * self.path_x**2 + 2 * path[1] * self.path_x + path[2]
+      y_pp = 6 * path[0] * self.path_x + 2 * path[1]
+      curv = y_pp / (1. + y_p**2)**1.5
+
+      a_y_max = 2.975 - v_ego * 0.0375  # ~1.85 @ 75mph, ~2.6 @ 25mph
+      v_curvature = np.sqrt(a_y_max / np.clip(np.abs(curv), 1e-4, None))
+      model_speed = np.min(v_curvature)
+      model_speed = max(20.0 * CV.MPH_TO_MS, model_speed)  # Don't slow down below 20mph
+    else:
+      model_speed = MAX_SPEED
 
     # Calculate speed for normal cruise control
     pedal_pressed = sm['carState'].gasPressed or sm['carState'].brakePressed
@@ -192,6 +224,12 @@ class Planner():
                                                     accel_limits_turns[1], accel_limits_turns[0],
                                                     jerk_limits[1], jerk_limits[0],
                                                     LON_MPC_STEP)
+      # dp - slow on curve from 0.7.6.1
+      if self.dp_slow_on_curve:
+        self.v_model, self.a_model = speed_smoother(self.v_acc_start, self.a_acc_start,
+                                                      model_speed, 2*accel_limits[1],
+                                                      accel_limits[0], 2*jerk_limits[1], jerk_limits[0],
+                                                      LON_MPC_STEP)
 
       # cruise speed can't be negative even is user is distracted
       self.v_cruise = max(self.v_cruise, 0.)

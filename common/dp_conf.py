@@ -35,6 +35,7 @@ confs = [
   {'name': 'dp_auto_lc_min_mph', 'default': 60, 'type': 'UInt8', 'min': 0, 'max': 255, 'depends': [{'name': 'dp_auto_lc', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_auto_lc_delay', 'default': 3, 'type': 'UInt8', 'min': 0, 'max': 10, 'depends': [{'name': 'dp_auto_lc', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   # long ctrl
+  {'name': 'dp_slow_on_curve', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_allow_gas', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_max_ctrl_speed', 'default': 92, 'type': 'Float32', 'conf_type': ['param', 'struct']},
   {'name': 'dp_lead_car_alert', 'default': False, 'type': 'Bool', 'conf_type': ['param', 'struct']},
