@@ -147,11 +147,12 @@ class App():
         self.update_app()
 
       elif is_online:
-        remote_version = local_version
-        if local_version is not None and auto_update:
-          remote_version = self.get_remote_version()
-        if local_version is None or (remote_version is not None and local_version != remote_version):
+        if local_version is None:
           self.update_app()
+        else:
+          remote_version = self.get_remote_version() if auto_update else local_version
+          if remote_version is not None and local_version != remote_version:
+            self.update_app()
       if self.is_installed:
         self.set_package_permissions()
     else:
