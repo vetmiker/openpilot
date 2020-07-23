@@ -11,7 +11,6 @@ static void ui_draw_sidebar_background(UIState *s) {
 
 static void ui_draw_sidebar_settings_button(UIState *s) {
   bool settingsActive = s->active_app == cereal::UiLayoutState::App::SETTINGS;
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
   const int settings_btn_xr = !s->scene.uilayout_sidebarcollapsed ? settings_btn_x : -(sbr_w);
 
   ui_draw_image(s->vg, settings_btn_xr, settings_btn_y, settings_btn_w, settings_btn_h, s->img_button_settings, settingsActive ? 1.0f : 0.65f);
@@ -37,37 +36,7 @@ static void ui_draw_sidebar_network_strength(UIState *s) {
   const int network_img_y = 196;
   const int img_idx = s->scene.thermal.getNetworkType() == cereal::ThermalData::NetworkType::NONE ? 0 : network_strength_map[s->scene.thermal.getNetworkStrength()];
   ui_draw_image(s->vg, network_img_x, network_img_y, network_img_w, network_img_h, s->img_network[img_idx], 1.0f);
-  const int network_img = s->scene.networkType == cereal_ThermalData_NetworkType_none ?
-                          s->img_network[0] : s->img_network[s->scene.networkStrength + 1];
-
-  ui_draw_image(s->vg, network_img_x, network_img_y, network_img_w, network_img_h, network_img, 1.0f);
 }
-//thank you @eFini
-static void ui_draw_sidebar_ip_addr(UIState *s) {
-  const int network_ip_w = 176;
-  const int network_ip_x = !s->scene.uilayout_sidebarcollapsed ? 54 : -(sbr_w);
-  const int network_ip_y = 255;
-
-  nvgFillColor(s->vg, COLOR_WHITE);
-  nvgFontSize(s->vg, 34);
-  nvgFontFaceId(s->vg, s->font_sans_regular);
-  nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-  nvgTextBox(s->vg, network_ip_x, network_ip_y, network_ip_w, network_ip_str, NULL);
-}
-
-static void ui_draw_sidebar_battery_text(UIState *s) {
-  const int battery_img_h = 36;
-  const int battery_img_w = 76;
-  const int battery_img_x = !s->scene.uilayout_sidebarcollapsed ? 150 : -(sbr_w);
-  const int battery_img_y = 305;
-
-  char battery_str[7];
-  snprintf(battery_str, sizeof(battery_str), "%d%%%s", s->scene.batteryPercent, strcmp(s->scene.batteryStatus, "Charging") == 0 ? "+" : "-");
-  nvgFillColor(s->vg, COLOR_WHITE);
-  nvgFontSize(s->vg, 40);
-  nvgFontFace(s->vg, "sans-regular");
-  nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-  nvgTextBox(s->vg, battery_img_x, battery_img_y, battery_img_w, battery_str, NULL);
 
 static void ui_draw_sidebar_battery_icon(UIState *s) {
   const int battery_img_h = 36;
@@ -92,7 +61,7 @@ static void ui_draw_sidebar_network_type(UIState *s) {
       {cereal::ThermalData::NetworkType::CELL4_G, "4G"},
       {cereal::ThermalData::NetworkType::CELL5_G, "5G"}};
   const int network_x = !s->scene.uilayout_sidebarcollapsed ? 50 : -(sbr_w);
-  const int network_y = 303;
+  const int network_y = 273;
   const int network_w = 100;
   const char *network_type = network_type_map[s->scene.thermal.getNetworkType()];
   nvgFillColor(s->vg, COLOR_WHITE);
@@ -134,13 +103,13 @@ static void ui_draw_sidebar_metric(UIState *s, const char* label_str, const char
     nvgTextBox(s->vg, metric_x + 50, metric_y + 50, metric_w - 60, value_str, NULL);
 
     nvgFillColor(s->vg, COLOR_WHITE);
-    nvgFontSize(s->vg, 46);
+    nvgFontSize(s->vg, 48);
     nvgFontFaceId(s->vg, s->font_sans_regular);
     nvgTextAlign(s->vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
     nvgTextBox(s->vg, metric_x + 50, metric_y + 50 + 66, metric_w - 60, label_str, NULL);
   } else {
     nvgFillColor(s->vg, COLOR_WHITE);
-    nvgFontSize(s->vg, 46);
+    nvgFontSize(s->vg, 48);
     nvgFontFaceId(s->vg, s->font_sans_bold);
     nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
     nvgTextBox(s->vg, metric_x + 35, metric_y + (strchr(message_str, '\n') ? 40 : 50), metric_w - 50, message_str, NULL);
@@ -172,10 +141,6 @@ static void ui_draw_sidebar_panda_metric(UIState *s) {
 
   if (s->scene.hwType == cereal::HealthData::HwType::UNKNOWN) {
     panda_severity = 2;
-<<<<<<< HEAD
-    snprintf(panda_message_str, sizeof(panda_message_str), "%s", "PANDA\nN/A");
-  } else if (s->scene.hwType == cereal_HealthData_HwType_whitePanda) {
-    panda_severity = 0;
     snprintf(panda_message_str, sizeof(panda_message_str), "%s", "NO\nVEHICLE");
   } else {
     if (s->started){
