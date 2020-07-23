@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 from cereal import car, arne182
-from selfdrive.config import Conversions as CV
-from selfdrive.controls.lib.drive_helpers import create_event, EventTypes as ET
-=======
-from cereal import car
->>>>>>> b205dd6954ad6d795fc04d66e0150675b4fae28d
+from selfdrive.controls.lib.drive_helpers import EventTypes as ET
 from selfdrive.car.volkswagen.values import CAR, BUTTON_STATES
 from common.params import put_nonblocking
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
