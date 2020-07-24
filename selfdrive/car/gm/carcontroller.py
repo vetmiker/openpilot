@@ -78,10 +78,6 @@ class CarController():
     # treat pedals as one
     final_pedal = actuators.gas - actuators.brake
 
-    # *** apply pedal hysteresis ***
-    final_brake, self.brake_steady = actuator_hystereses(
-      final_pedal, self.pedal_steady)
-
     if not enabled:
       # Stock ECU sends max regen when not enabled.
       apply_gas = P.MAX_ACC_REGEN
