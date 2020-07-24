@@ -474,9 +474,8 @@ def manager_thread():
   logger_dead = False
 
   while 1:
-    #gps = messaging.recv_one_or_none(gps_sock)
     msg = messaging.recv_sock(thermal_sock, wait=True)
-        logger_dead = True # logger is dead :(
+
     # heavyweight batch processes are gated on favorable thermal conditions
     if msg.thermal.thermalStatus >= ThermalStatus.yellow:
       for p in green_temp_processes:
