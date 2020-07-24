@@ -432,7 +432,7 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = []
 
     if self.cp_cam.can_invalid_cnt >= 200 and self.CP.enableCamera:
-      events.append(create_event('invalidGiraffeToyota', [ET.PERMANENT]))
+      events.add(EventName.invalidGiraffeToyota)
 
     if not self.waiting and ret.vEgo < 0.3 and not ret.gasPressed and self.CP.carFingerprint == CAR.RAV4H:
       self.waiting = True
