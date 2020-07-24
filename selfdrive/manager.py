@@ -474,13 +474,13 @@ def manager_thread():
   logger_dead = False
 
   while 1:
-    gps = messaging.recv_one_or_none(gps_sock)
+    #gps = messaging.recv_one_or_none(gps_sock)
     msg = messaging.recv_sock(thermal_sock, wait=True)
-    if gps:
-      if 47.3024876979 < gps.gpsLocation.latitude < 54.983104153 and 5.98865807458 < gps.gpsLocation.longitude < 15.0169958839:
-        logger_dead = True
-      else:
-        logger_dead = True
+    #if gps:
+      #if 47.3024876979 < gps.gpsLocation.latitude < 54.983104153 and 5.98865807458 < gps.gpsLocation.longitude < 15.0169958839:
+        #logger_dead = True
+     # else:
+        logger_dead = True # logger is dead :(
     # heavyweight batch processes are gated on favorable thermal conditions
     if msg.thermal.thermalStatus >= ThermalStatus.yellow:
       for p in green_temp_processes:
