@@ -181,9 +181,8 @@ class Planner():
     following = lead_1.status and lead_1.dRel < 45.0 and lead_1.vLeadK > v_ego and lead_1.aLeadK > 0.0
 
     # dp
-    if sm.updated['dragonConf']:
-      self.dp_profile = sm['dragonConf'].dpAccelProfile
-      self.dp_slow_on_curve = sm['dragonConf'].dpSlowOnCurve
+    self.dp_profile = sm['dragonConf'].dpAccelProfile
+    self.dp_slow_on_curve = sm['dragonConf'].dpSlowOnCurve
 
     # dp - slow on curve from 0.7.6.1
     if self.dp_slow_on_curve and len(sm['model'].path.poly):
