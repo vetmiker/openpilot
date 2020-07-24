@@ -504,11 +504,11 @@ class CarInterface(CarInterfaceBase):
     # events
     events, ret_arne182.events =  self.create_common_events(ret, pcm_enable=False)
     if ret.brakePressed:# or (self.CS.CP.openpilotLongitudinalControl and ret.gasPressed):
-      events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
+      events.add(EventName.pedalPressed)
     if self.CS.brake_error:
-      events.add(EventName.brakeUnavailable, [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
+      events.add(EventName.brakeUnavailable)
     if self.CS.brake_hold and self.CS.CP.openpilotLongitudinalControl:
-      events.events.add(EventName.brakeHold, [ET.NO_ENTRY, ET.USER_DISABLE]))
+      events.events.add(EventName.brakeHold)
     if self.CS.park_brake:
       events.add(EventName.parkBrake)
 
