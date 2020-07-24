@@ -7,7 +7,6 @@ import tempfile
 
 from selfdrive.car.car_helpers import interface_names
 from selfdrive.test.process_replay.process_replay import replay_process, CONFIGS
-from selfdrive.test.process_replay.compare_logs import compare_logs
 from tools.lib.logreader import LogReader
 
 

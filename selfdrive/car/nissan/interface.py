@@ -80,7 +80,7 @@ class CarInterface(CarInterfaceBase):
     events, eventsArne182 = self.create_common_events(ret)
 
     if self.CS.lkas_enabled:
-      events.add(car.CarEvent.EventName.invalidLkasSetting, [ET.PERMANENT]))
+      events.add(car.CarEvent.EventName.invalidLkasSetting)
 
     ret.events = events.to_msg()
     ret_arne182.events = eventsArne182

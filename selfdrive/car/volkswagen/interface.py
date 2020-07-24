@@ -139,11 +139,11 @@ class CarInterface(CarInterfaceBase):
     if self.CS.parkingBrakeSet:
       events.add(EventName.parkBrake)
     if self.CS.steeringFault:
-      events.add(EventName.steerTempUnavailable, [ET.NO_ENTRY, ET.WARNING]))
+      events.add(EventName.steerTempUnavailable)
 
     ret_arne182.events = eventsArne182
     ret.events = events.to_msg()
-    
+
     ret.buttonEvents = buttonEvents
     ret.canMonoTimes = canMonoTimes
 

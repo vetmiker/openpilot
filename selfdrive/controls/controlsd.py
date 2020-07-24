@@ -448,20 +448,20 @@ class Controls:
 
     recent_blinker = (self.sm.frame - self.last_blinker_frame) * DT_CTRL < 5.0  # 5s blinker cooldown
     ldw_allowed = self.is_ldw_enabled and CS.vEgo > LDW_MIN_SPEED and not recent_blinker \
-                    and self.sm['liveCalibration'].calStatus == Calibration.CALIBRATED  # and not self.active 
+                    and self.sm['liveCalibration'].calStatus == Calibration.CALIBRATED  # and not self.active
 
     meta = self.sm['model'].meta
     if len(meta.desirePrediction) and ldw_allowed:
       #l_lane_change_prob = meta.desirePrediction[Desire.laneChangeLeft - 1]
       #r_lane_change_prob = meta.desirePrediction[Desire.laneChangeRight - 1]
-      
+
       CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
-      
+
       l_lane_close = left_lane_visible and (self.sm['pathPlan'].lPoly[3] < (0.9 - CAMERA_OFFSET))
       r_lane_close = right_lane_visible and (self.sm['pathPlan'].rPoly[3] > -(0.8 + CAMERA_OFFSET))
 
-      CC.hudControl.leftLaneDepart = bool(l_lane_close)  # l_lane_change_prob > LANE_DEPARTURE_THRESHOLD and 
-      CC.hudControl.rightLaneDepart = bool(r_lane_close)  # r_lane_change_prob > LANE_DEPARTURE_THRESHOLD and 
+      CC.hudControl.leftLaneDepart = bool(l_lane_close)  # l_lane_change_prob > LANE_DEPARTURE_THRESHOLD and
+      CC.hudControl.rightLaneDepart = bool(r_lane_close)  # r_lane_change_prob > LANE_DEPARTURE_THRESHOLD and
 
     if CC.hudControl.rightLaneDepart or CC.hudControl.leftLaneDepart:
       self.events.add(EventName.ldw)
@@ -469,16 +469,18 @@ class Controls:
     alerts = self.events.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
     self.AM.add_many(self.sm.frame, alerts, self.enabled)
 
-    df_out = df_manager.update()
+    df_out = self.df_manager.update()
     if df_out.changed:
       df_alert = 'dfButtonAlert'
       if df_out.is_auto and df_out.last_is_auto:
-        if CS.cruiseState.enabled and not hide_auto_df_alerts:
-          df_alert += 'NoSound'
-          self.AM.add(self.sm.frame, df_alert, self.enabled, extra_text_1=df_out.model_profile_text + ' (auto)', extra_text_2='Dynamic follow: {} profile active'.format(df_out.model_profile_text))
+        # only show auto alert if engaged, not hiding auto, and time since lane speed alert not showing
+        if CS.cruiseState.enabled and not self.hide_auto_df_alerts:
+          df_alert += 'Silent'
+          self.AM.add_custom(frame, df_alert, self.enabled, extra_text_1=df_out.model_profile_text + ' (auto)')
+          return
       else:
-        self.AM.add(self.sm.frame, df_alert, self.enabled, extra_text_1=df_out.user_profile_text, extra_text_2='Dynamic follow: {} profile active'.format(df_out.user_profile_text))
-
+        self.AM.add_custom(frame, df_alert, self.enabled, extra_text_1=df_out.user_profile_text, extra_text_2='Dynamic follow: {} profile active'.format(df_out.user_profile_text))
+        return
     if traffic_light_alerts:
       traffic_status = self.arne_sm['trafficModelEvent'].status
       traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)

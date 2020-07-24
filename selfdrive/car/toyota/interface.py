@@ -386,8 +386,8 @@ class CarInterface(CarInterfaceBase):
     # ******************* do can recv *******************
     self.cp_cam.update_strings(can_strings)
     if self.frame < 1000:
-      self.cp_init.update_strings(can_strings)
-      ret = self.CS.update(self.cp_init, self.cp_cam, self.frame)
+      self.cp.update_strings(can_strings)
+      ret = self.CS.update(self.cp, self.cp_cam, self.frame)
     else:
       self.cp.update_strings(can_strings)
       ret = self.CS.update(self.cp, self.cp_cam, self.frame)
