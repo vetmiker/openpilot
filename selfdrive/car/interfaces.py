@@ -1,11 +1,11 @@
 import os
 import time
-from cereal import car
+from cereal import car, arne182
 from common.kalman.simple_kalman import KF1D
 from common.realtime import DT_CTRL
 from selfdrive.car import gen_empty_fingerprint
-from selfdrive.controls.lib.events import Events
-from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne, V_CRUISE_MAX
+from selfdrive.controls.lib.events import Events, Events_arne182
+from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 import cereal.messaging as messaging
 from common.op_params import opParams
@@ -15,6 +15,7 @@ from selfdrive.config import Conversions as CV
 
 GearShifter = car.CarState.GearShifter
 EventName = car.CarEvent.EventName
+EventNameArne182 = arne182.CarEventArne182.EventNameArne182
 MAX_CTRL_SPEED = (V_CRUISE_MAX + 4) * CV.KPH_TO_MS  # 144 + 4 = 92 mph
 
 # generic car and radar interfaces
@@ -104,7 +105,7 @@ class CarInterfaceBase():
         disengage_event = False
 
     events = Events()
-    eventsArne182 = []
+    eventsArne182 = Events_arne182()
 
     if cs_out.doorOpen and disengage_event:
       events.add(EventName.doorOpen)
@@ -112,14 +113,14 @@ class CarInterfaceBase():
       events.add(EventName.seatbeltNotLatched)
     if cs_out.gearShifter != GearShifter.drive and cs_out.gearShifter not in extra_gears:
       if cs_out.vEgo < 5:
-        eventsArne182.append(create_event_arne('wrongGearArne', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+        eventsArne182.add(EventNameArne182.wrongGearArne)
       else:
         events.add(EventName.wrongGear)
     if cs_out.gearShifter == GearShifter.reverse:
       if cs_out.vEgo < 5:
-        eventsArne182.append(create_event_arne('reverseGearArne', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+        eventsArne182.add(EventNameArne182.reverseGearArne)
       else:
-        events.add(EventName.reverseGear, [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE])
+        events.add(EventName.reverseGear)
     if not cs_out.cruiseState.available:
       events.add(EventName.wrongCarMode)
     if cs_out.espDisabled:
@@ -145,7 +146,7 @@ class CarInterfaceBase():
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
     if disengage_event and ((cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
        (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill))):
-      events.add(EventName.pedalPressed, [ET.NO_ENTRY, ET.USER_DISABLE])
+      events.add(EventName.pedalPressed)
 
     # we engage when pcm is active (rising edge)
     if pcm_enable:
