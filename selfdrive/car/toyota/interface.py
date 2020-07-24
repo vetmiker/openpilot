@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from cereal import car, arne182, log
 from selfdrive.config import Conversions as CV
-from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event, create_event_arne
+from selfdrive.controls.lib.drive_helpers import EventTypes as ET
 from selfdrive.car.toyota.values import Ecu, ECU_FINGERPRINT, CAR, TSS2_CAR, FINGERPRINTS
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, is_ecu_disconnected, gen_empty_fingerprint
 from selfdrive.swaglog import cloudlog
@@ -16,6 +16,7 @@ GearShifter = car.CarState.GearShifter
 LaneChangeState = log.PathPlan.LaneChangeState
 
 EventName = car.CarEvent.EventName
+EventNameArne182 = arne182.CarEventArne182.EventNameArne182
 
 class CarInterface(CarInterfaceBase):
   @staticmethod
@@ -427,7 +428,7 @@ class CarInterface(CarInterfaceBase):
     events, eventsArne182 = self.create_common_events(ret, extra_gears)
 
     if longControlDisabled:
-      eventsArne182.append(create_event_arne('longControlDisabled', [ET.WARNING]))
+      eventsArne182.add(EventNameArne182.longControlDisabled)
 
     ret.buttonEvents = []
 
@@ -440,12 +441,12 @@ class CarInterface(CarInterfaceBase):
       if ret.gasPressed:
         self.waiting = False
       else:
-        eventsArne182.append(create_event_arne('waitingMode', [ET.WARNING]))
+        eventsArne182.add(EventNameArne182.waitingMode)
 
     if ret.rightBlinker and self.CS.rightblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
-      eventsArne182.append(create_event_arne('rightALCbsm', [ET.WARNING]))
+      eventsArne182.add(EventNameArne182.rightALCbsm)
     if ret.leftBlinker and self.CS.leftblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
-      eventsArne182.append(create_event_arne('leftALCbsm', [ET.WARNING]))
+      eventsArne182.add(EventNameArne182.leftALCbsm)
 
     if self.CS.low_speed_lockout and self.CP.openpilotLongitudinalControl:
       events.add(EventName.lowSpeedLockout)
