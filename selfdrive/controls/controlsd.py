@@ -468,28 +468,28 @@ class Controls:
 
     alerts = self.events.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
     self.AM.add_many(self.sm.frame, alerts, self.enabled)
-    self.AM.process_alerts(self.sm.frame)
+
     df_out = df_manager.update()
     if df_out.changed:
       df_alert = 'dfButtonAlert'
       if df_out.is_auto and df_out.last_is_auto:
         if CS.cruiseState.enabled and not hide_auto_df_alerts:
           df_alert += 'NoSound'
-          self.AM.add(self.frame, df_alert, self.enabled, extra_text_1=df_out.model_profile_text + ' (auto)', extra_text_2='Dynamic follow: {} profile active'.format(df_out.model_profile_text))
+          self.AM.add(self.sm.frame, df_alert, self.enabled, extra_text_1=df_out.model_profile_text + ' (auto)', extra_text_2='Dynamic follow: {} profile active'.format(df_out.model_profile_text))
       else:
-        self.AM.add(self.frame, df_alert, self.enabled, extra_text_1=df_out.user_profile_text, extra_text_2='Dynamic follow: {} profile active'.format(df_out.user_profile_text))
+        self.AM.add(self.sm.frame, df_alert, self.enabled, extra_text_1=df_out.user_profile_text, extra_text_2='Dynamic follow: {} profile active'.format(df_out.user_profile_text))
 
     if traffic_light_alerts:
       traffic_status = self.arne_sm['trafficModelEvent'].status
       traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)
       if traffic_confidence >= 75:
         if traffic_status == 'SLOW':
-          self.AM.add(self.frame, 'trafficSlow', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+          self.AM.add(self.sm.frame, 'trafficSlow', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
         elif traffic_status == 'GREEN':
-          self.AM.add(self.frame, 'trafficGreen', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+          self.AM.add(self.sm.frame, 'trafficGreen', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
         elif traffic_status == 'DEAD':  # confidence will be 100
-          self.AM.add(self.frame, 'trafficDead', self.enabled)
-        
+          self.AM.add(self.sm.frame, 'trafficDead', self.enabled)
+    self.AM.process_alerts(self.sm.frame)
     CC.hudControl.visualAlert = self.AM.visual_alert
 
     if not self.read_only:
