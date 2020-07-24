@@ -1,7 +1,6 @@
 from cereal import car, arne182
 from common.numpy_fast import clip, interp
 from selfdrive.config import Conversions as CV
-from cereal import car
 
 # kph
 V_CRUISE_MAX = 169
