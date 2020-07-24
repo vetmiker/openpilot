@@ -1,4 +1,4 @@
-from cereal import log, car
+from cereal import log, car, arne182
 
 from common.realtime import DT_CTRL
 from selfdrive.config import Conversions as CV
@@ -87,6 +87,66 @@ class Events:
     ret = []
     for event_name in self.events:
       event = car.CarEvent.new_message()
+      event.name = event_name
+      for event_type in EVENTS.get(event_name, {}).keys():
+        setattr(event, event_type , True)
+      ret.append(event)
+    return ret
+  
+class Events_arne182:
+  def __init__(self):
+    self.events = []
+    self.static_events = []
+    self.events_prev = dict.fromkeys(EVENTS.keys(), 0)
+
+  @property
+  def names(self):
+    return self.events
+
+  def __len__(self):
+    return len(self.events)
+
+  def add(self, event_name, static=False):
+    if static:
+      self.static_events.append(event_name)
+    self.events.append(event_name)
+
+  def clear(self):
+    self.events_prev = {k: (v+1 if k in self.events else 0) for k, v in self.events_prev.items()}
+    self.events = self.static_events.copy()
+
+  def any(self, event_type):
+    for e in self.events:
+      if event_type in EVENTS.get(e, {}).keys():
+        return True
+    return False
+
+  def create_alerts(self, event_types, callback_args=None):
+    if callback_args is None:
+      callback_args = []
+
+    ret = []
+    for e in self.events:
+      types = EVENTS[e].keys()
+      for et in event_types:
+        if et in types:
+          alert = EVENTS[e][et]
+          if not isinstance(alert, Alert):
+            alert = alert(*callback_args)
+
+          if DT_CTRL * (self.events_prev[e] + 1) >= alert.creation_delay:
+            alert.alert_type = f"{EVENT_NAME[e]}/{et}"
+            ret.append(alert)
+    return ret
+
+  def add_from_msg(self, events):
+    for e in events:
+      self.events.append(e.name.raw)
+
+  def to_msg(self):
+    ret = []
+    for event_name in self.events:
+      event = arne182.CarEventArne182.new_message()
       event.name = event_name
       for event_type in EVENTS.get(event_name, {}).keys():
         setattr(event, event_type , True)
