@@ -27,11 +27,6 @@ from selfdrive.car.disable_radar import disable_radar
 from common.op_params import opParams
 from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
 
-op_params = opParams()
-df_manager = dfManager(op_params)
-
-hide_auto_df_alerts = op_params.get('hide_auto_df_alerts', False)
-traffic_light_alerts = op_params.get('traffic_light_alerts', True)
 
 LDW_MIN_SPEED = 12.5
 LANE_DEPARTURE_THRESHOLD = 0.1
@@ -67,6 +62,12 @@ class Controls:
     self.arne_sm = arne_sm
     if self.arne_sm is None:
       self.arne_sm = messaging_arne.SubMaster(['arne182Status', 'dynamicFollowButton', 'trafficModelEvent'])
+
+    self.op_params = opParams()
+    self.df_manager = dfManager(self.op_params)
+    self.hide_auto_df_alerts = self.op_params.get('hide_auto_df_alerts', False)
+    self.hide_auto_df_alerts = self.op_params.get('hide_auto_df_alerts', False)
+    self.traffic_light_alerts = self.op_params.get('traffic_light_alerts', True)
 
     self.can_sock = can_sock
     if can_sock is None:
@@ -455,7 +456,7 @@ class Controls:
       #l_lane_change_prob = meta.desirePrediction[Desire.laneChangeLeft - 1]
       #r_lane_change_prob = meta.desirePrediction[Desire.laneChangeRight - 1]
 
-      CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
+      CAMERA_OFFSET = self.op_params.get('camera_offset', 0.06)
 
       l_lane_close = left_lane_visible and (self.sm['pathPlan'].lPoly[3] < (0.9 - CAMERA_OFFSET))
       r_lane_close = right_lane_visible and (self.sm['pathPlan'].rPoly[3] > -(0.8 + CAMERA_OFFSET))
@@ -470,6 +471,7 @@ class Controls:
     self.AM.add_many(self.sm.frame, alerts, self.enabled)
 
     df_out = self.df_manager.update()
+    frame = self.sm.frame
     if df_out.changed:
       df_alert = 'dfButtonAlert'
       if df_out.is_auto and df_out.last_is_auto:
@@ -481,16 +483,16 @@ class Controls:
       else:
         self.AM.add_custom(frame, df_alert, self.enabled, extra_text_1=df_out.user_profile_text, extra_text_2='Dynamic follow: {} profile active'.format(df_out.user_profile_text))
         return
-    if traffic_light_alerts:
+    if self.traffic_light_alerts:
       traffic_status = self.arne_sm['trafficModelEvent'].status
       traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)
       if traffic_confidence >= 75:
         if traffic_status == 'SLOW':
-          self.AM.add(self.sm.frame, 'trafficSlow', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+          self.AM.add_custom(self.sm.frame, 'trafficSlow', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
         elif traffic_status == 'GREEN':
-          self.AM.add(self.sm.frame, 'trafficGreen', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+          self.AM.add_custom(self.sm.frame, 'trafficGreen', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
         elif traffic_status == 'DEAD':  # confidence will be 100
-          self.AM.add(self.sm.frame, 'trafficDead', self.enabled)
+          self.AM.add_custom(self.sm.frame, 'trafficDead', self.enabled)
     self.AM.process_alerts(self.sm.frame)
     CC.hudControl.visualAlert = self.AM.visual_alert
 
