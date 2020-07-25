@@ -441,7 +441,6 @@ def manager_init(should_register=True):
 def manager_thread():
   # now loop
   thermal_sock = messaging.sub_sock('thermal')
-  gps_sock = messaging.sub_sock('gpsLocation', conflate=True)
 
   cloudlog.info("manager start")
   cloudlog.info({"environ": os.environ})
