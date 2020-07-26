@@ -428,7 +428,7 @@ class CarInterface(CarInterfaceBase):
     events, events_arne182 = self.create_common_events(ret, extra_gears)
 
     if longControlDisabled:
-      eventsArne182.add(EventNameArne182.longControlDisabled)
+      events_arne182.add(EventNameArne182.longControlDisabled)
 
     ret.buttonEvents = []
 
@@ -441,12 +441,12 @@ class CarInterface(CarInterfaceBase):
       if ret.gasPressed:
         self.waiting = False
       else:
-        eventsArne182.add(EventNameArne182.waitingMode)
+        events_arne182.add(EventNameArne182.waitingMode)
 
     if ret.rightBlinker and self.CS.rightblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
-      eventsArne182.add(EventNameArne182.rightALCbsm)
+      events_arne182.add(EventNameArne182.rightALCbsm)
     if ret.leftBlinker and self.CS.leftblindspot and ret.vEgo > self.alca_min_speed and self.sm['pathPlan'].laneChangeState  == LaneChangeState.preLaneChange:
-      eventsArne182.add(EventNameArne182.leftALCbsm)
+      events_arne182.add(EventNameArne182.leftALCbsm)
 
     if self.CS.low_speed_lockout and self.CP.openpilotLongitudinalControl:
       events.add(EventName.lowSpeedLockout)
