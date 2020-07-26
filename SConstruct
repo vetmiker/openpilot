@@ -152,7 +152,6 @@ env = Environment(
     "#selfdrive/modeld",
     "#cereal/messaging",
     "#cereal/messaging_arne",
-    "#selfdrive/trafficd",
     "#cereal",
     "#opendbc/can",
   ],
