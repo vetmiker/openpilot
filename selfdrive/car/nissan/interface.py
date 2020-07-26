@@ -77,13 +77,13 @@ class CarInterface(CarInterfaceBase):
     be.type = car.CarState.ButtonEvent.Type.accelCruise
     buttonEvents.append(be)
 
-    events, eventsArne182 = self.create_common_events(ret)
+    events, events_arne182 = self.create_common_events(ret)
 
     if self.CS.lkas_enabled:
       events.add(car.CarEvent.EventName.invalidLkasSetting)
 
     ret.events = events.to_msg()
-    ret_arne182.events = eventsArne182
+    ret_arne182.events = events_arne182.to_msg()
 
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()

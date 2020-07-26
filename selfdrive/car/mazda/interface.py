@@ -66,7 +66,7 @@ class CarInterface(CarInterfaceBase):
 
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
-    
+
     ret_arne182 = arne182.CarStateArne182.new_message()
     ret = self.CS.update(self.cp, self.cp_cam)
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
@@ -75,7 +75,7 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = []
 
     # events
-    events, eventsArne182 = self.create_common_events(ret)
+    events, events_arne182 = self.create_common_events(ret)
 
     if self.CS.low_speed_lockout:
       events.add(EventName.belowEngageSpeed)
@@ -84,7 +84,7 @@ class CarInterface(CarInterfaceBase):
       events.add(EventName.belowSteerSpeed)
 
     ret.events = events.to_msg()
-    ret_arne182.events = eventsArne182
+    ret_arne182.events = events_arne182.to_msg()
 
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()

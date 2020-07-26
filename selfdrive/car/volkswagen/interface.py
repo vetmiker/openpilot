@@ -132,7 +132,7 @@ class CarInterface(CarInterfaceBase):
         be.pressed = self.CS.buttonStates[button]
         buttonEvents.append(be)
 
-    events, eventsArne182 = self.create_common_events(ret, extra_gears=[GEAR.eco, GEAR.sport])
+    events, events_arne182 = self.create_common_events(ret, extra_gears=[GEAR.eco, GEAR.sport])
 
     # Vehicle health and operation safety checks
     if self.CS.parkingBrakeSet:
@@ -140,7 +140,7 @@ class CarInterface(CarInterfaceBase):
     if self.CS.steeringFault:
       events.add(EventName.steerTempUnavailable)
 
-    ret_arne182.events = eventsArne182
+    ret_arne182.events = events_arne182.to_msg()
     ret.events = events.to_msg()
 
     ret.buttonEvents = buttonEvents

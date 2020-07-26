@@ -425,7 +425,7 @@ class CarInterface(CarInterfaceBase):
 
 
     # events
-    events, eventsArne182 = self.create_common_events(ret, extra_gears)
+    events, events_arne182 = self.create_common_events(ret, extra_gears)
 
     if longControlDisabled:
       eventsArne182.add(EventNameArne182.longControlDisabled)
@@ -459,7 +459,7 @@ class CarInterface(CarInterfaceBase):
         # while in standstill, send a user alert
         events.add(EventName.manualRestart)
     ret.events = events
-    ret_arne182.events = eventsArne182
+    ret_arne182.events = events_arne182.to_msg()
 
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()

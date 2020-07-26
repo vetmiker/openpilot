@@ -181,7 +181,7 @@ class CarInterface(CarInterfaceBase):
     ret.buttonEvents = []
 
 
-    events, eventsArne182 = self.create_common_events(ret)
+    events, events_arne182 = self.create_common_events(ret)
     #TODO: addd abs(self.CS.angle_steers) > 90 to 'steerTempUnavailable' event
 
 
@@ -195,10 +195,9 @@ class CarInterface(CarInterfaceBase):
 
       events.add(car.CarEvent.EventName.belowSteerSpeed)
 
-    ret.events = events
-    ret_arne182.events = eventsArne182
-
     ret.events = events.to_msg()
+
+    ret_arne182.events = events_arne182.to_msg()
 
     self.CS.out = ret.as_reader()
     return self.CS.out, ret_arne182.as_reader()
