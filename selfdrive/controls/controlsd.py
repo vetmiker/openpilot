@@ -26,7 +26,9 @@ from selfdrive.locationd.calibration_helpers import Calibration
 from selfdrive.car.disable_radar import disable_radar
 from common.op_params import opParams
 from selfdrive.controls.lib.dynamic_follow.df_manager import dfManager
-
+import selfdrive.crash as crash
+from selfdrive.swaglog import cloudlog
+from selfdrive.version import version, dirty
 
 LDW_MIN_SPEED = 12.5
 LANE_DEPARTURE_THRESHOLD = 0.1
@@ -619,6 +621,12 @@ class Controls:
       self.prof.display()
 
 def main(sm=None, pm=None, logcan=None, arne_sm=None):
+  params = Params()
+  dongle_id = params.get("DongleId").decode('utf-8')
+  cloudlog.bind_global(dongle_id=dongle_id, version=version, dirty=dirty, is_eon=True)
+  crash.bind_user(id=dongle_id)
+  crash.bind_extra(version=version, dirty=dirty, is_eon=True)
+  crash.install()
   controls = Controls(sm, pm, logcan, arne_sm)
   controls.controlsd_thread()
 
