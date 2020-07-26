@@ -458,7 +458,7 @@ class CarInterface(CarInterfaceBase):
       if ret.vEgo < 0.001:
         # while in standstill, send a user alert
         events.add(EventName.manualRestart)
-    ret.events = events
+    ret.events = events.to_msg()
     ret_arne182.events = events_arne182.to_msg()
 
     self.CS.out = ret.as_reader()
