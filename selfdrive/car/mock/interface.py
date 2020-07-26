@@ -86,7 +86,7 @@ class CarInterface(CarInterfaceBase):
     events = []
     events_arne182 = []
     ret.events = events
-    ret_arne182.events = events_arne182.to_msg()
+    ret_arne182.events = events_arne182
     return ret.as_reader(), ret_arne182.as_reader()
 
   def apply(self, c):
