@@ -527,7 +527,7 @@ class Controls:
     controlsState.vEgoRaw = CS.vEgoRaw
     controlsState.angleSteers = CS.steeringAngle
     controlsState.curvature = self.VM.calc_curvature(steer_angle_rad, CS.vEgo)
-    controlsState.decelForTurn = self.sm['plan'].decelForTurn,
+    controlsState.decelForTurn = self.sm['plan'].decelForTurn
     controlsState.steerOverride = CS.steeringPressed
     controlsState.state = self.state
     controlsState.engageable = not self.events.any(ET.NO_ENTRY)
