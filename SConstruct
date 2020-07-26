@@ -264,8 +264,7 @@ if arch == "aarch64":
   SConscript(['selfdrive/logcatd/SConscript'])
   SConscript(['selfdrive/sensord/SConscript'])
   SConscript(['selfdrive/clocksd/SConscript'])
-  SConscript(['selfdrive/trafficd/SConscript'])
-
+  
 # TODO: finish cereal, dbcbuilder, MPC
 else:
   SConscript(['tools/lib/index_log/SConscript'])
