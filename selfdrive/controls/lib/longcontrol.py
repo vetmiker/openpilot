@@ -132,6 +132,8 @@ class LongControl():
 
     # Update state machine
     output_gb = self.last_output_gb
+    if dRel is None:
+      dRel = 200
     if hasLead:
       stop = True if dRel < 4.0 else False
     else:
