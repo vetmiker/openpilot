@@ -111,11 +111,11 @@ routes = {
     'carFingerprint': HONDA.FIT,
     'enableCamera': True,
   },
-  "03be5f2fd5c508d1|2020-04-19--18-44-15": {
-    'carFingerprint': HONDA.HRV,
-    'enableCamera': True,
-    'fingerprintSource': 'fixed',
-  },
+  #"03be5f2fd5c508d1|2020-04-19--18-44-15": {
+    #'carFingerprint': HONDA.HRV,
+    #'enableCamera': True,
+    #'fingerprintSource': 'fixed',
+  #},
   "2ac95059f70d76eb|2018-02-05--15-03-29": {
     'carFingerprint': HONDA.ACURA_ILX,
     'enableCamera': True,
@@ -437,6 +437,7 @@ non_tested_cars = [
   GM.MALIBU,
   HONDA.ACURA_RDX,
   HONDA.CRV,
+  HONDA.HRV,
   HONDA.RIDGELINE,
   HYUNDAI.ELANTRA,
   HYUNDAI.ELANTRA_GT_I30,
