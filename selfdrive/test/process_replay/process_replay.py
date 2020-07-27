@@ -214,13 +214,13 @@ CONFIGS = [
   ProcessConfig(
     proc_name="controlsd",
     pub_sub={
-      "can": ["controlsState", "carState", "carControl", "sendcan", "carEvents", "carParams"],
+      "can": ["controlsState", "carState", "carControl", "sendcan", "carEvents", "carParams", "radarState"],
       "thermal": [], "health": [], "liveCalibration": [], "dMonitoringState": [], "plan": [], "pathPlan": [], "gpsLocation": [], "liveLocationKalman": [],
       "model": [], "frame": [],
     },
     ignore=["logMonoTime", "valid", "controlsState.startMonoTime", "controlsState.cumLagMs"],
     init_callback=fingerprint,
-    should_recv_callback=None,
+    should_recv_callback=radar_rcv_callback,
     tolerance=None,
   ),
   ProcessConfig(
