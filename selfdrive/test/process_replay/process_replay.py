@@ -220,7 +220,7 @@ CONFIGS = [
     },
     ignore=["logMonoTime", "valid", "controlsState.startMonoTime", "controlsState.cumLagMs"],
     init_callback=fingerprint,
-    should_recv_callback=radar_rcv_callback,
+    should_recv_callback=None,
     tolerance=None,
   ),
   ProcessConfig(
