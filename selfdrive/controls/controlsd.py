@@ -397,7 +397,7 @@ class Controls:
     else:
       gas_button_status = 0
 
-    actuators.gas, actuators.brake = self.LoC.update(self.active, CS, v_acc_sol, plan.vTargetFuture, a_acc_sol, self.CP, plan.hasLead, self.sm['radarState'].leadOne.dRel, plan.decelForTurn, plan.longitudinalPlanSource, gas_button_status)
+    actuators.gas, actuators.brake = self.LoC.update(self.active, CS, v_acc_sol, plan.vTargetFuture, a_acc_sol, self.CP, plan.hasLead, self.sm['radarState'], plan.decelForTurn, plan.longitudinalPlanSource, gas_button_status)
     # Steering PID loop and lateral MPC
     actuators.steer, actuators.steerAngle, lac_log = self.LaC.update(self.active, CS, self.CP, path_plan)
 
