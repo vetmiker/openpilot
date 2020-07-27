@@ -472,7 +472,7 @@ class Controls:
       self.events.add(EventName.ldw)
 
     alerts = self.events.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
-    alertsArne182 = self.self.eventsArne182.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
+    alertsArne182 = self.eventsArne182.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
     
     self.AM.add_many(self.sm.frame, alerts, self.enabled)
     self.AM.add_many(self.sm.frame, alertsArne182, self.enabled)
