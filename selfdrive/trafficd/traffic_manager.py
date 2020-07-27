@@ -13,7 +13,7 @@ class Traffic:
     self.sm = messaging_arne.SubMaster(['trafficModelRaw'])
 
     self.labels = ['SLOW', 'GREEN', 'NONE']
-    self.model_rate = 1 / 5.
+    self.model_rate = 1 / 3.
     self.recurrent_length = 1.0  # in seconds, how far back to factor into current prediction
     self.min_preds = int(round(self.recurrent_length / self.model_rate))
     self.last_pred_weight = 5.  # places nx weight on most recent prediction
@@ -40,7 +40,7 @@ class Traffic:
         self.shown_dead_warning = False
         self.past_preds.append(list(self.sm['trafficModelRaw'].prediction))
         pred, confidence = self.get_prediction()  # uses most common prediction from weighted past second list (1 / model_rate), NONE until car is started for min time
-        #print('{}, confidence: {}'.format(pred, confidence))
+        print('{}, confidence: {}'.format(pred, confidence))
         self.send_prediction(pred, confidence)
       else:
         if not self.shown_dead_warning and self.last_log['log'] != 0:
