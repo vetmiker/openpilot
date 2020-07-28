@@ -22,6 +22,8 @@
 #include "common/modeldata.h"
 #include "sound.hpp"
 
+#include "cereal/gen/c/arne182.capnp.h"
+
 #define STATUS_STOPPED 0
 #define STATUS_DISENGAGED 1
 #define STATUS_ENGAGED 2
@@ -39,6 +41,7 @@
 #define COLOR_YELLOW nvgRGBA(218, 202, 37, 255)
 #define COLOR_RED nvgRGBA(201, 34, 49, 255)
 #define COLOR_OCHRE nvgRGBA(218, 111, 37, 255)
+#define COLOR_GREEN nvgRGBA(34, 201, 49, 255)
 
 #ifndef QCOM
   #define UI_60FPS
@@ -102,11 +105,26 @@ typedef struct UIScene {
   bool world_objects_visible;
   mat4 extrinsic_matrix;      // Last row is 0 so we can use mat4.
 
+  //dev ui
   float speedlimit;
   bool speedlimit_valid;
-  
   float speedlimitaheaddistance;
   bool speedlimitahead_valid;
+  float gpsAccuracy;
+  float angleSteersDes;
+  float angleSteers;
+  float pa0;
+  float freeSpace;
+  int lead_status;
+  int lead_status2;
+  float lead_d_rel, lead_y_rel, lead_v_rel;
+  float lead_d_rel2, lead_y_rel2, lead_v_rel2;
+  int engaged;
+  bool brakeLights;
+  bool leftBlinker;
+  bool rightBlinker;
+  int blinker_blinkingrate;
+  char ipAddr[20];
 
   bool is_rhd;
   bool map_valid;
@@ -127,6 +145,9 @@ typedef struct UIScene {
   // Used to show gps planner status
   bool gps_planner_active;
 
+  // @shanes, dynamic Follow
+  int dfButtonStatus;
+
   cereal::HealthData::HwType hwType;
   int satelliteCount;
   uint8_t athenaStatus;
@@ -135,6 +156,7 @@ typedef struct UIScene {
   cereal::RadarState::LeadData::Reader lead_data[2];
   cereal::ControlsState::Reader controls_state;
   cereal::DriverState::Reader driver_state;
+
 } UIScene;
 
 typedef struct {
@@ -176,6 +198,9 @@ typedef struct UIState {
   int img_battery;
   int img_battery_charging;
   int img_network[6];
+  //dev ui
+  int img_brake;
+  int img_speed;
 
   // sockets
   SubMaster *sm;

@@ -16,6 +16,7 @@
 #include "common/params.h"
 #include "common/utilpp.h"
 #include "ui.hpp"
+#include "cereal/gen/cpp/arne182.capnp.h"
 
 static void ui_set_brightness(UIState *s, int brightness) {
   static int last_brightness = -1;
@@ -86,6 +87,32 @@ static void update_offroad_layout_state(UIState *s) {
     timeout = 2 * UI_FREQ;
   }
 #endif
+}
+
+//dfButton manager
+static void send_df(UIState *s, int status) {
+  capnp::MallocMessageBuilder msg;
+  auto EventArne182 = msg.initRoot<cereal::EventArne182>();
+  EventArne182.setLogMonoTime(nanos_since_boot());
+  auto dfStatus = EventArne182.initDynamicFollowButton();
+  dfStatus.setStatus(status);
+  s->pm->send("dynamicFollowButton", msg);
+}
+
+static bool handle_df_touch(UIState *s, int touch_x, int touch_y) {
+  if (s->awake && s->vision_connected && s->status != STATUS_STOPPED) {
+    int padding = 40;
+    if ((1660 - padding <= touch_x) && (855 - padding <= touch_y)) {
+      s->scene.uilayout_sidebarcollapsed = true;  // collapse sidebar when tapping df button
+      s->scene.dfButtonStatus++;
+      if (s->scene.dfButtonStatus > 3) {
+        s->scene.dfButtonStatus = 0;
+      }
+      send_df(s, s->scene.dfButtonStatus);
+      return true;
+    }
+  }
+  return false;
 }
 
 static void handle_sidebar_touch(UIState *s, int touch_x, int touch_y) {
@@ -168,12 +195,12 @@ static void ui_init(UIState *s) {
 
   pthread_mutex_init(&s->lock, NULL);
   s->sm = new SubMaster({"model", "controlsState", "uiLayoutState", "liveCalibration", "radarState", "thermal",
-                         "health", "ubloxGnss", "driverState", "dMonitoringState"
+                         "health", "ubloxGnss", "driverState", "dMonitoringState", "carState", "gpsLocationExternal"
 #ifdef SHOW_SPEEDLIMIT
                                     , "liveMapData"
 #endif
   });
-  s->pm = new PubMaster({"offroadLayout"});
+  s->pm = new PubMaster({"offroadLayout", "dynamicFollowButton"});
 
   s->ipc_fd = -1;
   s->scene.satelliteCount = -1;
@@ -214,6 +241,9 @@ static void ui_init_vision(UIState *s, const VisionStreamBufs back_bufs,
   s->scene.front_box_height = ui_info.front_box_height;
   s->scene.world_objects_visible = false;  // Invisible until we receive a calibration message.
   s->scene.gps_planner_active = false;
+
+  // Dynamic Follow
+  s->scene.dfButtonStatus = 0;
 
   s->rgb_width = back_bufs.width;
   s->rgb_height = back_bufs.height;
@@ -283,6 +313,7 @@ void handle_message(UIState *s, SubMaster &sm) {
   UIScene &scene = s->scene;
   if (s->started && sm.updated("controlsState")) {
     auto event = sm["controlsState"];
+    auto data = event.getControlsState();
     scene.controls_state = event.getControlsState();
     s->controls_timeout = 1 * UI_FREQ;
     scene.frontview = scene.controls_state.getRearViewCam();
@@ -326,6 +357,8 @@ void handle_message(UIState *s, SubMaster &sm) {
         }
       }
     }
+    scene.angleSteers = data.getAngleSteers();
+    scene.angleSteersDes = data.getAngleSteersDes();
   }
   if (sm.updated("radarState")) {
     auto data = sm["radarState"].getRadarState();
@@ -357,6 +390,18 @@ void handle_message(UIState *s, SubMaster &sm) {
     s->active_app = data.getActiveApp();
     scene.uilayout_sidebarcollapsed = data.getSidebarCollapsed();
   }
+  if (sm.updated("gpsLocationExternal")) {
+    scene.gpsAccuracy = sm["gpsLocationExternal"].getGpsLocationExternal().getAccuracy();
+    if (scene.gpsAccuracy > 100)
+    {
+      scene.gpsAccuracy = 99.99;
+    }
+    else if (scene.gpsAccuracy == 0)
+    {
+      scene.gpsAccuracy = 99.8;
+    }
+  }
+
 #ifdef SHOW_SPEEDLIMIT
   if (sm.updated("liveMapData")) {
     scene.map_valid = sm["liveMapData"].getLiveMapData().getMapValid();
@@ -386,6 +431,17 @@ void handle_message(UIState *s, SubMaster &sm) {
     auto data = sm["dMonitoringState"].getDMonitoringState();
     scene.is_rhd = data.getIsRHD();
     s->preview_started = data.getIsPreview();
+  }
+  //dev ui
+  //snprintf(scene.ipAddr, sizeof(s->scene.ipAddr), "%s", data.ipAddr.str);
+  if (sm.updated("carState")) {
+    auto data = sm["carState"].getCarState();
+    if(scene.leftBlinker!=data.getLeftBlinker() || scene.rightBlinker!=data.getRightBlinker()){
+      scene.blinker_blinkingrate = 100;
+    }
+    scene.brakeLights = data.getBrakeLights();
+    scene.leftBlinker = data.getLeftBlinker();
+    scene.rightBlinker = data.getRightBlinker();
   }
 
   s->started = scene.thermal.getStarted() || s->preview_started;
@@ -782,7 +838,10 @@ int main(int argc, char* argv[]) {
     if (touched == 1) {
       set_awake(s, true);
       handle_sidebar_touch(s, touch_x, touch_y);
-      handle_vision_touch(s, touch_x, touch_y);
+
+      if (!handle_df_touch(s, touch_x, touch_y) && !handle_df_touch(s, touch_x, touch_y)) {  // disables sidebar from popping out when tapping df or ls button
+        handle_vision_touch(s, touch_x, touch_y);
+      }
     }
 
     if (!s->started) {
