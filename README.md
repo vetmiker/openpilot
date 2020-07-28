@@ -30,7 +30,6 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 `release4`: this is the default branch that is most up to date with the ArnePilot 0.7 release branch. Normally you should use this branch because it has been tested and verified that it is fully working without any issues.
 
 `075-clean`: this is my old testing branch. I moved on to 077.
-`release4` branch.
 
 `077-clean`: Heavily in early early in development branch of OP 077. Not recommended for any use out of testing. Is missing many features like trafficd and a working Ui. May crash and lag.
 
