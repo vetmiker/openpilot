@@ -487,21 +487,21 @@ class Controls:
         # only show auto alert if engaged, not hiding auto, and time since lane speed alert not showing
         if CS.cruiseState.enabled and not self.hide_auto_df_alerts:
           df_alert += 'Silent'
-          self.AM.add_custom(frame, df_alert, self.enabled, extra_text_1=df_out.model_profile_text + ' (auto)')
+          self.AM.add_custom(frame, df_alert, ET.WARNING, self.enabled, extra_text_1=df_out.model_profile_text + ' (auto)')
           return
       else:
-        self.AM.add_custom(frame, df_alert, self.enabled, extra_text_1=df_out.user_profile_text, extra_text_2='Dynamic follow: {} profile active'.format(df_out.user_profile_text))
+        self.AM.add_custom(frame, df_alert, ET.WARNING, self.enabled, extra_text_1=df_out.user_profile_text, extra_text_2='Dynamic follow: {} profile active'.format(df_out.user_profile_text))
         return
     if self.traffic_light_alerts:
       traffic_status = self.arne_sm['trafficModelEvent'].status
       traffic_confidence = round(self.arne_sm['trafficModelEvent'].confidence * 100, 2)
       if traffic_confidence >= 75:
         if traffic_status == 'SLOW':
-          self.AM.add_custom(self.sm.frame, 'trafficSlow', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+          self.AM.add_custom(self.sm.frame, 'trafficSlow', ET.WARNING, self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
         elif traffic_status == 'GREEN':
-          self.AM.add_custom(self.sm.frame, 'trafficGreen', self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
+          self.AM.add_custom(self.sm.frame, 'trafficGreen', ET.WARNING, self.enabled, extra_text_2=' ({}%)'.format(traffic_confidence))
         elif traffic_status == 'DEAD':  # confidence will be 100
-          self.AM.add_custom(self.sm.frame, 'trafficDead', self.enabled)
+          self.AM.add_custom(self.sm.frame, 'trafficDead', ET.WARNING, self.enabled)
     self.AM.process_alerts(self.sm.frame)
     CC.hudControl.visualAlert = self.AM.visual_alert
 
