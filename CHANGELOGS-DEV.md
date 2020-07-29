@@ -4,6 +4,8 @@ dragonpilot 0.7.7.1
 * Added C2 quiet fan mode. (Thanks to @dingliangxue)
 * 加入「輔助換道最低啟動速度」、「自動換道最低啟動速度」設定。
 * Added "Assisted Lane Change Min Engage Speed" and "Auto Lane Change Min Engage Speed" settings.
+* 加入回調校介面。(感謝 @Kent)
+* Re-added Dev UI. (Thanks to @Kent)
 
 dragonpilot 0.7.7.0
 ========================
