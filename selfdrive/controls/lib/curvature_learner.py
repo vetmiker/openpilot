@@ -31,7 +31,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
         angle_band = 'outer'
 
     if angle_band is not None:
-      self.learned_offsets[angle_band] += d_poly[3] * self.learning_rate * -copysign(angle_steers)  # add when negative, subtract when positive
+      self.learned_offsets[angle_band] -= d_poly[3] * self.learning_rate * copysign(angle_steers)
       self.offset = self.learned_offsets[angle_band]
 
     if sec_since_boot() - self._last_write_time >= self.write_frequency:
