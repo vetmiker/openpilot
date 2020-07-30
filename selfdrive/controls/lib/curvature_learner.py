@@ -26,16 +26,16 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self.offset = 0.
     self._load_curvature()
 
-  def update_new(self, angle_steers, d_poly, v_ego):
+  def update(self, angle_steers, d_poly, v_ego):
     learning_sign = -copy_sign(angle_steers)  # add when negative, subtract when positive
-    if abs(angle_steers) > 0.1:  # not between -.1 and .1
+    if abs(angle_steers) >= 0.1:  # not between -.1 and .1
       if abs(angle_steers) < 2:
         self.learned_offsets['center'] += d_poly[3] * self.learning_rate * learning_sign
         self.offset = self.learned_offsets['center']
-      elif 2. < abs(angle_steers) < 5.:
+      elif 2 <= abs(angle_steers) < 5.:
         self.learned_offsets['inner'] += d_poly[3] * self.learning_rate
         self.offset = self.learned_offsets['inner']
-      elif abs(angle_steers) > 5.:
+      elif 5 <= abs(angle_steers):
         self.learned_offsets['outer'] += d_poly[3] * self.learning_rate
         self.offset = self.learned_offsets['outer']
 
