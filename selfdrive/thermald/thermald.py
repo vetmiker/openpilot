@@ -203,7 +203,7 @@ def thermald_thread():
   pm = PowerMonitoring()
   no_panda_cnt = 0
 
-  arne_pm = messaging_arne.PubMaster(['ipAddress'])
+  #arne_pm = messaging_arne.PubMaster(['ipAddress'])
 
   while 1:
     health = messaging.recv_sock(health_sock, wait=True)
@@ -314,9 +314,9 @@ def thermald_thread():
       except:
         ip_addr = 'N/A'
       ts_last_ip = ts
-      msg2 = messaging_arne.new_message('ipAddress')
-      msg2.ipAddress.ipAddr = ip_addr
-      arne_pm.send('ipAddress', msg2)
+      #msg2 = messaging_arne.new_message('ipAddress')
+      msg.thermal.ipAddr = ip_addr
+      #arne_pm.send('ipAddress', msg2)
 
     current_filter.update(msg.thermal.batteryCurrent / 1e6)
 
