@@ -32,12 +32,12 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     return clip(offset, -0.3, 0.3)
 
   def pick_angle_band(self, angle_steers):
-    if abs(angle_steers) >= 0.1:  # not between -.1 and .1
-      if abs(angle_steers) < 2:
+    if abs(angle_steers) >= 0.1:
+      if abs(angle_steers) < 2:  # between +=[.1, 2)
         return 'center'
-      if abs(angle_steers) < 5.:
+      if abs(angle_steers) < 5.:  # between +=[2, 5)
         return 'inner'
-      return 'outer'  # greater than +-5
+      return 'outer'  # between +=[5, inf)
     return None  # return none when below +- 0.1, removes possibility of returning offset in this case
 
   def _load_curvature(self):
