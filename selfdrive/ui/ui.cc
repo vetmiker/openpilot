@@ -363,7 +363,15 @@ void handle_message(UIState *s, SubMaster &sm) {
   if (sm.updated("radarState")) {
     auto data = sm["radarState"].getRadarState();
     scene.lead_data[0] = data.getLeadOne();
+    scene.lead_status = scene.lead_data[0].getStatus;
+    scene.lead_d_rel = scene.lead_data[0].getDRel;
+    //scene.lead_y_rel = scene.lead_data[0].getYRel();
+    scene.lead_v_rel = scene.lead_data[0].getVRel();
     scene.lead_data[1] = data.getLeadTwo();
+    //scene.lead_status2 = scene.lead_data[1].getStatus;
+    //scene.lead_d_rel2 = scene.lead_data[1].getDRel;
+    //scene.lead_y_rel2 = scene.lead_data[1].getYRel();
+    //scene.lead_v_rel2 = scene.lead_data[1].getVRel();
   }
   if (sm.updated("liveCalibration")) {
     scene.world_objects_visible = true;
