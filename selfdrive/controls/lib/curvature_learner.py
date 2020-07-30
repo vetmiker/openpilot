@@ -49,8 +49,8 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
       with open(self.curvature_file, 'r') as f:
         self.learned_offsets = json.load(f)
       return
-    except:
-      self.learned_offsets = {'center': 0., 'inner': 0., 'outer': 0.}  # can't read file or doesn't exist
+    except:  # can't read file or doesn't exist
+      self.learned_offsets = {'center': 0., 'inner': 0., 'outer': 0.}
       self._write_curvature()  # rewrite/create new file
 
   def _write_curvature(self):
