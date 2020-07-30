@@ -4,12 +4,11 @@ from numpy import clip
 from common.basedir import BASEDIR
 from common.realtime import sec_since_boot
 
-
 # by Zorrobyte
 # version 4
 
-def copy_sign(n):
-  return 1 if n > 0 else -1
+def copysign(n):
+  return 1 if n >= 0 else -1
 
 
 class CurvatureLearner:  # todo: disable when dynamic camera offset is working
@@ -22,7 +21,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self._load_curvature()
 
   def update(self, angle_steers, d_poly, v_ego):
-    learning_sign = -copy_sign(angle_steers)  # add when negative, subtract when positive
+    learning_sign = -copysign(angle_steers)  # add when negative, subtract when positive
     if abs(angle_steers) >= 0.1:  # not between -.1 and .1
       if abs(angle_steers) < 2:
         self.learned_offsets['center'] += d_poly[3] * self.learning_rate * learning_sign
