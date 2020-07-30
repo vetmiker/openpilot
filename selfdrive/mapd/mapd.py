@@ -293,7 +293,8 @@ class MapsdThread(LoggerThread):
                             else:
                                 speedLimittraffic = 130
                             query_lock.release()
-                        fix_ok = False
+                        else:
+                            fix_ok = False
                     had_good_gps = False
                 if not speedLimittrafficvalid and not had_good_gps:
                     fix_ok = False
