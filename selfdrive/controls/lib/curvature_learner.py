@@ -20,8 +20,8 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self.write_frequency = 2 * 60  # in seconds
 
     self.directions = ['left', 'right']
-    self.speed_bands = ['slow', 'medium', 'fast']
     self.angle_bands = ['center', 'inner', 'outer']
+    self.speed_bands = ['slow', 'medium', 'fast']
 
     self._load_curvature()
 
