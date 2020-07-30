@@ -17,7 +17,7 @@ from common.filter_simple import FirstOrderFilter
 from selfdrive.version import terms_version, training_version
 from selfdrive.swaglog import cloudlog
 import cereal.messaging as messaging
-import cereal.messaging_arne as messaging_arne
+#import cereal.messaging_arne as messaging_arne
 from selfdrive.loggerd.config import get_available_percent
 from selfdrive.pandad import get_expected_version
 from selfdrive.thermald.power_monitoring import PowerMonitoring, get_battery_capacity, get_battery_status, \
