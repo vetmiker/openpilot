@@ -59,6 +59,7 @@ class DynamicCameraOffset:
     self.right_lane_oncoming = False
     self.last_left_lane_oncoming = False
     self.last_right_lane_oncoming = False
+    self.keeping = False
     self.last_oncoming_time = 0
     self.i = 0.0
 
@@ -97,6 +98,7 @@ class DynamicCameraOffset:
       self.l_prob, self.r_prob = probs
 
       dynamic_offset = self._get_camera_offset(v_ego, active, angle_steers)
+      self.keeping = self.keeping_left or self.keeping_right
       self._send_state()  # for alerts, before speed check so alerts don't get stuck on
       if dynamic_offset is not None:
         return self.camera_offset + dynamic_offset

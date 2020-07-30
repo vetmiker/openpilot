@@ -174,7 +174,7 @@ class PathPlanner():
       self.LP.r_prob *= self.lane_change_ll_prob
     self.LP.update_d_poly(v_ego, angle_steers, active)
 
-    if active:
+    if active and not self.LP.dynamic_camera_offset.keeping:  # only when dynamic camera offset is not active
       curvature_factor += self.curvature_learner.update(angle_steers - angle_offset, self.LP.d_poly, v_ego)
 
     # account for actuation delay
