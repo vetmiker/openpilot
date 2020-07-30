@@ -1,3 +1,10 @@
+2020-07-28 (0.7.7.0)
+========================
+* 修正無法上傳記錄的問題。(感謝 @Mojo)
+* Fixed unable to upload log issue. (Thanks to @Mojo)
+* 修正無法關閉警示音的問題。(感謝 @Mojo)
+× Fixed unable to disable audio alert (-100%) issue. ($Thanks to @Mojo)
+
 2020-07-27 (0.7.7.0)
 ========================
 * 加入回調校介面。(感謝 @Kent)
