@@ -1,7 +1,8 @@
-from numpy import clip
-import json
-import csv
 import os
+import json
+from numpy import clip
+from common.basedir import BASEDIR
+from common.realtime import sec_since_boot
 
 
 # HOW TO
@@ -14,55 +15,53 @@ import os
 # version 4
 
 class CurvatureLearner:
-  def __init__(self, debug=False):
+  def __init__(self):
+    self.curvature_file = '{}/curvaturev4.json'.format(BASEDIR)
+    rate = 1 / 20.  # pathplanner is 20 hz
+    self.learning_rate = 1.6666e-3 * rate  # equivalent to x/12000
+    self.write_frequency = 2 * 60  # in seconds
     self.offset = 0.
-    self.learning_rate = 12000
-    self.frame = 0
-    self.debug = debug
-    try:
-      with open("/data/curvaturev4.json", "r") as f:
-        self.learned_offsets = json.load(f)
-    except (OSError, IOError):
-      self.learned_offsets = {
-        "center": 0.,
-        "inner": 0.,
-        "outer": 0.
-      }
-      with open("/data/curvaturev4.json", "w") as f:
-        json.dump(self.learned_offsets, f)
-      os.chmod("/data/curvaturev4.json", 0o777)
+    self._load_curvature()
 
-  def update(self, angle_steers=0., d_poly=None, v_ego=0.):
+  def update(self, angle_steers, d_poly, v_ego):
     if angle_steers > 0.1:
       if abs(angle_steers) < 2.:
-        self.learned_offsets["center"] -= d_poly[3] / self.learning_rate
+        self.learned_offsets["center"] -= d_poly[3] * self.learning_rate
         self.offset = self.learned_offsets["center"]
       elif 2. < abs(angle_steers) < 5.:
-        self.learned_offsets["inner"] -= d_poly[3] / self.learning_rate
+        self.learned_offsets["inner"] -= d_poly[3] * self.learning_rate
         self.offset = self.learned_offsets["inner"]
       elif abs(angle_steers) > 5.:
-        self.learned_offsets["outer"] -= d_poly[3] / self.learning_rate
+        self.learned_offsets["outer"] -= d_poly[3] * self.learning_rate
         self.offset = self.learned_offsets["outer"]
     elif angle_steers < -0.1:
       if abs(angle_steers) < 2.:
-        self.learned_offsets["center"] += d_poly[3] / self.learning_rate
+        self.learned_offsets["center"] += d_poly[3] * self.learning_rate
         self.offset = self.learned_offsets["center"]
       elif 2. < abs(angle_steers) < 5.:
-        self.learned_offsets["inner"] += d_poly[3] / self.learning_rate
+        self.learned_offsets["inner"] += d_poly[3] * self.learning_rate
         self.offset = self.learned_offsets["inner"]
       elif abs(angle_steers) > 5.:
-        self.learned_offsets["outer"] += d_poly[3] / self.learning_rate
+        self.learned_offsets["outer"] += d_poly[3] * self.learning_rate
         self.offset = self.learned_offsets["outer"]
 
-    self.offset = clip(self.offset, -0.3, 0.3)
-    self.frame += 1
+    if sec_since_boot() - self._last_write_time >= self.write_frequency:
+      self._write_curvature()
+    return clip(self.offset, -0.3, 0.3)
 
-    if self.frame == 12000:  # every 2 mins
-      with open("/data/curvaturev4.json", "w") as f:
-        json.dump(self.learned_offsets, f)
-      self.frame = 0
-    if self.debug:
-      with open('/data/curvdebug.csv', 'a') as csv_file:
-        csv_file_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        csv_file_writer.writerow([self.learned_offsets, v_ego])
-    return self.offset
+  def _load_curvature(self):
+    self._last_write_time = 0
+    try:
+      with open(self.curvature_file, 'r') as f:
+        self.learned_offsets = json.load(f)
+      return
+    except:
+      pass
+    self.learned_offsets = {'center': 0., 'inner': 0., 'outer': 0.}  # can't read file or doesn't exist
+    self._write_curvature()  # rewrite/create new file
+
+  def _write_curvature(self):
+    with open(self.curvature_file, 'w') as f:
+      json.dump(self.learned_offsets, f)
+    os.chmod(self.curvature_file, 0o777)
+    self._last_write_time = sec_since_boot()
