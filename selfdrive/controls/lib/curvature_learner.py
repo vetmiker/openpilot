@@ -17,26 +17,29 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     rate = 1 / 20.  # pathplanner is 20 hz
     self.learning_rate = 1.6666e-3 * rate  # equivalent to x/12000
     self.write_frequency = 2 * 60  # in seconds
-    self.offset = 0.
     self._load_curvature()
 
   def update(self, angle_steers, d_poly, v_ego):
-    angle_band = None
-    if abs(angle_steers) >= 0.1:  # not between -.1 and .1
-      if abs(angle_steers) < 2:
-        angle_band = 'center'
-      elif 2 <= abs(angle_steers) < 5.:
-        angle_band = 'inner'
-      elif 5 <= abs(angle_steers):
-        angle_band = 'outer'
+    offset = 0
+    angle_band = self.pick_angle_band(angle_steers)
 
-    if angle_band is not None:
+    if angle_band is not None:  # don't return an offset if not between a band
       self.learned_offsets[angle_band] -= d_poly[3] * self.learning_rate * copysign(angle_steers)
-      self.offset = self.learned_offsets[angle_band]
+      offset = self.learned_offsets[angle_band]
 
     if sec_since_boot() - self._last_write_time >= self.write_frequency:
       self._write_curvature()
-    return clip(self.offset, -0.3, 0.3)
+    return clip(offset, -0.3, 0.3)
+
+  def pick_angle_band(self, angle_steers):
+    if abs(angle_steers) >= 0.1:  # not between -.1 and .1
+      if abs(angle_steers) < 2:
+        return 'center'
+      elif 2 <= abs(angle_steers) < 5.:
+        return 'inner'
+      elif 5 <= abs(angle_steers):
+        return 'outer'
+    return None
 
   def _load_curvature(self):
     self._last_write_time = 0
