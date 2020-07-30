@@ -413,6 +413,8 @@ void handle_message(UIState *s, SubMaster &sm) {
 #endif
   if (sm.updated("thermal")) {
     scene.thermal = sm["thermal"].getThermal();
+    scene.pa0 = scene.thermal.getPa0();
+    scene.freeSpace = scene.thermal.getFreeSpace;
   }
   if (sm.updated("ubloxGnss")) {
     auto data = sm["ubloxGnss"].getUbloxGnss();
