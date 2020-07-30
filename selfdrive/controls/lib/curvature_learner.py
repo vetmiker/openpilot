@@ -19,7 +19,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self.learning_rate = 1.6666e-3 * rate  # equivalent to x/12000
     self.write_frequency = 2 * 60  # in seconds
 
-    self.speed_bands = ['sng', 'traffic', 'highway']
+    self.speed_bands = ['slow', 'medium', 'fast']
     self.angle_bands = ['center', 'inner', 'outer']
 
     self._load_curvature()
@@ -39,11 +39,11 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     return clip(offset, -0.3, 0.3)
 
   def pick_speed_band(self, v_ego):
-    if v_ego <= 10 * CV.MPH_TO_MS:
-      return 'sng'
+    if v_ego <= 25 * CV.MPH_TO_MS:
+      return 'slow'
     if v_ego <= 50 * CV.MPH_TO_MS:
-      return 'traffic'
-    return 'highway'
+      return 'medium'
+    return 'fast'
 
   def pick_angle_band(self, angle_steers):
     if abs(angle_steers) >= 0.1:
