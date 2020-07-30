@@ -5,6 +5,7 @@ from selfdrive.swaglog import cloudlog
 from selfdrive.controls.lib.lateral_mpc import libmpc_py
 from selfdrive.controls.lib.drive_helpers import MPC_COST_LAT
 from selfdrive.controls.lib.lane_planner import LanePlanner
+from selfdrive.controls.lib.curvature_learner import CurvatureLearner
 from selfdrive.config import Conversions as CV
 from common.params import Params
 import cereal.messaging as messaging
@@ -66,6 +67,8 @@ class PathPlanner():
     self.op_params = opParams()
     self.alca_nudge_required = self.op_params.get('alca_nudge_required', default=True)
     self.alca_min_speed = self.op_params.get('alca_min_speed', default=30.0) * CV.MPH_TO_MS
+
+    self.curvature_learner = CurvatureLearner()
 
   def setup_mpc(self):
     self.libmpc = libmpc_py.libmpc
@@ -170,6 +173,9 @@ class PathPlanner():
       self.LP.l_prob *= self.lane_change_ll_prob
       self.LP.r_prob *= self.lane_change_ll_prob
     self.LP.update_d_poly(v_ego, angle_steers, active)
+
+    if active:
+      curvature_factor += self.curvature_learner.update(angle_steers - angle_offset, self.LP.d_poly, v_ego)
 
     # account for actuation delay
     self.cur_state = calc_states_after_delay(self.cur_state, v_ego, angle_steers - angle_offset, curvature_factor, VM.sR, CP.steerActuatorDelay)
