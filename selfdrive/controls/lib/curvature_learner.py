@@ -8,7 +8,7 @@ from selfdrive.config import Conversions as CV
 
 # by Zorrobyte
 # version 4
-# modified by ShaneSmiskol to add speed as a learning factor
+# modified by ShaneSmiskol to add speed and curve direction as learning factors
 # version 5 due to json incompatibilities
 
 
