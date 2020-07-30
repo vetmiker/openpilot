@@ -35,11 +35,10 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     if abs(angle_steers) >= 0.1:  # not between -.1 and .1
       if abs(angle_steers) < 2:
         return 'center'
-      elif 2 <= abs(angle_steers) < 5.:
+      if abs(angle_steers) < 5.:
         return 'inner'
-      elif 5 <= abs(angle_steers):
-        return 'outer'
-    return None
+      return 'outer'  # greater than +-5
+    return None  # return none when below +- 0.1, removes possibility of returning offset in this case
 
   def _load_curvature(self):
     self._last_write_time = 0
