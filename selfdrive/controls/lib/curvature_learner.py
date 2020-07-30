@@ -5,17 +5,12 @@ from common.basedir import BASEDIR
 from common.realtime import sec_since_boot
 
 
-# HOW TO
-# import this module to where you want to use it, such as from ```selfdrive.controls.lib.curvature_learner import CurvatureLearner```
-# create the object ```self.curvature_offset = CurvatureLearner(debug=False)```
-# call the update method ```self.curvature_offset.update(angle_steers - angle_offset, self.LP.d_poly)```
-# The learned curvature offsets will save and load automatically
-# If you still need help, check out how I have it implemented in the devel_curvaturefactorlearner branch
 # by Zorrobyte
 # version 4
 
 def copy_sign(n):
   return 1 if n > 0 else -1
+
 
 class CurvatureLearner:  # todo: disable when dynamic camera offset is working
   def __init__(self):
@@ -33,10 +28,10 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
         self.learned_offsets['center'] += d_poly[3] * self.learning_rate * learning_sign
         self.offset = self.learned_offsets['center']
       elif 2 <= abs(angle_steers) < 5.:
-        self.learned_offsets['inner'] += d_poly[3] * self.learning_rate
+        self.learned_offsets['inner'] += d_poly[3] * self.learning_rate * learning_sign
         self.offset = self.learned_offsets['inner']
       elif 5 <= abs(angle_steers):
-        self.learned_offsets['outer'] += d_poly[3] * self.learning_rate
+        self.learned_offsets['outer'] += d_poly[3] * self.learning_rate * learning_sign
         self.offset = self.learned_offsets['outer']
 
     if sec_since_boot() - self._last_write_time >= self.write_frequency:
