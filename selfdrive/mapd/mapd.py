@@ -283,9 +283,18 @@ class MapsdThread(LoggerThread):
 
             if gps.accuracy > 2.5:
                 if gps.accuracy > 5.0:
-                    had_good_gps = False
                     if not speedLimittrafficvalid:
+                        if had_good_gps:
+                            query_lock = self.sharedParams.get('query_lock', None)
+                            query_lock.acquire()
+                            self.sharedParams['speedLimittrafficvalid'] = True
+                            if max_speed is not None:
+                                speedLimittraffic = max_speed * 3.6
+                            else:
+                                speedLimittraffic = 130
+                            query_lock.release()
                         fix_ok = False
+                    had_good_gps = False
                 if not speedLimittrafficvalid and not had_good_gps:
                     fix_ok = False
             elif not had_good_gps:
