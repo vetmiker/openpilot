@@ -14,7 +14,7 @@ from common.realtime import sec_since_boot
 # by Zorrobyte
 # version 4
 
-class CurvatureLearner:
+class CurvatureLearner:  # todo: disable when dynamic camera offset is working
   def __init__(self):
     self.curvature_file = '{}/curvaturev4.json'.format(BASEDIR)
     rate = 1 / 20.  # pathplanner is 20 hz
@@ -26,24 +26,24 @@ class CurvatureLearner:
   def update(self, angle_steers, d_poly, v_ego):
     if angle_steers > 0.1:
       if abs(angle_steers) < 2.:
-        self.learned_offsets["center"] -= d_poly[3] * self.learning_rate
-        self.offset = self.learned_offsets["center"]
+        self.learned_offsets['center'] -= d_poly[3] * self.learning_rate
+        self.offset = self.learned_offsets['center']
       elif 2. < abs(angle_steers) < 5.:
-        self.learned_offsets["inner"] -= d_poly[3] * self.learning_rate
-        self.offset = self.learned_offsets["inner"]
+        self.learned_offsets['inner'] -= d_poly[3] * self.learning_rate
+        self.offset = self.learned_offsets['inner']
       elif abs(angle_steers) > 5.:
-        self.learned_offsets["outer"] -= d_poly[3] * self.learning_rate
-        self.offset = self.learned_offsets["outer"]
+        self.learned_offsets['outer'] -= d_poly[3] * self.learning_rate
+        self.offset = self.learned_offsets['outer']
     elif angle_steers < -0.1:
       if abs(angle_steers) < 2.:
-        self.learned_offsets["center"] += d_poly[3] * self.learning_rate
-        self.offset = self.learned_offsets["center"]
+        self.learned_offsets['center'] += d_poly[3] * self.learning_rate
+        self.offset = self.learned_offsets['center']
       elif 2. < abs(angle_steers) < 5.:
-        self.learned_offsets["inner"] += d_poly[3] * self.learning_rate
-        self.offset = self.learned_offsets["inner"]
+        self.learned_offsets['inner'] += d_poly[3] * self.learning_rate
+        self.offset = self.learned_offsets['inner']
       elif abs(angle_steers) > 5.:
-        self.learned_offsets["outer"] += d_poly[3] * self.learning_rate
-        self.offset = self.learned_offsets["outer"]
+        self.learned_offsets['outer'] += d_poly[3] * self.learning_rate
+        self.offset = self.learned_offsets['outer']
 
     if sec_since_boot() - self._last_write_time >= self.write_frequency:
       self._write_curvature()
