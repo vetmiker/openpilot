@@ -11,9 +11,6 @@ from selfdrive.config import Conversions as CV
 # modified by ShaneSmiskol to add speed as a learning factor
 # version 5 due to json incompatibilities
 
-def copysign(n):
-  return 1 if n >= 0 else -1
-
 
 class CurvatureLearner:  # todo: disable when dynamic camera offset is working
   def __init__(self):
@@ -33,7 +30,8 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
 
     if angle_band is not None:  # don't return an offset if not between a band
       speed_band = self.pick_speed_band(v_ego)  # will never be none
-      self.learned_offsets[angle_band][speed_band] -= d_poly[3] * self.learning_rate * copysign(angle_steers)  # the learning
+      learning_sign = 1 if angle_steers >= 0 else -1
+      self.learned_offsets[angle_band][speed_band] -= d_poly[3] * self.learning_rate * learning_sign  # the learning
       offset = self.learned_offsets[angle_band][speed_band]
 
     if sec_since_boot() - self._last_write_time >= self.write_frequency:
