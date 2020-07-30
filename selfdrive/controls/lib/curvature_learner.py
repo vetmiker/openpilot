@@ -17,7 +17,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self.curvature_file = '{}/curvaturev5.json'.format(BASEDIR)
     rate = 1 / 20.  # pathplanner is 20 hz
     self.learning_rate = 1.6666e-3 * rate  # equivalent to x/12000
-    self.write_frequency = 2 * 60  # in seconds
+    self.write_frequency = 5  # in seconds
 
     self.directions = ['left', 'right']
     self.angle_bands = ['center', 'inner', 'outer']
