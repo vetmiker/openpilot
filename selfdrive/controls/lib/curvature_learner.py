@@ -19,6 +19,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self.learning_rate = 1.6666e-3 * rate  # equivalent to x/12000
     self.write_frequency = 2 * 60  # in seconds
 
+    self.directions = ['left', 'right']
     self.speed_bands = ['slow', 'medium', 'fast']
     self.angle_bands = ['center', 'inner', 'outer']
 
@@ -26,13 +27,13 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
 
   def update(self, angle_steers, d_poly, v_ego):
     offset = 0
-    angle_band = self.pick_angle_band(angle_steers)
+    angle_band, direction = self.pick_angle_band(angle_steers)
 
     if angle_band is not None:  # don't return an offset if not between a band
       speed_band = self.pick_speed_band(v_ego)  # will never be none
       learning_sign = 1 if angle_steers >= 0 else -1
-      self.learned_offsets[angle_band][speed_band] -= d_poly[3] * self.learning_rate * learning_sign  # the learning
-      offset = self.learned_offsets[angle_band][speed_band]
+      self.learned_offsets[direction][angle_band][speed_band] -= d_poly[3] * self.learning_rate * learning_sign  # the learning
+      offset = self.learned_offsets[direction][angle_band][speed_band]
 
     if sec_since_boot() - self._last_write_time >= self.write_frequency:
       self._write_curvature()
@@ -46,13 +47,14 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     return 'fast'
 
   def pick_angle_band(self, angle_steers):
+    direction = 'left' if angle_steers > 0 else 'right'
     if abs(angle_steers) >= 0.1:
       if abs(angle_steers) < 2:  # between +=[.1, 2)
-        return 'center'
+        return 'center', direction
       if abs(angle_steers) < 5.:  # between +=[2, 5)
-        return 'inner'
-      return 'outer'  # between +=[5, inf)
-    return None  # return none when below +-0.1, removes possibility of returning offset in this case
+        return 'inner', direction
+      return 'outer', direction  # between +=[5, inf)
+    return None, direction  # return none when below +-0.1, removes possibility of returning offset in this case
 
   def _load_curvature(self):
     self._last_write_time = 0
@@ -61,7 +63,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
         self.learned_offsets = json.load(f)
       return
     except:  # can't read file or doesn't exist
-      self.learned_offsets = {a: {s: 0 for s in self.speed_bands} for a in self.angle_bands}
+      self.learned_offsets = {d: {a: {s: 0 for s in self.speed_bands} for a in self.angle_bands} for d in self.directions}
       self._write_curvature()  # rewrite/create new file
 
   def _write_curvature(self):
