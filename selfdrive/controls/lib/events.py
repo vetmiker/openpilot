@@ -280,7 +280,7 @@ EVENTS = {
   EventName.startup: {
     ET.PERMANENT: Alert(
       "Be ready to take over at any time",
-      "Do not forget to PRAY!",,
+      "Do not forget to PRAY!",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 7.),
   },
