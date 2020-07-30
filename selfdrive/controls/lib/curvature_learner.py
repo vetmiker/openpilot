@@ -68,6 +68,6 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
 
   def _write_curvature(self):
     with open(self.curvature_file, 'w') as f:
-      json.dump(self.learned_offsets, f)
+      f.write(json.dumps(self.learned_offsets, indent=2))
     os.chmod(self.curvature_file, 0o777)
     self._last_write_time = sec_since_boot()
