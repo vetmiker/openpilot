@@ -569,7 +569,7 @@ static void ui_draw_vision_event(UIState *s) {
     float img_wheel_alpha = 0.1f;
     bool is_engaged = (s->status == STATUS_ENGAGED) && !s->scene.steerOverride;
     bool is_warning = (s->status == STATUS_WARNING);
-    bool is_engageable = s->scene.engageable;
+    bool is_engageable = s->scene.controls_state.getEngageable();
     if (is_engaged || is_warning || is_engageable) {
       nvgBeginPath(s->vg);
       nvgCircle(s->vg, bg_wheel_x, (bg_wheel_y + (bdr_s*1.5)), bg_wheel_size);
