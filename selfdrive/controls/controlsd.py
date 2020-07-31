@@ -292,6 +292,7 @@ class Controls:
       if CS.steeringPressed:
         self.distance_traveled_override += CS.vEgo * DT_CTRL
     if (self.sm.frame - self.distance_traveled_frame) * DT_CTRL < 10.0:
+      params = Params()
       params.put("DistanceTraveled", str(self.distance_traveled))
       params.put("DistanceTraveledEngaged", str(self.distance_traveled_engaged))
       params.put("DistanceTraveledOverride", str(self.distance_traveled_override))
