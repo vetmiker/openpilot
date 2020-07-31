@@ -358,6 +358,7 @@ void handle_message(UIState *s, SubMaster &sm) {
         }
       }
     }
+    scene.steerOverride = data.getSteerOverride();
     scene.angleSteers = data.getAngleSteers();
     scene.angleSteersDes = data.getAngleSteersDes();
   }
