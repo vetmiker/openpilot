@@ -15,6 +15,7 @@ from selfdrive.controls.lib.speed_smoother import speed_smoother
 from selfdrive.controls.lib.longcontrol import LongCtrlState, MIN_CAN_SPEED
 from selfdrive.controls.lib.fcw import FCWChecker
 from selfdrive.controls.lib.long_mpc import LongitudinalMpc
+from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX
 from selfdrive.controls.lib.long_mpc_model import LongitudinalMpcModel
 from common.travis_checker import travis
 from common.op_params import opParams
@@ -30,6 +31,7 @@ if not travis:
 else:
   curvature_factor = 1.0
 
+
 MAX_SPEED = 255.0
 NO_CURVATURE_SPEED = 90.0
 
@@ -41,7 +43,7 @@ AWARENESS_DECEL = -0.2     # car smoothly decel at .2m/s^2 when user is distract
 # make sure these accelerations are smaller than mpc limits
 _A_CRUISE_MIN_V_ECO = [-1.0, -0.7, -0.6, -0.5, -0.3]
 _A_CRUISE_MIN_V_SPORT = [-3.0, -2.6, -2.3, -2.0, -1.0]
-_A_CRUISE_MIN_V_FOLLOWING = [-4.0, -4.0, -3.5, -2.5, -2.0]
+_A_CRUISE_MIN_V_FOLLOWING = [-3.0, -2.5, -2.0, -1.5, -1.0]
 _A_CRUISE_MIN_V = [-2.0, -1.5, -1.0, -0.7, -0.5]
 _A_CRUISE_MIN_BP = [0.0, 5.0, 10.0, 20.0, 55.0]
 
@@ -54,7 +56,7 @@ _A_CRUISE_MAX_V_FOLLOWING = [1.6, 1.4, 1.4, .7, .3]
 _A_CRUISE_MAX_BP = [0., 5., 10., 20., 55.]
 
 # Lookup table for turns
-_A_TOTAL_MAX_V = [3.3, 3.0, 3.9]
+_A_TOTAL_MAX_V = [3.5, 4.0, 5.0]
 _A_TOTAL_MAX_BP = [0., 25., 55.]
 
 # 75th percentile
@@ -217,6 +219,8 @@ class Planner():
     long_control_state = sm['controlsState'].longControlState
     v_cruise_kph = sm['controlsState'].vCruise
     force_slow_decel = sm['controlsState'].forceDecel
+
+    v_cruise_kph = min(v_cruise_kph, V_CRUISE_MAX)
     v_cruise_setpoint = v_cruise_kph * CV.KPH_TO_MS
 
     lead_1 = sm['radarState'].leadOne
@@ -224,7 +228,7 @@ class Planner():
 
     enabled = (long_control_state == LongCtrlState.pid) or (long_control_state == LongCtrlState.stopping)
     
-    following = (lead_1.status and lead_1.dRel < 40.0 and lead_1.vRel < 0.0) or (lead_2.status and lead_2.dRel < 40.0 and lead_2.vRel < 0.0)
+    following = (lead_1.status and lead_1.dRel < 45.0 and lead_1.vRel < 0.0) or (lead_2.status and lead_2.dRel < 45.0 and lead_2.vRel < 0.0) #lead_1.status and lead_1.dRel < 45.0 and lead_1.vLeadK > v_ego and lead_1.aLeadK > 0.0
      
     if gas_button_status == 1:
       speed_ahead_distance = 150
