@@ -315,8 +315,9 @@ def thermald_thread():
         ip_addr = 'N/A'
       ts_last_ip = ts
       #msg2 = messaging_arne.new_message('ipAddress')
-      msg.thermal.ipAddr = ip_addr
+      
       #arne_pm.send('ipAddress', msg2)
+    msg.thermal.ipAddr = ip_addr
 
     current_filter.update(msg.thermal.batteryCurrent / 1e6)
 
