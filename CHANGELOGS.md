@@ -1,9 +1,16 @@
 2020-07-28 (0.7.7.0)
 ========================
+* 修正 steer ratio learner 關閉。(感謝 @Mojo 回報, @ShaneSmiskol 提供代碼)
+* Fixed steer ratio learner toggle. (Thanks to @Mojo, @ShaneSmiskol)
+* 加入 "dp_lqr" 設定來強制使用 RAV4 的 lqr 調校。(感謝 @eisenheim)
+* Added "dp_lqr" setting to force enable lqr tuning from RAV4. (Thanks to eisenheim) 
+
+2020-07-28 (0.7.7.0)
+========================
 * 修正無法上傳記錄的問題。(感謝 @Mojo)
 * Fixed unable to upload log issue. (Thanks to @Mojo)
 * 修正無法關閉警示音的問題。(感謝 @Mojo)
-× Fixed unable to disable audio alert (-100%) issue. ($Thanks to @Mojo)
+* Fixed unable to disable audio alert (-100%) issue. ($Thanks to @Mojo)
 
 2020-07-27 (0.7.7.0)
 ========================

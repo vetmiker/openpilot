@@ -102,6 +102,7 @@ confs = [
   {'name': 'dp_is_updating', 'default': False, 'type': 'Bool', 'set_param_only': True, 'conf_type': ['param', 'struct']},
 
   {'name': 'dp_sr_learner', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
+  {'name': 'dp_lqr', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
 
   # including thermal data
   {'name': 'dp_thermal_started', 'default': False, 'type': 'Bool', 'conf_type': ['struct']},
