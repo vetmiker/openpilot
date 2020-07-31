@@ -1,7 +1,6 @@
 import os
 import json
 from numpy import clip
-from common.basedir import BASEDIR
 from common.realtime import sec_since_boot
 from selfdrive.config import Conversions as CV
 
@@ -14,7 +13,7 @@ from selfdrive.config import Conversions as CV
 
 class CurvatureLearner:  # todo: disable when dynamic camera offset is working
   def __init__(self):
-    self.curvature_file = '{}/curvaturev5.json'.format(BASEDIR)
+    self.curvature_file = '/data/curvaturev5.json'
     rate = 1 / 20.  # pathplanner is 20 hz
     self.learning_rate = 1.6666e-3 * rate  # equivalent to x/12000
     self.write_frequency = 2 * 60  # in seconds
