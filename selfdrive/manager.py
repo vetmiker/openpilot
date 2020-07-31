@@ -494,7 +494,7 @@ def manager_thread():
         else:
           start_managed_process(p)
     else:
-      logger_dead = False
+      logger_dead = True  # set to False for logging
       for p in reversed(car_started_processes):
         kill_managed_process(p)
       # this is ugly
