@@ -31,7 +31,7 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 
 `075-clean`: this is my old testing branch. I moved on to 077.
 
-`077-clean`: Heavily in early early in development branch of OP 077. Not recommended for any use out of testing. Is missing many features like trafficd and a working Ui. May crash and lag.
+`077-clean`: Current development branch
 
 `release3`: this is my old branch, that is compatible with ArnePilot 0.6.
 
@@ -40,6 +40,16 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 # Configuration
 
 - You can turn on or off some of the [Feature](https://github.com/arne182/ArnePilot/blob/81a3258da49e1bb9739a5f1d0a84b38afd10583f/common/op_params.py#L500) by editing `op_edit.py`. Run the following command `python /data/openpilot/op_edit.py`
+
+# Todo
+
+- [ ] Finish Dev UI
+
+- [ ] Fix Lag Trafficd
+
+- [ ] get MPC working
+
+- [ ] add APK for OSM and smart steer
 
 # Features
 
@@ -77,11 +87,16 @@ This aims to provide a smoother driving experience in stop and go traffic (under
 - Added ability to turn on and off RSA at certain speed. `python /data/ArnePilot/op_edit.py`
 - Easily view the EON's IP Address.Just look at the sidebar right under wifi singal strength's.
 - Battery has percentage instead of the battery icon.
-- [WIP] Traffic light detection from Littlemountainman, shane and brain. To get accurate result make sure your daily commute/area is mapped on [OSM](openstreetmap.org) with right direaction. [For example](https://imgur.com/purBVpd)...  [still dont get it watch the video by mageymoo1](https://youtu.be/7dPaF0tDb7Y).
 - We also have enabled commas e2e model which will only work between 11 MPH to 29 MPH. Commas e2e model helps slows down for traffic light, stop sign, etc. e2e, traffic model and mapd all works together to help you stop at the light. All of this can be turned off via `/data/openpilot/op_edit.py`.
 - Loggin has been Disabled by default on this fork. If you would like to record your drive edit the [following line](https://github.com/arne182/ArnePilot/blob/4d66df96a91c9c13491a3d78b9c1c2a9e848724a/selfdrive/manager.py#L480)
 - Smart speed (smart speed is essentially speedlimit which eon will not go over unless you have set custom offset) can be overridden by pressing gas above the current smart speed.
 
+# Work-in-Progress Features
+
+All WIP features can be configured by modifying `python /data/ArnePilot/op_edit.py`
+- Traffic light detection from Littlemountainman, shane and brain. To get accurate result make sure your daily commute/area is mapped on [OSM](openstreetmap.org) with right direaction. [For example](https://imgur.com/purBVpd)...  [still dont get it watch the video by mageymoo1](https://youtu.be/7dPaF0tDb7Y).
+- 2020 Corolla tuning by Sparrows
+- Virtual lane lines and Lane center. This feature is for European roads and is recommended for used in Europe only.
 
 # Licensing
 
