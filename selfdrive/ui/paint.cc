@@ -567,9 +567,9 @@ static void ui_draw_vision_event(UIState *s) {
     const int img_wheel_y = bg_wheel_y-25;
     const float img_rotation = s->scene.angleSteers/180*3.141592;
     float img_wheel_alpha = 0.1f;
-    bool is_engaged = (s->status == STATUS_ENGAGED) && !scene->steerOverride;
+    bool is_engaged = (s->status == STATUS_ENGAGED) && !s->scene->steerOverride;
     bool is_warning = (s->status == STATUS_WARNING);
-    bool is_engageable = scene->engageable;
+    bool is_engageable = s->scene->engageable;
     if (is_engaged || is_warning || is_engageable) {
       nvgBeginPath(s->vg);
       nvgCircle(s->vg, bg_wheel_x, (bg_wheel_y + (bdr_s*1.5)), bg_wheel_size);
