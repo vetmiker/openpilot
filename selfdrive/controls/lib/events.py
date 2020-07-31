@@ -864,7 +864,7 @@ EVENTSARNE182 = {
       "Using profile:",
       "",
       AlertStatus.normal, AlertSize.mid,
-      Priority.LOWER, VisualAlert.none, AudibleAlert.chimeWarning1, 0.2, 0., 2.),
+      Priority.LOWER, VisualAlert.none, AudibleAlert.chimeWarning1, 0.4, 0., 2.),
   },
 
   "dfButtonAlertSilent": {

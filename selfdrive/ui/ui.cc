@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
@@ -8,6 +9,8 @@
 #include <sstream>
 #include <sys/resource.h>
 #include <czmq.h>
+#include "json11.hpp"
+#include <fstream>
 #include "common/util.h"
 #include "common/timing.h"
 #include "common/swaglog.h"
@@ -18,6 +21,8 @@
 #include "ui.hpp"
 #include "cereal/gen/cpp/arne182.capnp.h"
 #include "dashcam.h"
+
+std::map<std::string, int> DF_TO_IDX = {{"close", 0}, {"normal", 1}, {"far", 2}, {"auto", 3}};
 
 static void ui_set_brightness(UIState *s, int brightness) {
   static int last_brightness = -1;
@@ -244,7 +249,21 @@ static void ui_init_vision(UIState *s, const VisionStreamBufs back_bufs,
   s->scene.gps_planner_active = false;
 
   // Dynamic Follow
-  s->scene.dfButtonStatus = 0;
+  // from shane's todo: run opparams first (in main()?) to ensure json values exist https://github.com/ShaneSmiskol/openpilot/commit/90ded3f5689daf4f3622973dfd4c63ba369573fd#diff-f7a9e034709fadfe2b5065cde2766598
+ std::ifstream op_params_file("/data/op_params.json");
+ std::string op_params_content((std::istreambuf_iterator<char>(op_params_file)),
+                               (std::istreambuf_iterator<char>()));
+
+ std::string err;
+ auto json = json11::Json::parse(op_params_content, err);
+ if (!json.is_null() && err.empty()) {
+   printf("successfully parsed opParams json\n");
+   s->scene.dfButtonStatus = DF_TO_IDX[json["dynamic_follow"].string_value()];
+//    printf("dfButtonStatus: %d\n", s->scene.dfButtonStatus);
+ } else {  // error parsing json
+   printf("ERROR PARSING OPPARAMS JSON!\n");
+   s->scene.dfButtonStatus = 0;
+ }
 
   s->rgb_width = back_bufs.width;
   s->rgb_height = back_bufs.height;

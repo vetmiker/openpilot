@@ -670,14 +670,18 @@ static void ui_draw_driver_view(UIState *s) {
 
 // @shanes, dynamic follow button.
 static void ui_draw_df_button(UIState *s) {
+  int btn_status = s->scene.dfButtonStatus;
   int btn_w = 150;
   int btn_h = 150;
+  int x_padding = 200;
+  int y_padding = 50;
   int btn_x = 1920 - btn_w;
   int btn_y = 1080 - btn_h - 50;
+  int btn_colors[4][3] = {{4, 67, 137}, {36, 168, 188}, {252, 255, 75}, {55, 184, 104}};
 
   nvgBeginPath(s->vg);
   nvgRoundedRect(s->vg, btn_x-110, btn_y-45, btn_w, btn_h, 100);
-  nvgStrokeColor(s->vg, nvgRGBA(12, 79, 130, 255));
+  nvgStrokeColor(s->vg, nvgRGBA(btn_colors[btn_status][0], btn_colors[btn_status][1], btn_colors[btn_status][2], 255));
   nvgStrokeWidth(s->vg, 11);
   nvgStroke(s->vg);
 
