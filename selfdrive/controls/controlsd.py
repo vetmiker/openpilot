@@ -141,9 +141,10 @@ class Controls:
     self.last_blinker_frame = 0
     self.last_ldw_frame = 0
     self.saturated_count = 0
-    self.distance_traveled = 0
-    self.distance_traveled_override = 0
-    self.distance_traveled_engaged = 0
+    self.distance_traveled = float(params.get("DistanceTraveled", encoding='utf8'))
+    self.distance_traveled_engaged = float(params.get("DistanceTraveledEngaged", encoding='utf8'))
+    self.distance_traveled_override = float(params.get("DistanceTraveledOverride", encoding='utf8'))
+    self.distance_traveled_frame = 0
     self.events_prev = []
     self.current_alert_types = [ET.PERMANENT]
 
@@ -290,7 +291,11 @@ class Controls:
       self.distance_traveled_engaged += CS.vEgo * DT_CTRL
       if CS.steeringPressed:
         self.distance_traveled_override += CS.vEgo * DT_CTRL
-
+    if (self.sm.frame - self.distance_traveled_frame) * DT_CTRL < 10.0:
+      params.put("DistanceTraveled", str(self.distance_traveled))
+      params.put("DistanceTraveledEngaged", str(self.distance_traveled_engaged))
+      params.put("DistanceTraveledOverride", str(self.distance_traveled_override))
+      self.distance_traveled_frame = self.sm.frame
     return CS, CS_arne182
 
   def state_transition(self, CS):
