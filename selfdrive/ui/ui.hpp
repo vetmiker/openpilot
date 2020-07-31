@@ -147,6 +147,9 @@ typedef struct UIScene {
 
   // @shanes, dynamic Follow
   int dfButtonStatus;
+  
+  // dashcam
+  bool recording;
 
   cereal::HealthData::HwType hwType;
   int satelliteCount;
