@@ -124,7 +124,7 @@ typedef struct UIScene {
   bool leftBlinker;
   bool rightBlinker;
   int blinker_blinkingrate;
-  char ipAddr[20];
+  std::string ipAddr;
 
   bool is_rhd;
   bool map_valid;
