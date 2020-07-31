@@ -20,8 +20,8 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self.write_frequency = 2 * 60  # in seconds
 
     self.directions = ['left', 'right']
-    self.angle_bands = ['center', 'inner', 'outer']
     self.speed_bands = ['slow', 'medium', 'fast']
+    self.angle_bands = ['center', 'inner', 'outer']
 
     self._load_curvature()
 
@@ -63,7 +63,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
         self.learned_offsets = json.load(f)
       return
     except:  # can't read file or doesn't exist
-      self.learned_offsets = {d: {a: {s: 0 for s in self.speed_bands} for a in self.angle_bands} for d in self.directions}
+      self.learned_offsets = {d: {s: {a: 0 for a in self.angle_bands} for s in self.speed_bands} for d in self.directions}
       self._write_curvature()  # rewrite/create new file
 
   def _write_curvature(self):
