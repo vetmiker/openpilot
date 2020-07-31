@@ -122,6 +122,7 @@ typedef struct UIScene {
   int engaged;
   bool brakeLights;
   bool leftBlinker;
+  bool steerOverride;
   bool rightBlinker;
   int blinker_blinkingrate;
   std::string ipAddr;
