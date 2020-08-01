@@ -3,7 +3,7 @@ import subprocess
 from common.basedir import BASEDIR
 
 
-class Spinner():
+class Spinner:
   def __init__(self, noop=False):
     # spinner is currently only implemented for android
     self.spinner_proc = None

@@ -70,7 +70,7 @@ class VisionIPCError(Exception):
   pass
 
 
-class VisionIPC():
+class VisionIPC:
   def __init__(self, front=False):
     self.clib = ffi.dlopen(os.path.join(gf_dir, "libvisionipc.so"))
 

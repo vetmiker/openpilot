@@ -12,7 +12,7 @@ from rednose.helpers.sympy_helpers import euler_rotate, quat_matrix_r, quat_rota
 EARTH_GM = 3.986005e14  # m^3/s^2 (gravitational constant * mass of earth)
 
 
-class States():
+class States:
   ECEF_POS = slice(0, 3)  # x, y and z in ECEF in meters
   ECEF_ORIENTATION = slice(3, 7)  # quat for pose of phone in ecef
   ECEF_VELOCITY = slice(7, 10)  # ecef velocity in m/s
@@ -33,7 +33,7 @@ class States():
   IMU_OFFSET_ERR = slice(19, 22)
 
 
-class LiveKalman():
+class LiveKalman:
   name = 'live'
 
   initial_x = np.array([-2.7e6, 4.2e6, 3.8e6,

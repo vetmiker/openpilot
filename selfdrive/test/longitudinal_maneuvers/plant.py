@@ -102,7 +102,7 @@ def to_3s_byte(x):
   s = struct.pack("!h", int(x))
   return binascii.hexlify(s)[1:]
 
-class Plant():
+class Plant:
   messaging_initialized = False
 
   def __init__(self, lead_relevancy=False, rate=100, speed=0.0, distance_lead=2.0):

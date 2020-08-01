@@ -74,7 +74,7 @@ HUDData = namedtuple("HUDData",
                      ["pcm_accel", "v_cruise",  "car",
                      "lanes", "fcw", "acc_alert", "steer_required"])
 
-class CarControllerParams():
+class CarControllerParams:
   def __init__(self, CP):
       self.BRAKE_MAX = 1024//4
       self.STEER_MAX = CP.lateralParams.torqueBP[-1]
@@ -84,7 +84,7 @@ class CarControllerParams():
       self.STEER_LOOKUP_BP = [v * -1 for v in CP.lateralParams.torqueBP][1:][::-1] + list(CP.lateralParams.torqueBP)
       self.STEER_LOOKUP_V = [v * -1 for v in CP.lateralParams.torqueV][1:][::-1] + list(CP.lateralParams.torqueV)
 
-class CarController():
+class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.braking = False
     self.brake_steady = 0.

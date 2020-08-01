@@ -1,4 +1,4 @@
-class FakeSteeringWheel():
+class FakeSteeringWheel:
   def __init__(self, dt=0.01):
     # physical params
     self.DAC = 4. / 0.625  # convert torque value from can to Nm

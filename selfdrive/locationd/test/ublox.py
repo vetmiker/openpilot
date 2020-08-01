@@ -726,7 +726,7 @@ class UBlox:
     elif grey:
       import cereal.messaging as messaging
 
-      class BoarddSerial():
+      class BoarddSerial:
         def __init__(self):
           self.ubloxRaw = messaging.sub_sock('ubloxRaw')
           self.buf = ""

@@ -27,12 +27,12 @@ def create_random_file(file_path, size_mb, lock=False):
     if not lock:
         os.remove(lock_path)
 
-class MockResponse():
+class MockResponse:
   def __init__(self, text, status_code):
     self.text = text
     self.status_code = status_code
 
-class MockApi():
+class MockApi:
   def __init__(self, dongle_id):
     pass
 
@@ -42,7 +42,7 @@ class MockApi():
   def get_token(self):
     return "fake-token"
 
-class MockApiIgnore():
+class MockApiIgnore:
   def __init__(self, dongle_id):
     pass
 
@@ -52,7 +52,7 @@ class MockApiIgnore():
   def get_token(self):
     return "fake-token"
 
-class MockParams():
+class MockParams:
   def __init__(self):
     self.params = {
       "DongleId": b"0000000000000000",

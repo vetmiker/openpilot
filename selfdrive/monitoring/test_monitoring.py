@@ -20,7 +20,7 @@ _INVISIBLE_SECONDS_TO_ORANGE = _AWARENESS_TIME - _AWARENESS_PROMPT_TIME_TILL_TER
 _INVISIBLE_SECONDS_TO_RED = _AWARENESS_TIME + 1
 _UNCERTAIN_SECONDS_TO_GREEN = _HI_STD_TIMEOUT + 0.5
 
-class fake_DM_msg():
+class fake_DM_msg:
   def __init__(self, is_face_detected, is_distracted=False, is_model_uncertain=False):
     self.faceOrientation = [0., 0., 0.]
     self.facePosition = [0., 0.]

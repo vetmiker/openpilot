@@ -4,7 +4,7 @@ from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_comm
 from selfdrive.car.chrysler.values import CAR, SteerLimitParams
 from opendbc.can.packer import CANPacker
 
-class CarController():
+class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.apply_steer_last = 0
     self.ccframe = 0

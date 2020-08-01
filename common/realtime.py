@@ -50,7 +50,7 @@ def set_core_affinity(core):
     return -1
 
 
-class Ratekeeper():
+class Ratekeeper:
   def __init__(self, rate, print_delay_threshold=0.):
     """Rate in Hz for ratekeeping. print_delay_threshold must be nonnegative."""
     self._interval = 1. / rate

@@ -10,7 +10,7 @@ from selfdrive.locationd.models.constants import ObservationKind
 from selfdrive.locationd.models.loc_kf import parse_pr, parse_prr
 
 
-class States():
+class States:
   ECEF_POS = slice(0, 3)  # x, y and z in ECEF in meters
   ECEF_VELOCITY = slice(3, 6)
   CLOCK_BIAS = slice(6, 7)  # clock bias in light-meters,
@@ -20,7 +20,7 @@ class States():
   GLONASS_FREQ_SLOPE = slice(10, 11)  # GLONASS bias in m expressed as bias + freq_num*freq_slope
 
 
-class GNSSKalman():
+class GNSSKalman:
   name = 'gnss'
 
   x_initial = np.array([-2712700.6008, -4281600.6679, 3859300.1830,

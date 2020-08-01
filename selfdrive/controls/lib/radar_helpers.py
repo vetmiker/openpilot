@@ -13,7 +13,7 @@ SPEED, ACCEL = 0, 1   # Kalman filter states enum
 v_ego_stationary = 4.   # no stationary object flag below this speed
 
 
-class Track():
+class Track:
   def __init__(self, v_lead, kalman_params):
     self.cnt = 0
     self.aLeadTau = _LEAD_ACCEL_TAU
@@ -58,7 +58,7 @@ def mean(l):
   return sum(l) / len(l)
 
 
-class Cluster():
+class Cluster:
   def __init__(self):
     self.tracks = set()
 

@@ -6,7 +6,7 @@ import pylab
 
 from selfdrive.config import Conversions as CV
 
-class ManeuverPlot():
+class ManeuverPlot:
   def __init__(self, title=None):
     self.time_array = []
 

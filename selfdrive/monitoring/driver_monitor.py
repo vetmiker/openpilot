@@ -54,7 +54,7 @@ MAX_TERMINAL_DURATION = 300  # 30s
 RESIZED_FOCAL = 320.0
 H, W, FULL_W = 320, 160, 426
 
-class DistractedType():
+class DistractedType:
   NOT_DISTRACTED = 0
   BAD_POSE = 1
   BAD_BLINK = 2
@@ -80,7 +80,7 @@ def face_orientation_from_net(angles_desc, pos_desc, rpy_calib, is_rhd):
   yaw -= rpy_calib[2] * (1 - 2 * int(is_rhd))  # lhd -> -=, rhd -> +=
   return roll, pitch, yaw
 
-class DriverPose():
+class DriverPose:
   def __init__(self):
     self.yaw = 0.
     self.pitch = 0.
@@ -93,13 +93,13 @@ class DriverPose():
     self.low_std = True
     self.cfactor = 1.
 
-class DriverBlink():
+class DriverBlink:
   def __init__(self):
     self.left_blink = 0.
     self.right_blink = 0.
     self.cfactor = 1.
 
-class DriverStatus():
+class DriverStatus:
   def __init__(self):
     self.pose = DriverPose()
     self.pose_calibrated = self.pose.pitch_offseter.filtered_stat.n > _POSE_OFFSET_MIN_COUNT and \

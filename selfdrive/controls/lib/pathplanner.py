@@ -46,7 +46,7 @@ def calc_states_after_delay(states, v_ego, steer_angle, curvature_factor, steer_
   return states
 
 
-class PathPlanner():
+class PathPlanner:
   def __init__(self, CP):
     self.LP = LanePlanner()
 

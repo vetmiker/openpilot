@@ -14,7 +14,7 @@ from selfdrive.controls.lib.radar_helpers import Cluster, Track
 from selfdrive.swaglog import cloudlog
 
 
-class KalmanParams():
+class KalmanParams:
   def __init__(self, dt):
     # Lead Kalman Filter params, calculating K from A, C, Q, R requires the control library.
     # hardcoding a lookup table to compute K for values of radar_ts between 0.1s and 1.0s
@@ -84,7 +84,7 @@ def get_lead(v_ego, ready, clusters, lead_msg, low_speed_override=True):
   return lead_dict
 
 
-class RadarD():
+class RadarD:
   def __init__(self, radar_ts, delay=0):
     self.current_time = 0
 

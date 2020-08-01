@@ -5,7 +5,7 @@ from common.realtime import DT_CTRL
 from cereal import log
 
 
-class LatControlLQR():
+class LatControlLQR:
   def __init__(self, CP):
     self.scale = CP.lateralTuning.lqr.scale
     self.ki = CP.lateralTuning.lqr.ki

@@ -48,7 +48,7 @@ def intrinsics_from_vp(vp):
     [  0.,    0.,     1.]])
 
 
-class Calibrator():
+class Calibrator:
   def __init__(self, param_put=False):
     self.param_put = param_put
     self.vp = copy.copy(VP_INIT)

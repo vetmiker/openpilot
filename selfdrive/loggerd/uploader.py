@@ -93,7 +93,7 @@ def is_on_hotspot():
   except Exception:
     return False
 
-class Uploader():
+class Uploader:
   def __init__(self, dongle_id, root):
     self.dongle_id = dongle_id
     self.api = Api(dongle_id)

@@ -33,7 +33,7 @@ def parse_pr(m):
   return z_i, R_i, sat_pos_freq_i
 
 
-class States():
+class States:
   ECEF_POS = slice(0, 3)  # x, y and z in ECEF in meters
   ECEF_ORIENTATION = slice(3, 7)  # quat for orientation of phone in ecef
   ECEF_VELOCITY = slice(7, 10)  # ecef velocity in m/s
@@ -68,7 +68,7 @@ class States():
   ACCELEROMETER_SCALE_ERR = slice(28, 29)
 
 
-class LocKalman():
+class LocKalman:
   name = "loc"
   x_initial = np.array([0, 0, 0,
                         1, 0, 0, 0,

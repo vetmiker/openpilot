@@ -4,7 +4,7 @@ from selfdrive.test.longitudinal_maneuvers.plant import Plant
 import numpy as np
 
 
-class Maneuver():
+class Maneuver:
   def __init__(self, title, duration, **kwargs):
     # Was tempted to make a builder class
     self.distance_lead = kwargs.get("initial_distance_lead", 200.0)

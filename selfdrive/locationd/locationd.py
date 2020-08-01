@@ -45,7 +45,7 @@ def get_H():
   return H_f
 
 
-class Localizer():
+class Localizer:
   def __init__(self, disabled_logs=None, dog=None):
     if disabled_logs is None:
       disabled_logs = []

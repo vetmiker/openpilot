@@ -10,7 +10,7 @@ from opendbc.can.packer import CANPacker
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 
-class CarControllerParams():
+class CarControllerParams:
   def __init__(self):
     self.STEER_MAX = 300
     self.STEER_STEP = 2              # how often we update the steer cmd
@@ -38,7 +38,7 @@ class CarControllerParams():
     self.BRAKE_LOOKUP_V = [MAX_BRAKE, 0]
 
 
-class CarController():
+class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.start_time = 0.
     self.apply_steer_last = 0

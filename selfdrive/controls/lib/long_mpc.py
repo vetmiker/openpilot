@@ -11,7 +11,7 @@ from selfdrive.controls.lib.drive_helpers import MPC_COST_LONG
 LOG_MPC = os.environ.get('LOG_MPC', False)
 
 
-class LongitudinalMpc():
+class LongitudinalMpc:
   def __init__(self, mpc_id):
     self.mpc_id = mpc_id
 

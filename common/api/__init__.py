@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from common.basedir import PERSIST
 from selfdrive.version import version
 
-class Api():
+class Api:
   def __init__(self, dongle_id):
     self.dongle_id = dongle_id
     with open(PERSIST+'/comma/id_rsa') as f:

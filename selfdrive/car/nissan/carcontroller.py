@@ -13,7 +13,7 @@ LKAS_MAX_TORQUE = 1               # A value of 1 is easy to overpower
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 
-class CarController():
+class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.CP = CP
     self.car_fingerprint = CP.carFingerprint

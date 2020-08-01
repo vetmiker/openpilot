@@ -5,7 +5,7 @@ from selfdrive.car.volkswagen.values import DBC, CANBUS, MQB_LDW_MESSAGES, BUTTO
 from opendbc.can.packer import CANPacker
 
 
-class CarController():
+class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.apply_steer_last = 0
 

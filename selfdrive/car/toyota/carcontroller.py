@@ -30,7 +30,7 @@ def accel_hysteresis(accel, accel_steady, enabled):
   return accel, accel_steady
 
 
-class CarController():
+class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.last_steer = 0
     self.accel_steady = 0.

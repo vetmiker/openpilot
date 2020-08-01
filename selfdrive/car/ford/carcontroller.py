@@ -7,7 +7,7 @@ from opendbc.can.packer import CANPacker
 MAX_STEER_DELTA = 1
 TOGGLE_DEBUG = False
 
-class CarController():
+class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.packer = CANPacker(dbc_name)
     self.enable_camera = CP.enableCamera

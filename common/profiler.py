@@ -1,6 +1,6 @@
 import time
 
-class Profiler():
+class Profiler:
   def __init__(self, enabled=False):
     self.enabled = enabled
     self.cp = {}

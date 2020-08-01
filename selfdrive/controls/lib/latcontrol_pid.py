@@ -4,7 +4,7 @@ from cereal import car
 from cereal import log
 
 
-class LatControlPID():
+class LatControlPID:
   def __init__(self, CP):
     self.pid = PIController((CP.lateralTuning.pid.kpBP, CP.lateralTuning.pid.kpV),
                             (CP.lateralTuning.pid.kiBP, CP.lateralTuning.pid.kiV),

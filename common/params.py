@@ -119,7 +119,7 @@ def fsync_dir(path):
     os.close(fd)
 
 
-class FileLock():
+class FileLock:
   def __init__(self, path, create):
     self._path = path
     self._create = create
@@ -135,7 +135,7 @@ class FileLock():
       self._fd = None
 
 
-class DBAccessor():
+class DBAccessor:
   def __init__(self, path):
     self._path = path
     self._vals = None
@@ -334,7 +334,7 @@ def write_db(params_path, key, value):
     lock.release()
 
 
-class Params():
+class Params:
   def __init__(self, db=PARAMS):
     self.db = db
 

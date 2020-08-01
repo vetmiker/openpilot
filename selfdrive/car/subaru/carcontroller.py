@@ -5,7 +5,7 @@ from selfdrive.car.subaru.values import DBC
 from opendbc.can.packer import CANPacker
 
 
-class CarControllerParams():
+class CarControllerParams:
   def __init__(self):
     self.STEER_MAX = 2047              # max_steer 4095
     self.STEER_STEP = 2                # how often we update the steer cmd
@@ -16,7 +16,7 @@ class CarControllerParams():
     self.STEER_DRIVER_FACTOR = 1       # from dbc
 
 
-class CarController():
+class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.lkas_active = False
     self.apply_steer_last = 0

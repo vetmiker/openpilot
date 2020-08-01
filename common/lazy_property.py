@@ -1,4 +1,4 @@
-class lazy_property():
+class lazy_property:
   """Defines a property whose value will be computed only once and as needed.
 
      This can only be used on instance methods.
