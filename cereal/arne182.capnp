@@ -183,5 +183,7 @@ struct EventArne182 {
     trafficModelRaw @11: TrafficModelRaw;
     trafficModelEvent @12: TrafficModelEvent;
     dynamicFollowData @13 :DynamicFollowData;
+    #e2e button from shane. https://github.com/ShaneSmiskol/openpilot/pull/130/files
+    modelLongButton @14 :ModelLongButton;
   }
 }

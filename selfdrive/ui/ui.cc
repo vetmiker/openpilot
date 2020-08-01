@@ -95,6 +95,33 @@ static void update_offroad_layout_state(UIState *s) {
 #endif
 }
 
+// e2e model button.
+static void send_ml(UIState *s, bool enabled) {
+  capnp::MallocMessageBuilder msg;
+  auto event = msg.initRoot<cereal::Event>();
+  event.setLogMonoTime(nanos_since_boot());
+  auto mlStatus = event.initModelLongButton();
+  mlStatus.setEnabled(enabled);
+  s->pm->send("modelLongButton", msg);
+}
+
+static bool handle_ml_touch(UIState *s, int touch_x, int touch_y) {
+  //mlButton manager
+  if ((s->awake && s->vision_connected && s->status != STATUS_STOPPED) || s->ui_debug) {
+    int padding = 40;
+    int btn_w = 500;
+    int btn_h = 138;
+    int xs[2] = {1920 / 2 - btn_w / 2, 1920 / 2 + btn_w / 2};
+    int y_top = 915 - btn_h / 2;
+    if (xs[0] <= touch_x + padding && touch_x - padding <= xs[1] && y_top - padding <= touch_y) {
+      s->scene.mlButtonEnabled = !s->scene.mlButtonEnabled;
+      send_ml(s, s->scene.mlButtonEnabled);
+      return true;
+    }
+  }
+    return false;
+}
+
 //dfButton manager
 static void send_df(UIState *s, int status) {
   capnp::MallocMessageBuilder msg;
@@ -208,7 +235,7 @@ static void ui_init(UIState *s) {
                                     , "liveMapData"
 #endif
   });
-  s->pm = new PubMaster({"offroadLayout", "dynamicFollowButton"});
+  s->pm = new PubMaster({"offroadLayout", "dynamicFollowButton", "modelLongButton"});
 
   s->ipc_fd = -1;
   s->scene.satelliteCount = -1;
@@ -266,6 +293,7 @@ static void ui_init_vision(UIState *s, const VisionStreamBufs back_bufs,
    printf("ERROR PARSING OPPARAMS JSON!\n");
    s->scene.dfButtonStatus = 0;
  }
+  s->scene.mlButtonEnabled = false;
 
   s->rgb_width = back_bufs.width;
   s->rgb_height = back_bufs.height;
@@ -873,8 +901,10 @@ int main(int argc, char* argv[]) {
       set_awake(s, true);
       handle_sidebar_touch(s, touch_x, touch_y);
 
-      if (!handle_df_touch(s, touch_x, touch_y) && !handle_df_touch(s, touch_x, touch_y)) {  // disables sidebar from popping out when tapping df or ls button
+      if (!handle_df_touch(s, touch_x, touch_y) && !handle_df_touch(s, touch_x, touch_y) && !handle_ml_touch(s, touch_x, touch_y)) {  // disables sidebar from popping out when tapping df or ls button
         handle_vision_touch(s, touch_x, touch_y);
+      } else {
+      s->scene.uilayout_sidebarcollapsed = true;  // collapse sidebar when tapping any SA button
       }
     }
 
