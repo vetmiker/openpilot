@@ -101,7 +101,7 @@ This aims to provide a smoother driving experience in stop and go traffic (under
 
 All WIP features can be configured by modifying `python /data/opepilot/op_edit.py`
 - Traffic light detection from Littlemountainman, shane and brain. To get accurate result make sure your daily commute/area is mapped on [OSM](openstreetmap.org) with right direaction. [For example](https://imgur.com/purBVpd)...  [still dont get it watch the video by mageymoo1](https://youtu.be/7dPaF0tDb7Y).
-- 2020 Corolla tuning by Sparrows
+- 2020 Corolla tuning by Spairrow326
 - Virtual lane lines and Lane center. This feature is for European roads and is recommended for used in Europe only.
 -e2e model button to fix ghost breaking issue. WIP (just need to fix the alerts.)
 
