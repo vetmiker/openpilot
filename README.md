@@ -1,5 +1,4 @@
 This README describes the custom features build by me (Arne Schwarck) on top of [ArnePilot](http://github.com/commaai/ArnePilot) of [comma.ai](http://comma.ai). This fork is optimized for the Toyota RAV4 Hybrid 2016 and for driving in Germany but also works with other cars and in other countries. If you would like to support the developement on this project feel free to https://www.patreon.com/arneschwarck
-- [ ] TODO describe which other cars and countries are known
 [![](https://i.imgur.com/UelUjKAh.png)](#)
 
 For a demo of this version of ArnePilot check the video below:
@@ -40,6 +39,17 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 # Configuration
 
 - You can turn on or off some of the [Feature](https://github.com/arne182/ArnePilot/blob/81a3258da49e1bb9739a5f1d0a84b38afd10583f/common/op_params.py#L500) by editing `op_edit.py`. Run the following command `python /data/openpilot/op_edit.py`
+
+# Supported Cars
+
+- RAV4 Hybrid 2016-19
+- RAV4 2017-19
+- Corolla 2019,2020
+- Prius 2017
+- RX hyrid 2017
+- C 2018
+- Hyundia Genesis 2015-16
+- Chevrolet Volt 2017
 
 # Todo
 
