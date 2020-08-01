@@ -487,13 +487,13 @@ class Controls:
 
     alerts = self.events.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
     alertsArne182 = self.eventsArne182.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
-    self.last_model_long = self.sm_smiskol['modelLongButton'].enabled
+    self.last_model_long = self.arne_sm['modelLongButton'].enabled
     self.AM.add_many(self.sm.frame, alerts, self.enabled)
     self.AM.add_many(self.sm.frame, alertsArne182, self.enabled)
 
     df_out = self.df_manager.update()
     frame = self.sm.frame
-    if self.sm_smiskol['modelLongButton'].enabled != self.last_model_long:
+    if self.arne_sm['modelLongButton'].enabled != self.last_model_long:
       extra_text_1 = 'disabled!' if self.last_model_long else 'enabled!'
       self.AM.add_custom(frame, 'modelLongAlert', ET.WARNING, self.enabled, extra_text_1=extra_text_1)
       return
