@@ -107,7 +107,7 @@ static void send_ml(UIState *s, bool enabled) {
 
 static bool handle_ml_touch(UIState *s, int touch_x, int touch_y) {
   //mlButton manager
-  if ((s->awake && s->vision_connected && s->status != STATUS_STOPPED) || s->ui_debug) {
+  if ((s->awake && s->vision_connected && s->status != STATUS_STOPPED)) {
     int padding = 40;
     int btn_w = 500;
     int btn_h = 138;
