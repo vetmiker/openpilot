@@ -128,6 +128,8 @@ typedef struct UIScene {
   std::string ipAddr;
   float output_scale;
   int gear;
+  bool rightBlindspot;
+  bool leftblindspot;
   
   bool is_rhd;
   bool map_valid;
