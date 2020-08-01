@@ -165,6 +165,10 @@ struct TrafficModelEvent {
   confidence @1 :Float32;
 }
 
+struct ModelLongButton {
+  enabled @0 :Bool;
+}
+
 struct EventArne182 {
   # in nanoseconds?
   logMonoTime @0 :UInt64;
