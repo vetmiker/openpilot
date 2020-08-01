@@ -675,7 +675,7 @@ static void ui_draw_df_button(UIState *s) {
   int btn_h = 150;
   int x_padding = 200;
   int y_padding = 50;
-  int btn_x = 1920 - btn_w - x_padding;
+  int btn_x = 1920 - btn_w - x_padding - 100;
   int btn_y = 1080 - btn_h - y_padding;
   int btn_colors[4][3] = {{4, 67, 137}, {36, 168, 188}, {252, 255, 75}, {55, 184, 104}};
 
@@ -695,9 +695,9 @@ static void ui_draw_df_button(UIState *s) {
 }
 
 static void ui_draw_ml_button(UIState *s) {
-  int btn_w = 500;
+  int btn_w = 400;
   int btn_h = 138;
-  int x = 1920 / 2;
+  int x = 1920 / 2 + 150;
   int y = 915;
   int btn_x = x - btn_w / 2;
   int btn_y = y - btn_h / 2;
@@ -719,7 +719,7 @@ static void ui_draw_ml_button(UIState *s) {
 
   nvgFillColor(s->vg, nvgRGBA(255, 255, 255, 255));
   nvgFontSize(s->vg, 65);
-  nvgText(s->vg, x, y + btn_h / 8, "Toggle Model Long", NULL);
+  nvgText(s->vg, x, y + btn_h / 8, "Model Long", NULL);
 }
 
   //dev ui
