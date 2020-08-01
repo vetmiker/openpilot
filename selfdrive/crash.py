@@ -68,8 +68,8 @@ else:
   u_tag = []
   if isinstance(username, str):
     u_tag.append(username)
-  if isinstance(uniqueID, str):
-    u_tag.append(uniqueID)
+  #if isinstance(uniqueID, str):
+    #u_tag.append(uniqueID)
   if len(u_tag) > 0:
     error_tags['username'] = ''.join(u_tag)
 
