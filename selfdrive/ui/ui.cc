@@ -109,9 +109,9 @@ static bool handle_ml_touch(UIState *s, int touch_x, int touch_y) {
   //mlButton manager
   if ((s->awake && s->vision_connected && s->status != STATUS_STOPPED)) {
     int padding = 40;
-    int btn_w = 500;
+    int btn_w = 400;
     int btn_h = 138;
-    int xs[2] = {1920 / 2 - btn_w / 2, 1920 / 2 + btn_w / 2};
+    int xs[2] = {1920 / 2 + 75 - btn_w / 2, 1920 / 2 + 75 + btn_w / 2};
     int y_top = 915 - btn_h / 2;
     if (xs[0] <= touch_x + padding && touch_x - padding <= xs[1] && y_top - padding <= touch_y) {
       s->scene.mlButtonEnabled = !s->scene.mlButtonEnabled;
@@ -135,8 +135,8 @@ static void send_df(UIState *s, int status) {
 static bool handle_df_touch(UIState *s, int touch_x, int touch_y) {
   if (s->awake && s->vision_connected && s->status != STATUS_STOPPED) {
     int padding = 40;
-    int btn_x_1 = 1660 - 200;
-    int btn_x_2 = 1660 - 50;
+    int btn_x_1 = 1660 - 200 - 175;
+    int btn_x_2 = 1660 - 50 - 175;
     if ((btn_x_1 - padding <= touch_x) && (touch_x <= btn_x_2 + padding) && (855 - padding <= touch_y)) {
       s->scene.uilayout_sidebarcollapsed = true;  // collapse sidebar when tapping df button
       s->scene.dfButtonStatus++;
