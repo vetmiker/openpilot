@@ -45,10 +45,10 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
 
 - RAV4 Hybrid 2016-19
 - RAV4 2017-19
-- Corolla 2019,2020
+- Corolla 2019-20
 - Prius 2017
 - RX hyrid 2017
-- C 2018
+- CT 2018
 - Hyundia Genesis 2015-16
 - Chevrolet Volt 2017
 
@@ -86,7 +86,7 @@ This aims to provide a smoother driving experience in stop and go traffic (under
 - We also have enabled commas e2e model which will only work between 11 MPH to 29 MPH. Commas e2e model helps slows down for traffic light, stop sign, etc. e2e, traffic model and mapd all works together to help you stop at the light. All of this can be turned off via `/data/openpilot/op_edit.py`.
 - Smart speed (smart speed is essentially speedlimit which eon will not go over unless you have set custom offset) can be overridden by pressing gas above the current smart speed.
 
-# Tss2 Features
+# TSS2 Features
 
 - Control 3 gas profiles with sport eco and normal buttons on car
 - Blind Spot Monitoring for all of the toyota which will be added to control ALC(vision based lane change from comma.ai). For right now it is always on. It will flash rapidly when stopped and if the object is detected.
