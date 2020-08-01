@@ -7,8 +7,8 @@ CAMERA_OFFSET = 0.06  # m from center car to camera
 
 def compute_path_pinv(l=50):
   deg = 3
-  x = np.arange(l*1.0)
-  X = np.vstack(tuple(x**n for n in range(deg, -1, -1))).T
+  x = np.arange(l * 1.0)
+  X = np.vstack(tuple(x ** n for n in range(deg, -1, -1))).T
   pinv = np.linalg.pinv(X)
   return pinv
 
@@ -18,7 +18,7 @@ def model_polyfit(points, path_pinv):
 
 
 def eval_poly(poly, x):
-  return poly[3] + poly[2]*x + poly[1]*x**2 + poly[0]*x**3
+  return poly[3] + poly[2] * x + poly[1] * x ** 2 + poly[0] * x ** 3
 
 
 def calc_d_poly(l_poly, r_poly, p_poly, l_prob, r_prob, lane_width, v_ego):
@@ -91,8 +91,8 @@ class LanePlanner:
     current_lane_width = abs(self.l_poly[3] - self.r_poly[3])
     self.lane_width_estimate += 0.005 * (current_lane_width - self.lane_width_estimate)
     speed_lane_width = interp(v_ego, [0., 31.], [2.8, 3.5])
-    self.lane_width = self.lane_width_certainty * self.lane_width_estimate + \
-                      (1 - self.lane_width_certainty) * speed_lane_width
+    self.lane_width = (self.lane_width_certainty * self.lane_width_estimate +
+                       (1 - self.lane_width_certainty) * speed_lane_width)
 
     self.d_poly = calc_d_poly(self.l_poly, self.r_poly, self.p_poly, self.l_prob, self.r_prob, self.lane_width, v_ego)
 
