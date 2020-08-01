@@ -89,6 +89,7 @@ latControl: [8210, false, 20.]
 phantomData: [8211, false, 20.]
 thermalonline: [8212, false, 1., 1]
 ipAddress: [8213, false, 0.]
+modelLongButton: [8214, false, 0.]
 
 #alca Events
 alcaStatus: [8214, false, 0.]
@@ -100,7 +101,6 @@ dynamicFollowButton: [8217, false, 0.]
 trafficModelEvent: [8218, false, 5.]
 trafficModelRaw: [8219, false, 5.]
 dynamicFollowData: [8220, false, 20.]
-modelLongButton: [8221, false, 0.]
 
 # 8080 is reserved for slave testing daemon
 # 8762 is reserved for logserver
