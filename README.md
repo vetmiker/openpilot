@@ -62,34 +62,40 @@ This is done automatically otherwise run (pkill -f boardd; cd /data/openpilot/pa
     - by mapped sign(stop, yield, roundabouts, bump, hump, traffic light, speed sign, road attribute)
 - No disengage for gas, only longitudinal disengage for brake, tire slip or cancel
 - Only disengage on main off and on brake at low speed
-- Reacting Toyota tssp higher acceleration and braking limits.
-- Speed sign reading
-- Stock Toyota ldw steering assist
-- Cruise set speed available down to 7 kph
 - Smooth longitudinal controller also at low speeds
 - No disengage for seat belt remove and door opened. Practical for when stopping and then someone opens a door so that the car does not drive into the lead
 - No fingerprint compatibility problems. A completely different way to combine and split Fingerprints so that they always work I.e. comma is not supporting rav4h 2019 because of this Fingerprint method. Mine is better
 - Custom events and capnp structure so that comma is happy with the drives from my fork
 - Forward collision warning actually brakes for you.
-- Blind Spot Monitoring for all of the toyota which will be added to control ALC(vision based lane change from comma.ai). For right now it is always on. It will flash rapidly when stopped and if the object is detected.
 - Ability to ruduce or Increase curvature Factor from `op_edit.py` (`python /data/ArnePilot/op_edit.py`) It will also works with eco and sport mode. If using eco mode then it will start breaking early (350 m before) if using sport mode it will slow down little late (150 m).
-- Ability to change the SpeedLimit Offset directly from APK. It is based in percentages. For Example, if -1% at 60mph, it will be  approx. 59.4mph, -10% is roughly 54mph etc. (Thank you eFini for the help)
-- Dashcam recording button added to the ui. ( it will save video's to the `/data/media/0/video`)
-- GPS Accurecy on the Dev UI.
 - Live speedlimit_offset in op_tune.py
-- If the model detect's cut in it will draw two different chevron to show the user that it see's both of the car.
-- Control 3 gas profiles with sport eco and normal buttons on car ( only for toyota).
 - [Dynamic distance profiles](https://github.com/ShaneSmiskol/ArnePilot/tree/stock_additions-devel#dynamic-follow-3-profiles) from Shane (In other word three different dynamic profiles: `close`, `normal`, `far`, `auto`). Profile can be adjusted from either `python /data/ArnePilot/op_edit.py` or use live tuner to change the profile live (can take up to 4 sec to for new profile to be adjusted) `python /data/ArnePilot/op_tune.py`.
-- Dynamic Follow Button: Now you can change the Dynamic Follow Distance just by tapping the blue button on the bottom right.
 - [Dynamic Gas:](https://github.com/ShaneSmiskol/ArnePilot/tree/stock_additions-devel#dynamic-gas)
 This aims to provide a smoother driving experience in stop and go traffic (under 20 mph) by modifying the maximum gas that can be applied based on your current velocity and the relative velocity of the lead car. It'll also of course increase the maximum gas when the lead is accelerating to help you get up to speed quicker than stock. And smoother; this eliminates the jerking you get from stock ArnePilot with comma pedal. It tries to coast if the lead is only moving slowly, it doesn't use maximum gas as soon as the lead inches forward :). When you are above 20 mph, relative velocity and the following distance is taken into consideration.
-- ALC w/ BSM : (Automatic Lane Change with Blind spot monitoring) you can now change lane automataclly. It will wait 1 sec before applying ALC. If the BSM detacts objects it will stop the lane change and will take you back in your original lane. Also, it will notify the user on the eon
-- Added ability to turn on and off RSA at certain speed. `python /data/ArnePilot/op_edit.py`
+- We also have enabled commas e2e model which will only work between 11 MPH to 29 MPH. Commas e2e model helps slows down for traffic light, stop sign, etc. e2e, traffic model and mapd all works together to help you stop at the light. All of this can be turned off via `/data/openpilot/op_edit.py`.
+- Smart speed (smart speed is essentially speedlimit which eon will not go over unless you have set custom offset) can be overridden by pressing gas above the current smart speed.
+
+# Tss2 Features
+
+- Control 3 gas profiles with sport eco and normal buttons on car
+- Blind Spot Monitoring for all of the toyota which will be added to control ALC(vision based lane change from comma.ai). For right now it is always on. It will flash rapidly when stopped and if the object is detected.
+- ALC w/ BSM : (Automatic Lane Change with Blind spot monitoring) you can now change lane automataclly. It will wait 1 sec before applying ALC. If the BSM detacts objects it will stop the lane change and will take you back in your original lane. Also, it will notify the user on the eon.
+- Reacting Toyota tssp higher acceleration and braking limits.
+- Speed sign reading
+- Stock Toyota ldw steering assist
+- Cruise set speed available down to 7 kph
+- Added ability to turn on and off RSA at certain speed. `python /data/openpilot/op_edit.py`
+
+# UI Modifications
+
+- GPS Accurecy on the Dev UI.
 - Easily view the EON's IP Address.Just look at the sidebar right under wifi singal strength's.
 - Battery has percentage instead of the battery icon.
-- We also have enabled commas e2e model which will only work between 11 MPH to 29 MPH. Commas e2e model helps slows down for traffic light, stop sign, etc. e2e, traffic model and mapd all works together to help you stop at the light. All of this can be turned off via `/data/openpilot/op_edit.py`.
-- Loggin has been Disabled by default on this fork. If you would like to record your drive edit the [following line](https://github.com/arne182/ArnePilot/blob/4d66df96a91c9c13491a3d78b9c1c2a9e848724a/selfdrive/manager.py#L480)
-- Smart speed (smart speed is essentially speedlimit which eon will not go over unless you have set custom offset) can be overridden by pressing gas above the current smart speed.
+- If the model detect's cut in it will draw two different chevron to show the user that it see's both of the car.
+- Dashcam recording button added to the ui. ( it will save video's to the `/data/media/0/video`)
+- Ability to change the SpeedLimit Offset directly from APK. It is based in percentages. For Example, if -1% at 60mph, it will be  approx. 59.4mph, -10% is roughly 54mph etc. (Thank you eFini for the help)
+- Dynamic Follow Button: Now you can change the Dynamic Follow Distance just by tapping the blue button on the bottom right. Now with colorful DF button depending on the profile
+- Smart speed icon
 
 # Work-in-Progress Features
 
@@ -97,6 +103,12 @@ All WIP features can be configured by modifying `python /data/opepilot/op_edit.p
 - Traffic light detection from Littlemountainman, shane and brain. To get accurate result make sure your daily commute/area is mapped on [OSM](openstreetmap.org) with right direaction. [For example](https://imgur.com/purBVpd)...  [still dont get it watch the video by mageymoo1](https://youtu.be/7dPaF0tDb7Y).
 - 2020 Corolla tuning by Sparrows
 - Virtual lane lines and Lane center. This feature is for European roads and is recommended for used in Europe only.
+-e2e model button to fix ghost breaking issue. WIP (just need to fix the alerts.)
+
+# Data collection
+- Loggin has been Disabled by default on this fork. If you would like to record your drive edit the [following line](https://github.com/arne182/ArnePilot/blob/4d66df96a91c9c13491a3d78b9c1c2a9e848724a/selfdrive/manager.py#L480)
+- Offline crash logging. sentry does not catches all the error. now if their is no internet it will still log error in /data/community/crashes
+- OSM tracers logging and uploading anonymously to help improve MapD as well as OSM accuracy. [Arne is currently ranked 8th for overal tracers uploaded](https://www.openstreetmap.org/stats/data_stats.html).
 
 # Licensing
 
