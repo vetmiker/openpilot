@@ -117,7 +117,7 @@ All WIP features can be configured by modifying `python /data/opepilot/op_edit.p
 
 # Data collection
 - Loggin has been Disabled by default on this fork. If you would like to record your drive edit the [following line](https://github.com/arne182/ArnePilot/blob/4d66df96a91c9c13491a3d78b9c1c2a9e848724a/selfdrive/manager.py#L480)
-- Offline crash logging. sentry does not catches all the error. now if their is no internet it will still log error in /data/community/crashes
+- Offline crash logging. sentry does not catches all the error. now if their is no internet it will still log error in `/data/community/crashes`
 - OSM tracers logging and uploading anonymously to help improve MapD as well as OSM accuracy. [Arne is currently ranked 8th for overal tracers uploaded](https://www.openstreetmap.org/stats/data_stats.html).
 
 # Licensing
