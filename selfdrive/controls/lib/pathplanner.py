@@ -135,7 +135,7 @@ class PathPlanner:
       # starting
       elif self.lane_change_state == LaneChangeState.laneChangeStarting:
         # fade out over .5s
-        self.lane_change_ll_prob = max(self.lane_change_ll_prob - 2*DT_MDL, 0.0)
+        self.lane_change_ll_prob = max(self.lane_change_ll_prob - 2 * DT_MDL, 0.0)
         # 98% certainty
         if lane_change_prob < 0.02 and self.lane_change_ll_prob < 0.01:
           self.lane_change_state = LaneChangeState.laneChangeFinishing
@@ -195,7 +195,7 @@ class PathPlanner:
         self.last_cloudlog_t = t
         cloudlog.warning("Lateral mpc - nan: True")
 
-    if self.mpc_solution[0].cost > 20000. or mpc_nans:   # TODO: find a better way to detect when MPC did not converge
+    if self.mpc_solution[0].cost > 20000. or mpc_nans:  # TODO: find a better way to detect when MPC did not converge
       self.solution_invalid_cnt += 1
     else:
       self.solution_invalid_cnt = 0
