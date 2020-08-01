@@ -226,7 +226,7 @@ void draw_lock_button(UIState *s) {
   int btn_w = 150;
   int btn_h = 150;
   int btn_x = 1920 - btn_w - 150;
-  int btn_y = 1080 - 25 - btn_h;
+  int btn_y = 1080 - 50 - btn_h;
   float alpha = 0.3f;
 
   if (!lock_image) {
@@ -265,7 +265,7 @@ static void screen_draw_button(UIState *s, int touch_x, int touch_y) {
     int btn_w = 150;
     int btn_h = 150;
     int btn_x = 1920 - btn_w;
-    int btn_y = 1080 - 25 - btn_h;
+    int btn_y = 1080 - 50 - btn_h;
     nvgBeginPath(s->vg);
       nvgRoundedRect(s->vg, btn_x-110, btn_y-45, btn_w, btn_h, 100);
       nvgStrokeColor(s->vg, nvgRGBA(255,255,255,80));
@@ -283,7 +283,7 @@ static void screen_draw_button(UIState *s, int touch_x, int touch_y) {
       else {
         nvgFillColor(s->vg, nvgRGBA(255, 255, 255, 200));
       }
-      nvgText(s->vg,btn_x-80,btn_y+50,"REC",NULL);
+      nvgText(s->vg,btn_x-50,btn_y+50,"REC",NULL);
   }
 
   if (captureState == CAPTURE_STATE_CAPTURING) {
