@@ -930,7 +930,7 @@ int main(int argc, char* argv[]) {
       }
     } else {
       // blank screen on reverse gear
-      if (s->scene.gear == 4) {
+      if (s->scene.gear == cereal::CarState::GearShifter::REVERSE) {
         set_awake(s, false);
       } else {
         set_awake(s, true);
