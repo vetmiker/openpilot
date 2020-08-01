@@ -230,7 +230,7 @@ static void ui_init(UIState *s) {
 
   pthread_mutex_init(&s->lock, NULL);
   s->sm = new SubMaster({"model", "controlsState", "uiLayoutState", "liveCalibration", "radarState", "thermal",
-                         "health", "ubloxGnss", "driverState", "dMonitoringState", "carState", "gpsLocationExternal"
+                         "health", "ubloxGnss", "driverState", "dMonitoringState", "carState", "gpsLocationExternal", "liveMpc"
 #ifdef SHOW_SPEEDLIMIT
                                     , "liveMapData"
 #endif
@@ -245,6 +245,8 @@ static void ui_init(UIState *s) {
   // init display
   s->fb = framebuffer_init("ui", 0, true, &s->fb_w, &s->fb_h);
   assert(s->fb);
+  
+  s->livempc_or_radarstate_changed = false;
 
   set_awake(s, true);
 
@@ -434,16 +436,16 @@ void handle_message(UIState *s, SubMaster &sm) {
   if (sm.updated("model")) {
     read_model(scene.model, sm["model"].getModel());
   }
-  // else if (which == cereal::Event::LIVE_MPC) {
-  //   auto data = event.getLiveMpc();
-  //   auto x_list = data.getX();
-  //   auto y_list = data.getY();
-  //   for (int i = 0; i < 50; i++){
-  //     scene.mpc_x[i] = x_list[i];
-  //     scene.mpc_y[i] = y_list[i];
-  //   }
-  //   s->livempc_or_radarstate_changed = true;
-  // }
+  if (sm.updated("liveMpc")) {
+     auto data = sm["liveMpc"].getLiveMpc();
+     auto x_list = data.getX();
+     auto y_list = data.getY();
+     for (int i = 0; i < 50; i++){
+       scene.mpc_x[i] = x_list[i];
+       scene.mpc_y[i] = y_list[i];
+     }
+     s->livempc_or_radarstate_changed = true;
+  }
   if (sm.updated("uiLayoutState")) {
     auto data = sm["uiLayoutState"].getUiLayoutState();
     s->active_app = data.getActiveApp();
