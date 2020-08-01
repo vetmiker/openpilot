@@ -108,7 +108,9 @@ static void send_df(UIState *s, int status) {
 static bool handle_df_touch(UIState *s, int touch_x, int touch_y) {
   if (s->awake && s->vision_connected && s->status != STATUS_STOPPED) {
     int padding = 40;
-    if ((1660 - padding <= touch_x) && (855 - padding <= touch_y)) {
+    int btn_x_1 = 1660 - 200;
+    int btn_x_2 = 1660 - 50;
+    if ((btn_x_1 - padding <= touch_x) && (touch_x <= btn_x_2 + padding) && (855 - padding <= touch_y)) {
       s->scene.uilayout_sidebarcollapsed = true;  // collapse sidebar when tapping df button
       s->scene.dfButtonStatus++;
       if (s->scene.dfButtonStatus > 3) {
