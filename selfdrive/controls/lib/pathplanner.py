@@ -106,16 +106,16 @@ class PathPlanner:
     elif sm['carState'].rightBlinker:
       self.lane_change_direction = LaneChangeDirection.right
 
-    if (not active) or (self.lane_change_timer > LANE_CHANGE_TIME_MAX) or (not one_blinker) or (not self.lane_change_enabled):
+    if not active or self.lane_change_timer > LANE_CHANGE_TIME_MAX or not one_blinker or not self.lane_change_enabled:
       self.lane_change_state = LaneChangeState.off
       self.lane_change_direction = LaneChangeDirection.none
     else:
       torque_applied = sm['carState'].steeringPressed and \
-                       ((sm['carState'].steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or
-                        (sm['carState'].steeringTorque < 0 and self.lane_change_direction == LaneChangeDirection.right))
+                       (sm['carState'].steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or \
+                       (sm['carState'].steeringTorque < 0 and self.lane_change_direction == LaneChangeDirection.right)
 
-      blindspot_detected = ((sm['carState'].leftBlindspot and self.lane_change_direction == LaneChangeDirection.left) or
-                            (sm['carState'].rightBlindspot and self.lane_change_direction == LaneChangeDirection.right))
+      blindspot_detected = (sm['carState'].leftBlindspot and self.lane_change_direction == LaneChangeDirection.left) or \
+                           (sm['carState'].rightBlindspot and self.lane_change_direction == LaneChangeDirection.right)
 
       lane_change_prob = self.LP.l_lane_change_prob + self.LP.r_lane_change_prob
 
