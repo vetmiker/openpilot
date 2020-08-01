@@ -283,7 +283,7 @@ static void screen_draw_button(UIState *s, int touch_x, int touch_y) {
       else {
         nvgFillColor(s->vg, nvgRGBA(255, 255, 255, 200));
       }
-      nvgText(s->vg,btn_x-25,btn_y+50,"REC",NULL);
+      nvgText(s->vg,btn_x-37,btn_y+50,"REC",NULL);
   }
 
   if (captureState == CAPTURE_STATE_CAPTURING) {
