@@ -65,13 +65,13 @@ class Controls:
                                      'dMonitoringState', 'plan', 'pathPlan', 'liveLocationKalman', 'radarState'])
     self.arne_sm = arne_sm
     if self.arne_sm is None:
-      self.arne_sm = messaging_arne.SubMaster(['arne182Status', 'dynamicFollowButton', 'trafficModelEvent'])
+      self.arne_sm = messaging_arne.SubMaster(['arne182Status', 'dynamicFollowButton', 'trafficModelEvent', 'modelLongButton' ])
 
     self.op_params = opParams()
     self.df_manager = dfManager(self.op_params)
     self.hide_auto_df_alerts = self.op_params.get('hide_auto_df_alerts', False)
-    self.hide_auto_df_alerts = self.op_params.get('hide_auto_df_alerts', False)
     self.traffic_light_alerts = self.op_params.get('traffic_light_alerts', True)
+    self.last_model_long = False
 
     self.can_sock = can_sock
     if can_sock is None:
@@ -152,7 +152,7 @@ class Controls:
       self.distance_traveled = 0
       self.distance_traveled_engaged = 0
       self.distance_traveled_override = 0
-      
+
     self.distance_traveled_frame = 0
     self.events_prev = []
     self.current_alert_types = [ET.PERMANENT]
@@ -486,12 +486,17 @@ class Controls:
 
     alerts = self.events.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
     alertsArne182 = self.eventsArne182.create_alerts(self.current_alert_types, [self.CP, self.sm, self.is_metric])
-    
+    self.last_model_long = self.arne_sm['modelLongButton'].enabled
     self.AM.add_many(self.sm.frame, alerts, self.enabled)
     self.AM.add_many(self.sm.frame, alertsArne182, self.enabled)
 
     df_out = self.df_manager.update()
     frame = self.sm.frame
+    if self.arne_sm['modelLongButton'].enabled != self.last_model_long:
+      extra_text_1 = 'disabled!' if self.last_model_long else 'enabled!'
+      self.AM.add_custom(frame, 'modelLongAlert', ET.WARNING, self.enabled, extra_text_1=extra_text_1)
+      return
+
     if df_out.changed:
       df_alert = 'dfButtonAlert'
       if df_out.is_auto and df_out.last_is_auto:
