@@ -269,6 +269,8 @@ typedef struct UIState {
   bool started;
   bool preview_started;
   bool vision_seen;
+  
+  bool livempc_or_radarstate_changed;
 
   std::atomic<float> light_sensor;
 
