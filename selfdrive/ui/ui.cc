@@ -98,9 +98,9 @@ static void update_offroad_layout_state(UIState *s) {
 // e2e model button.
 static void send_ml(UIState *s, bool enabled) {
   capnp::MallocMessageBuilder msg;
-  auto event = msg.initRoot<cereal::Event>();
-  event.setLogMonoTime(nanos_since_boot());
-  auto mlStatus = event.initModelLongButton();
+  auto EventArne182 = msg.initRoot<cereal::EventArne182>();
+  EventArne182.setLogMonoTime(nanos_since_boot());
+  auto mlStatus = EventArne182.initModelLongButton();
   mlStatus.setEnabled(enabled);
   s->pm->send("modelLongButton", msg);
 }
