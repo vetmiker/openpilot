@@ -863,7 +863,7 @@ EVENTSARNE182 = {
     ET.WARNING: Alert(
       "Using profile:",
       "",
-      AlertStatus.normal, AlertSize.samll,
+      AlertStatus.normal, AlertSize.mid,
       Priority.LOWER, VisualAlert.none, AudibleAlert.chimeWarning1, 0.4, 0., 2.),
   },
 
