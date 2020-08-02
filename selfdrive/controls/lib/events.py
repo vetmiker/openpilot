@@ -863,7 +863,7 @@ EVENTSARNE182 = {
     ET.WARNING: Alert(
       "Using profile:",
       "",
-      AlertStatus.normal, AlertSize.mid,
+      AlertStatus.normal, AlertSize.samll,
       Priority.LOWER, VisualAlert.none, AudibleAlert.chimeWarning1, 0.4, 0., 2.),
   },
 
@@ -871,7 +871,7 @@ EVENTSARNE182 = {
     ET.WARNING: Alert(
       "Using profile:",
       "",
-      AlertStatus.normal, AlertSize.mid,
+      AlertStatus.normal, AlertSize.small,
       Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0.2, 0., 2.),
   },
 
@@ -927,7 +927,7 @@ EVENTSARNE182 = {
     ET.WARNING: Alert(
       "Steer Assist Active",
       "Brake Pressed Acceleration Disabled",
-      AlertStatus.userPrompt, AlertSize.mid,
+      AlertStatus.userPrompt, AlertSize.small,
       Priority.LOW, VisualAlert.none, AudibleAlert.none, .4, 2., 0.2),
   },
 
