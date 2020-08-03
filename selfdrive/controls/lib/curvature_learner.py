@@ -15,7 +15,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
   def __init__(self):
     self.curvature_file = '/data/curvaturev5.json'
     rate = 1 / 20.  # pathplanner is 20 hz
-    self.learning_rate = 2.5833e-3 * rate  # equivalent to x/12000
+    self.learning_rate = 2.8e-3 * rate  # equivalent to x/12000
     self.write_frequency = 5  # in seconds
 
     self.directions = ['left', 'right']
@@ -31,8 +31,8 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     if angle_band is not None:  # don't return an offset if not between a band
       speed_band = self.pick_speed_band(v_ego)  # will never be none
       learning_sign = 1 if angle_steers >= 0 else -1
-      self.learned_offsets[direction][angle_band][speed_band] -= d_poly[3] * self.learning_rate * learning_sign  # the learning
-      offset = self.learned_offsets[direction][angle_band][speed_band]
+      self.learned_offsets[direction][speed_band][angle_band] -= d_poly[3] * self.learning_rate * learning_sign  # the learning
+      offset = self.learned_offsets[direction][speed_band][angle_band]
 
     if sec_since_boot() - self._last_write_time >= self.write_frequency:
       self._write_curvature()
