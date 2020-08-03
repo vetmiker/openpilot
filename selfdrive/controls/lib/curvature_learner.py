@@ -1,6 +1,6 @@
 import os
 import json
-from numpy import clip
+from common.numpy_fast import clip
 from common.realtime import sec_since_boot
 from selfdrive.config import Conversions as CV
 
@@ -17,30 +17,33 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     rate = 1 / 20.  # pathplanner is 20 hz
     self.learning_rate = 2.6e-3 * rate  # equivalent to x/12000
     self.write_frequency = 60 * 2  # in seconds
+    self.min_lr_prob = .75
 
     self.directions = ['left', 'right']
     self.speed_bands = ['slow', 'medium', 'fast']
     self.angle_bands = ['center', 'inner', 'outer']
     self._load_curvature()
 
-  def update(self, angle_steers, d_poly, v_ego):
+  def update(self, angle_steers, d_poly, lane_probs, v_ego):
     offset = 0
+    lr_prob = lane_probs[0] + lane_probs[1] - lane_probs[0] * lane_probs[1]
     angle_band, direction = self.pick_angle_band(angle_steers)
 
-    if angle_band is not None:  # don't return an offset if not between a band
+    if angle_band is not None:  # don't learn/return an offset if not in a band
       speed_band = self.pick_speed_band(v_ego)  # will never be none
-      learning_sign = 1 if angle_steers >= 0 else -1
-      self.learned_offsets[direction][speed_band][angle_band] -= d_poly[3] * self.learning_rate * learning_sign  # the learning
+      if lr_prob >= self.min_lr_prob:  # only learn when lane lines are present; still use existing offset
+        learning_sign = 1 if angle_steers >= 0 else -1
+        self.learned_offsets[direction][speed_band][angle_band] -= d_poly[3] * self.learning_rate * learning_sign  # the learning
       offset = self.learned_offsets[direction][speed_band][angle_band]
 
     if sec_since_boot() - self._last_write_time >= self.write_frequency:
       self._write_curvature()
-    return clip(offset, -0.3, 0.3)
+    return clip(offset, -0.35, 0.35)
 
   def pick_speed_band(self, v_ego):
-    if v_ego <= 25 * CV.MPH_TO_MS:
+    if v_ego <= 35 * CV.MPH_TO_MS:
       return 'slow'
-    if v_ego <= 50 * CV.MPH_TO_MS:
+    if v_ego <= 55 * CV.MPH_TO_MS:
       return 'medium'
     return 'fast'
 
