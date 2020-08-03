@@ -250,7 +250,6 @@ car_started_processes = [
   'plannerd',
   'loggerd',
   'radard',
-  'trafficd',
   'calibrationd',
   'paramsd',
   'camerad',
@@ -260,10 +259,13 @@ car_started_processes = [
   'mapd',
   'thermalonlined',
   'locationd',
-  'traffic_manager',
   'dmonitoringd',
 ]
-
+if traffic_lights:
+  car_started_processes += [
+    'trafficd',
+    'traffic_manager',
+  ]
 if WEBCAM:
   car_started_processes += [
     'dmonitoringmodeld',
