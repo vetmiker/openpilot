@@ -21,7 +21,6 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self.directions = ['left', 'right']
     self.speed_bands = ['slow', 'medium', 'fast']
     self.angle_bands = ['center', 'inner', 'outer']
-
     self._load_curvature()
 
   def update(self, angle_steers, d_poly, v_ego):
