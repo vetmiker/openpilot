@@ -13,7 +13,7 @@ from typing import Dict, List
 from selfdrive.swaglog import cloudlog, add_logentries_handler
 from common.basedir import BASEDIR, PARAMS
 from common.android import ANDROID
-from common.op_param import opParams
+from common.op_params import opParams
 op_params = opParams()
 
 traffic_lights = op_params.get('traffic_lights', False)
