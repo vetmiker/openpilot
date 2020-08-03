@@ -1,3 +1,8 @@
+dragonpilot 0.7.7.2
+========================
+* 加入 ZSS 支援。(感謝 @bobbydough, @WilliamPrius 建議, @bobbydough 測試)
+* Added ZSS support. (Thanks to @bobbydough, @WilliamPrius for recommendation, @bobbydough for testing)
+
 dragonpilot 0.7.7.1
 ========================
 * 加入 C2 風扇靜音模式。(感謝 @dingliangxue)

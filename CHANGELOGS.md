@@ -1,3 +1,8 @@
+2020-08-02 (0.7.7.0)
+========================
+* 加入 ZSS 支援。(感謝 @bobbydough, @WilliamPrius 建議, @bobbydough 測試)
+* Added ZSS support. (Thanks to @bobbydough, @WilliamPrius for recommendation, @bobbydough for testing)
+
 2020-07-28 (0.7.7.0)
 ========================
 * 修正 steer ratio learner 關閉。(感謝 @Mojo 回報, @ShaneSmiskol 提供代碼)
