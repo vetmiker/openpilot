@@ -1,3 +1,10 @@
+2020-08-04 (0.7.7.0)
+========================
+* 嘗試修正非 Toyota 使用 lqr 產生的錯誤。
+* Attempted to fix lqr issue on non-Toyota Cars.
+* 加入錯誤記錄至 /sdcard/crash_logs/ (感謝 @ShaneSmiskol 提供代碼)
+* Added error logs to /sdcard/crash_logs/ (Special Thanks to @ShaneSmiskol)
+
 2020-08-02 (0.7.7.0)
 ========================
 * 加入 ZSS 支援。(感謝 @bobbydough, @WilliamPrius 建議, @bobbydough 測試)

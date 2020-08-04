@@ -2,6 +2,8 @@ dragonpilot 0.7.7.2
 ========================
 * 加入 ZSS 支援。(感謝 @bobbydough, @WilliamPrius 建議, @bobbydough 測試)
 * Added ZSS support. (Thanks to @bobbydough, @WilliamPrius for recommendation, @bobbydough for testing)
+* 加入錯誤記錄至 /sdcard/crash_logs/ (感謝 @ShaneSmiskol 提供代碼)
+* Added error logs to /sdcard/crash_logs/ (Special Thanks to @ShaneSmiskol)
 
 dragonpilot 0.7.7.1
 ========================
