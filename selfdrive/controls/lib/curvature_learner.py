@@ -32,10 +32,10 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     dist = v_ego * TR
     lat_pos = eval_poly(d_poly, dist)  # lateral position in meters at 1.8 seconds
 
-    if abs(lat_pos) >= 2.5 * FT_TO_M:  # todo: need to gather data and figure out accurate conversions from steer angle to curvature at 1.8s
-      if abs(lat_pos) < 5. * FT_TO_M:  # between +=[.1, 2)
+    if abs(lat_pos) >= .4757:  # todo: need to gather data and figure out accurate conversions from steer angle to curvature at 1.8s
+      if abs(lat_pos) < 1.755:  # between +=[.1, 2)
         return 'center', lat_pos
-      if abs(lat_pos) < 7.5 * FT_TO_M:  # between +=[2, 5)
+      if abs(lat_pos) < 2.356:  # between +=[2, 5)
         return 'inner', lat_pos
       return 'outer', lat_pos  # between +=[5, inf)
     return None, lat_pos  # return none when below +-0.1, removes possibility of returning offset in this case
