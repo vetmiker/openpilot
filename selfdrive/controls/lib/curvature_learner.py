@@ -34,7 +34,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
 
     if abs(lat_pos) >= 2.5 * FT_TO_M:  # todo: need to gather data and figure out accurate conversions from steer angle to curvature at 1.8s
       if abs(lat_pos) < 5. * FT_TO_M:  # between +=[.1, 2)
-        return 'center', lat_pos  # todo: don't need to return direction if we return lat_pos
+        return 'center', lat_pos
       if abs(lat_pos) < 7.5 * FT_TO_M:  # between +=[2, 5)
         return 'inner', lat_pos
       return 'outer', lat_pos  # between +=[5, inf)
@@ -66,16 +66,6 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     if v_ego <= 55 * CV.MPH_TO_MS:
       return 'medium'
     return 'fast'
-
-  # def pick_angle_band(self, angle_steers):
-  #   direction = 'left' if angle_steers > 0 else 'right'
-  #   if abs(angle_steers) >= 0.1:
-  #     if abs(angle_steers) < 2:  # between +=[.1, 2)
-  #       return 'center', direction
-  #     if abs(angle_steers) < 5.:  # between +=[2, 5)
-  #       return 'inner', direction
-  #     return 'outer', direction  # between +=[5, inf)
-  #   return None, direction  # return none when below +-0.1, removes possibility of returning offset in this case
 
   def _load_curvature(self):
     self._last_write_time = 0
