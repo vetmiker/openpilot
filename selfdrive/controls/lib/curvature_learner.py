@@ -40,7 +40,12 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
       return 'outer', lat_pos  # between +=[5, inf)
     return None, lat_pos  # return none when below +-0.1, removes possibility of returning offset in this case
 
-  def update(self, v_ego, d_poly, lane_probs):
+  def _gather_data(self, v_ego, d_poly, angle_steers):
+    with open('/data/curv_learner_data', 'a') as f:
+      f.write('{}\n'.format({'v_ego': v_ego, 'd_poly': d_poly, 'angle_steers': angle_steers}))
+
+  def update(self, v_ego, d_poly, lane_probs, angle_steers):
+    self._gather_data(v_ego, d_poly, angle_steers)
     offset = 0
     if v_ego < self.min_speed:
       return offset
