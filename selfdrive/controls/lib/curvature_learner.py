@@ -23,21 +23,23 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
     self.min_speed = 15 * CV.MPH_TO_MS
 
     self.directions = ['left', 'right']
-    self.speed_bands = ['slow', 'medium', 'fast']
-    self.curvature_bands = ['center', 'inner', 'outer']
+    self.speed_bands = {'slow': 35 * CV.MPH_TO_MS, 'medium': 55 * CV.MPH_TO_MS, 'fast': float('inf')}
+    self.curvature_bands = {'center': 5, 'inner': 5, 'outer': 5, 'sharp': float('inf')}
     self._load_curvature()
 
   def pick_curvature_band(self, v_ego, d_poly):
-    TR = 1.8
+    TR = 0.9
     dist = v_ego * TR
     lat_pos = eval_poly(d_poly, dist)  # lateral position in meters at 1.8 seconds
 
-    if abs(lat_pos) >= .4757:  # todo: need to gather data and figure out accurate conversions from steer angle to curvature at 1.8s
-      if abs(lat_pos) < 1.755:  # between +=[.1, 2)
+    if abs(lat_pos) >= 0.05275:  # todo: WIP, tuning
+      if abs(lat_pos) < 0.131:  # between +=[.1, 2)
         return 'center', lat_pos
-      if abs(lat_pos) < 2.356:  # between +=[2, 5)
+      if abs(lat_pos) < 0.29618:  # between +=[2, 5)
         return 'inner', lat_pos
-      return 'outer', lat_pos  # between +=[5, inf)
+      if abs(lat_pos) < 0.67579:
+        return 'outer', lat_pos  # between +=[5, inf)
+      return 'sharp'
     return None, lat_pos  # return none when below +-0.1, removes possibility of returning offset in this case
 
   def _gather_data(self, v_ego, d_poly, angle_steers):

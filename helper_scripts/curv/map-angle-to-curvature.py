@@ -26,22 +26,22 @@ sharp_max = float('inf')
 TR = 0.9
 data_banded = {'center': [], 'inner': [], 'outer': [], 'sharp': []}
 
-within_percent = 0.15  # only use angles within 10% lower than max angle to get higher max average (instead of max())
+within_percent = 0.1  # only use angles within 10% lower than max angle to get higher max average (instead of max())
 
 for line in data:
   if line['v_ego'] < 15 * CV.MPH_TO_MS:
     continue
   angle_steers = line['angle_steers']
   if abs(angle_steers) >= min_angle:
-    if abs(angle_steers) < center_max:
+    if abs(angle_steers) < center_max * (1 + within_percent):
       if center_max * (1 - within_percent) < abs(angle_steers):  # within 10% lower
         data_banded['center'].append(line)
       continue
-    if abs(angle_steers) < inner_max:
+    if abs(angle_steers) < inner_max * (1 + within_percent):
       if inner_max * (1 - within_percent) < abs(angle_steers):
         data_banded['inner'].append(line)
       continue
-    if abs(angle_steers) < outer_max:
+    if abs(angle_steers) < outer_max * (1 + within_percent):
       if outer_max * (1 - within_percent) < abs(angle_steers):
         data_banded['outer'].append(line)
       continue
@@ -83,4 +83,4 @@ for band in avg_curvatures:
                                                              round(avg_curvatures[band] * modifiers[band], 5)))
 
 min_curv_from_angle = (min_angle * avg_curvatures['center']) / avg_angle_bands['center']  # calcs 0.1 deg min equivelent
-print('max. calc. curvature for CL: {}'.format(round(min_curv_from_angle, 5)))
+print('max. calc. curvature for CL: {} (ADJUSTED: {})'.format(round(min_curv_from_angle, 5), round(min_curv_from_angle * modifiers['center'], 5)))
