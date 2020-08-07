@@ -1,4 +1,5 @@
 import os
+import math
 import json
 from common.numpy_fast import clip
 from common.realtime import sec_since_boot
@@ -49,7 +50,7 @@ class CurvatureLearner:  # todo: disable when dynamic camera offset is working
   def update(self, v_ego, d_poly, lane_probs, angle_steers):
     self._gather_data(v_ego, d_poly, angle_steers)
     offset = 0
-    if v_ego < self.min_speed:
+    if v_ego < self.min_speed or math.isnan(d_poly[0]) or len(d_poly) != 4:
       return offset
 
     lr_prob = lane_probs[0] + lane_probs[1] - lane_probs[0] * lane_probs[1]
