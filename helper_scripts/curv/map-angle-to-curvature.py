@@ -18,46 +18,69 @@ for fi in os.listdir():
         except:
           print('error: {}'.format(line))
 
-min_angle = .1
-center_max = 2.
-inner_max = 5.
-outer_max = float('inf')
-TR = 1.8
-data_banded = {'center': [], 'inner': [], 'outer': []}
+min_angle = 1.
+center_max = 2.5
+inner_max = 7.5
+outer_max = 15.
+sharp_max = float('inf')
+TR = 0.9
+data_banded = {'center': [], 'inner': [], 'outer': [], 'sharp': []}
+
+within_percent = 0.15  # only use angles within 10% lower than max angle to get higher max average (instead of max())
 
 for line in data:
   if line['v_ego'] < 15 * CV.MPH_TO_MS:
     continue
   angle_steers = line['angle_steers']
   if abs(angle_steers) >= min_angle:
-    if abs(angle_steers) < 2:  # between +=[.1, 2)
-      data_banded['center'].append(line)
+    if abs(angle_steers) < center_max:
+      if center_max * (1 - within_percent) < abs(angle_steers):  # within 10% lower
+        data_banded['center'].append(line)
       continue
-    if abs(angle_steers) < 5.:  # between +=[2, 5)
-      data_banded['inner'].append(line)
+    if abs(angle_steers) < inner_max:
+      if inner_max * (1 - within_percent) < abs(angle_steers):
+        data_banded['inner'].append(line)
       continue
-    data_banded['outer'].append(line)
+    if abs(angle_steers) < outer_max:
+      if outer_max * (1 - within_percent) < abs(angle_steers):
+        data_banded['outer'].append(line)
+      continue
+    data_banded['sharp'].append(line)
 
-avg_center_angle = np.mean([abs(line['angle_steers']) for line in data_banded['center']])
-avg_inner_angle = np.mean([abs(line['angle_steers']) for line in data_banded['inner']])
-avg_outer_angle = np.mean([abs(line['angle_steers']) for line in data_banded['outer']])
-print('mean absolute center angle: {}'.format(avg_center_angle))
-print('mean absolute inner angle: {}'.format(avg_inner_angle))
-print('mean absolute outer angle: {}'.format(avg_outer_angle))
+for band in data_banded:
+  print('{}: {}'.format(band, len(data_banded[band])), end=' ')
+print()
 
-min_angle = {'center': 1.5, 'inner': 3.8, 'outer': 8}
-avg_curvs = {'center': [], 'inner': [], 'outer': []}
+avg_angle_bands = {}
+max_angle_text = {'center': '{} deg'.format(center_max),
+                  'inner': '{} deg'.format(inner_max),
+                  'outer': '{} deg'.format(outer_max),
+                  'sharp': 'doen\'t matter as much/inf'}
+for band in data_banded:
+  avg_angle_bands[band] = np.mean([abs(line['angle_steers']) for line in data_banded[band]])
+  print('MA {} angle: {} ({})'.format(band, round(avg_angle_bands[band], 4), max_angle_text[band]))
+print()
+
+curvature_dict = {'center': [], 'inner': [], 'outer': [], 'sharp': []}
 for band in data_banded:
   for line in data_banded[band]:
-    if abs(line['angle_steers']) > min_angle[band]:
-      dist = line['v_ego'] * TR
-      lat_pos = np.polyval(line['d_poly'], dist)  # lateral position in meters at 1.8 seconds
-      avg_curvs[band].append(lat_pos)
+    dist = line['v_ego'] * TR
+    lat_pos = np.polyval(line['d_poly'], dist)  # lateral position in meters at 1.8 seconds
+    curvature_dict[band].append(lat_pos)
 
+avg_curvatures = {band: np.mean(np.abs(curvature_dict[band])) for band in curvature_dict}
+std_curvatures = {band: np.std(np.abs(curvature_dict[band])) for band in curvature_dict}
 
-avg_center_curv = np.max(np.abs(avg_curvs['center']))
-avg_inner_curv = np.max(np.abs(avg_curvs['inner']))
-avg_outer_curv = np.max(np.abs(avg_curvs['outer']))
-print('mean absolute center curv: {}'.format(avg_center_curv))
-print('mean absolute inner curv: {}'.format(avg_inner_curv))
-print('mean absolute outer curv: {}'.format(avg_outer_curv))
+modifiers = {}
+modifiers['center'] = center_max / avg_angle_bands['center']  # just since average angle doesn't equal the exact max limit
+modifiers['inner'] = inner_max / avg_angle_bands['inner']
+modifiers['outer'] = outer_max / avg_angle_bands['outer']
+modifiers['sharp'] = 1  # we don't even use this
+
+for band in avg_curvatures:
+  print('MA {} curvature: {}, std: {} (ADJUSTED: {})'.format(band, round(avg_curvatures[band], 5),
+                                                             round(std_curvatures[band], 4),
+                                                             round(avg_curvatures[band] * modifiers[band], 5)))
+
+min_curv_from_angle = (min_angle * avg_curvatures['center']) / avg_angle_bands['center']  # calcs 0.1 deg min equivelent
+print('max. calc. curvature for CL: {}'.format(round(min_curv_from_angle, 5)))
