@@ -477,7 +477,7 @@ EVENTS = {
   EventName.promptKeepHandsOnWheel: {
     ET.WARNING: Alert(
       "HANDS OFF STEERING WHEEL",
-      "Driver must keeP hands on wheel",
+      "Driver must keep hands on wheel",
       AlertStatus.userPrompt, AlertSize.mid,
       Priority.MID, VisualAlert.steerRequired, AudibleAlert.chimeWarning2Repeat, .1, .1, .1),
   },
