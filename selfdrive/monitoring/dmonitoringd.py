@@ -61,8 +61,6 @@ def dmonitoringd_thread(sm=None, pm=None):
                         sm['carState'].steeringPressed
       if driver_engaged:
         driver_status.update(Events(), True, sm['carState'].cruiseState.enabled, sm['carState'].standstill)
-        # Update events from steering state
-        steering_status.update(events, sm['carState'].steeringPressed, sm['carState'].cruiseState.enabled, sm['carState'].standstill)
       v_cruise_last = v_cruise
 
     # Get model meta
@@ -78,6 +76,8 @@ def dmonitoringd_thread(sm=None, pm=None):
         events.add(car.CarEvent.EventName.tooDistracted)
       # Update events from driver state
       driver_status.update(events, driver_engaged, sm['carState'].cruiseState.enabled, sm['carState'].standstill)
+	    # Update events from steering state
+      steering_status.update(events, sm['carState'].steeringPressed, sm['carState'].cruiseState.enabled, sm['carState'].standstill)      
 
       # dMonitoringState packet
       dat = messaging.new_message('dMonitoringState')
