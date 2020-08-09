@@ -6,6 +6,7 @@ from common.params import Params
 import cereal.messaging as messaging
 from selfdrive.controls.lib.events import Events
 from selfdrive.monitoring.driver_monitor import DriverStatus, MAX_TERMINAL_ALERTS, MAX_TERMINAL_DURATION
+from selfdrive.monitoring.steering_monitor import SteeringStatus
 from selfdrive.locationd.calibration_helpers import Calibration
 
 def dmonitoringd_thread(sm=None, pm=None):
@@ -24,6 +25,7 @@ def dmonitoringd_thread(sm=None, pm=None):
     sm = messaging.SubMaster(['driverState', 'liveCalibration', 'carState', 'model'])
 
   driver_status = DriverStatus()
+  steering_status = SteeringStatus()
   is_rhd = params.get("IsRHD")
   if is_rhd is not None:
     driver_status.is_rhd_region = bool(int(is_rhd))
@@ -59,6 +61,8 @@ def dmonitoringd_thread(sm=None, pm=None):
                         sm['carState'].steeringPressed
       if driver_engaged:
         driver_status.update(Events(), True, sm['carState'].cruiseState.enabled, sm['carState'].standstill)
+        # Update events from steering state
+        steering_status.update(events, sm['carState'].steeringPressed, sm['carState'].cruiseState.enabled, sm['carState'].standstill)
       v_cruise_last = v_cruise
 
     # Get model meta
