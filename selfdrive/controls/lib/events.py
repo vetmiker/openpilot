@@ -468,15 +468,15 @@ EVENTS = {
   
   EventName.preKeepHandsOnWheel: {
     ET.WARNING: Alert(
-      "HANDS OFF STEERING WHEEL: No Steering Pressed Detected",
-      "",
+      "PLACE HANDS ON WHEEL:",
+      "Hold wheel at all times",
       AlertStatus.normal, AlertSize.small,
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, .0, .1, .1, alert_rate=0.75),
   },
 
   EventName.promptKeepHandsOnWheel: {
     ET.WARNING: Alert(
-      "HANDS OFF STEERING WHEEL",
+      "KEEP HANDS ON WHEEL",
       "Driver must keep hands on wheel",
       AlertStatus.userPrompt, AlertSize.mid,
       Priority.MID, VisualAlert.steerRequired, AudibleAlert.chimeWarning2Repeat, .1, .1, .1),
@@ -485,7 +485,7 @@ EVENTS = {
   EventName.keepHandsOnWheel: {
     ET.WARNING: Alert(
       "DISENGAGE IMMEDIATELY",
-      "Driver kept hands off sterring wheel",
+      "Driver must keep hands on steering wheel",
       AlertStatus.critical, AlertSize.full,
       Priority.HIGH, VisualAlert.steerRequired, AudibleAlert.chimeWarningRepeat, .1, .1, .1),
   },
