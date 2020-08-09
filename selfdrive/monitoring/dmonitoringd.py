@@ -76,7 +76,7 @@ def dmonitoringd_thread(sm=None, pm=None):
         events.add(car.CarEvent.EventName.tooDistracted)
       # Update events from driver state
       driver_status.update(events, driver_engaged, sm['carState'].cruiseState.enabled, sm['carState'].standstill)
-	    # Update events from steering state
+      # Update events from steering state
       steering_status.update(events, sm['carState'].steeringPressed, sm['carState'].cruiseState.enabled, sm['carState'].standstill)      
 
       # dMonitoringState packet
