@@ -16,11 +16,11 @@ EventName = car.CarEvent.EventName
 
 _PRESSED_FILTER_TS = 0.16  # 1Hz -> (1./0.16)rad/sec
 
-_PRE_ALERT_THRESHOLD = 50 # 5s
-_PROMPT_ALERT_THRESHOLD = 150 # 15s
-_TERMINAL_ALERT_THRESHOLD = 300 # 30s
+_PRE_ALERT_THRESHOLD = 50 * awareness_factor  # 5s
+_PROMPT_ALERT_THRESHOLD = 150 * awareness_factor  # 15s
+_TERMINAL_ALERT_THRESHOLD = 300 * awareness_factor  # 30s
 
-MAX_TERMINAL_DURATION = 300  # 30s
+MAX_TERMINAL_DURATION = 300 * awareness_factor  # 30s
 
 class SteeringState(Enum):
   NOT_ACTIVE = 0
