@@ -5,6 +5,13 @@ from common.realtime import DT_DMON
 
 from cereal import car
 
+from common.op_params import opParams
+from common.travis_checker import travis
+if not travis:
+  awareness_factor = opParams().get('awareness_factor', default=1.0)
+else:
+  awareness_factor = 1
+
 EventName = car.CarEvent.EventName
 
 _PRESSED_FILTER_TS = 0.16  # 1Hz -> (1./0.16)rad/sec
