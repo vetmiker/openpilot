@@ -1,3 +1,8 @@
+2020-08-11 (0.7.7.0)
+========================
+* 加入 d_poly offset。 (感謝 @ShaneSmiskol)
+* Added d_poly offset. (Thanks to @ShaneSmiskol)
+
 2020-08-05 (0.7.7.0)
 ========================
 * 修正 Dev UI 顯示。
