@@ -349,16 +349,6 @@ def main():
 
     time.sleep(backoff(conn_retries))
 
-  params.delete("AthenadPid")
-
-@dispatcher.add_method
-def delete_all_camera_records():
-  os.system("cd /sdcard/realdata/ && rm-rf")
-
-@dispatcher.add_method
-def reboot_eon():
-  os.system("reboot")
-
 
 if __name__ == "__main__":
   main()
