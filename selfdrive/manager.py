@@ -202,6 +202,7 @@ managed_processes = {
   "driverview": "selfdrive.monitoring.driverview",
   "systemd": "selfdrive.dragonpilot.systemd",
   "appd": "selfdrive.dragonpilot.appd",
+  "gpxd": "selfdrive.dragonpilot.gpxd",
 }
 
 daemon_processes = {
@@ -267,6 +268,7 @@ if ANDROID:
     'clocksd',
     'gpsd',
     'dmonitoringmodeld',
+    'gpxd',
   ]
 
 def register_managed_process(name, desc, car_started=False):
@@ -602,6 +604,8 @@ def main():
     del managed_processes['uploader']
   if params.get("dp_updated") == b'0':
     del managed_processes['updated']
+  if params.get('dp_gpxd') == b'0':
+    del managed_processes['gpxd']
 
   # SystemExit on sigterm
   signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(1))

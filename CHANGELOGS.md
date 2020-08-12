@@ -1,3 +1,10 @@
+2020-08-12 (0.7.7.0)
+========================
+* 新增 (dp_gpxd) 將 GPS 軌跡導出至 GPX 格式 (/sdcard/gpx_logs/）的功能。 （感謝 @mageymoo1）
+* Added ability (dp_gpxd) to export GPS track into GPX files (/sdcard/gpx_logs/). (Thanks to @mageymoo1)
+* 使用德國的車道寬度估算值。 （感謝 @arne182）
+* Used lane width estimate value from Germany. (Thanks to @arne182)
+
 2020-08-11 (0.7.7.0)
 ========================
 * 加入 d_poly offset。 (感謝 @ShaneSmiskol)

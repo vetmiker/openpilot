@@ -22,6 +22,7 @@ confs = [
   {'name': 'dp_upload_on_mobile', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_uploader', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_upload_on_hotspot', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_uploader', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_updated', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
+  {'name': 'dp_gpxd', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   {'name': 'dp_hotspot_on_boot', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   # lat ctrl
   {'name': 'dp_lat_ctrl', 'default': True, 'type': 'Bool', 'conf_type': ['param', 'struct']},
