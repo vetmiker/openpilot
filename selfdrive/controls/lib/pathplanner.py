@@ -99,6 +99,7 @@ class PathPlanner():
     VM.update_params(x, sr)
 
     curvature_factor = VM.curvature_factor(v_ego)
+    curvature_factor += self.op_params.get('curvature_offset')
 
     self.LP.parse_model(sm['model'])
 
