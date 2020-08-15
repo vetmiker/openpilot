@@ -15,6 +15,8 @@ def apply_deadzone(error, deadzone):
 
 class LatPIDController():
   def __init__(self, k_p, k_i, k_f=1., pos_limit=None, neg_limit=None, rate=100, sat_limit=0.8, convert=None):
+    self.op_params = opParams()
+    self.enable_derivative = self.op_params.get('enable_lat_derivative')
     self._k_p = k_p  # proportional gain
     self._k_i = k_i  # integral gain
     self.k_f = k_f  # feedforward gain
@@ -82,10 +84,11 @@ class LatPIDController():
          not freeze_integrator:
         self.i = i
 
-    ENABLE_DERIV = True
     d = 0.
-    if ENABLE_DERIV:
-      k_d = (0.2 + 0.05) / 2  # average of kp and ki
+    self.enable_derivative = self.op_params.get('enable_lat_derivative')
+    if self.enable_derivative:
+      # k_d = (0.2 + 0.05) / 2  # average of kp and ki
+      k_d = self.op_params.get('lat_d') * 20
       d = k_d * (error - self.last_error)
 
     control = self.p + self.f + self.i + d

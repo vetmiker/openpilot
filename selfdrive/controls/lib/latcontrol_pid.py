@@ -41,7 +41,7 @@ class LatControlPID():
                                      feedforward=steer_feedforward, speed=CS.vEgo, deadzone=deadzone)
 
       with open('/data/latcontrol_pid_data', 'a') as f:
-        f.write('{}\n'.format({'angle_steers_des': self.angle_steers_des, 'angle_steers': CS.steeringAngle}))
+        f.write('{}\n'.format({'angle_steers_des': self.angle_steers_des, 'angle_steers': CS.steeringAngle, 'derivative': self.pid.enable_derivative}))
 
       pid_log.active = True
       pid_log.p = self.pid.p
