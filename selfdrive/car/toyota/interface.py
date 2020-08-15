@@ -61,7 +61,7 @@ class CarInterface(CarInterfaceBase):
 
       ret.lateralTuning.init('pid')
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2], [0.05]]
-      ret.lateralTuning.pid.KdV = [0.05, 0.085, 0.1]
+      # ret.lateralTuning.pid.KdV = [0.05, 0.085, 0.1]
       ret.lateralTuning.pid.kf = 0.00003  # full torque for 20 deg at 80mph means 0.00007818594
 
     elif candidate in [CAR.RAV4, CAR.RAV4H]:
