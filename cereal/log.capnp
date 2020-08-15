@@ -2081,11 +2081,11 @@ struct DragonConf {
   dpSteeringLimitAlert @12 :Bool;
   dpSteeringOnSignal @13 :Bool;
   dpSignalOffDelay @14 :UInt8;
-  dpAssistedLcMinMph @15 :UInt8;
+  dpAssistedLcMinMph @15 :Float32;
   dpAutoLc @16 :Bool;
   dpAutoLcCont @17 :Bool;
-  dpAutoLcMinMph @18 :UInt8;
-  dpAutoLcDelay @19 :UInt8;
+  dpAutoLcMinMph @18 :Float32;
+  dpAutoLcDelay @19 :Float32;
   dpSlowOnCurve @20 :Bool;
   dpAllowGas @21 :Bool;
   dpMaxCtrlSpeed @22 :Float32;
