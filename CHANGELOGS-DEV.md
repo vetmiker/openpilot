@@ -1,5 +1,7 @@
 dragonpilot 0.7.7.3
 ========================
+* 修正同時開啟 dp_toyota_zss 和 dp_lqr 產生的錯誤。(感謝 @bobbydough)
+* Fixed error cuased by enabling both dp_toyota_zss and dp_lqr at the same time. (Thanks to @bobbydough)
 * 新增 (dp_gpxd) 將 GPS 軌跡導出至 GPX 格式 (/sdcard/gpx_logs/）的功能。 （感謝 @mageymoo1）
 * Added ability (dp_gpxd) to export GPS track into GPX files (/sdcard/gpx_logs/). (Thanks to @mageymoo1)
 * 使用德國的車道寬度估算值。 （感謝 @arne182）
