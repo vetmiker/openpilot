@@ -90,7 +90,7 @@ class opParams:
                         'dynamic_camera_offset_time': Param(3.5, VT.number, 'How long to keep away from oncoming traffic in seconds after losing lead'),
                         'support_white_panda': Param(False, bool, 'Enable this to allow engagement with the deprecated white panda.\n'
                                                                   'localizer might not work correctly'),
-                        'prius_use_lqr': Param(False, bool, 'If you have a newer Prius with a good angle sensor, you can try enabling this to use LQR'),
+                        'prius_use_pid': Param(False, bool, 'Switches to PI/D for Prius'),
                         'corolla_use_lqr': Param(False, bool, 'Enable this to use LQR for lat with your Corolla (2017)'),
                         'corollaTSS2_use_indi': Param(False, bool, 'Enable this to use INDI for lat with your Corolla with TSS2'),
                         'username': Param(None, [type(None), str, bool], 'Your identifier provided with any crash logs sent to Sentry.\n'

@@ -8,7 +8,7 @@ from selfdrive.car.interfaces import CarInterfaceBase
 from common.op_params import opParams
 
 op_params = opParams()
-prius_use_lqr = op_params.get('prius_use_lqr')
+prius_use_pid = op_params.get('prius_use_pid')
 corolla_use_lqr = op_params.get('corolla_use_lqr')
 corollaTSS2_use_indi = op_params.get('corollaTSS2_use_indi')
 EventName = car.CarEvent.EventName
@@ -59,10 +59,17 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.6371   # hand-tune
       ret.mass = 3045. * CV.LB_TO_KG + STD_CARGO_KG
 
-      ret.lateralTuning.init('pid')
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2], [0.05]]
-      # ret.lateralTuning.pid.KdV = [0.05, 0.085, 0.1]
-      ret.lateralTuning.pid.kf = 0.00003  # full torque for 20 deg at 80mph means 0.00007818594
+      if prius_use_pid:
+        ret.lateralTuning.init('pid')
+        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2], [0.05]]
+        ret.lateralTuning.pid.kf = 0.00003  # full torque for 20 deg at 80mph means 0.00007818594
+      else:
+        ret.lateralTuning.init('indi')
+        ret.lateralTuning.indi.innerLoopGain = 3.98
+        ret.lateralTuning.indi.outerLoopGain = 3.0
+        ret.lateralTuning.indi.timeConstant = 0.1
+        ret.lateralTuning.indi.actuatorEffectiveness = 0.99
+        ret.steerActuatorDelay = 0.488
 
     elif candidate in [CAR.RAV4, CAR.RAV4H]:
       stop_and_go = True if (candidate in CAR.RAV4H) else False
