@@ -14,11 +14,12 @@ def apply_deadzone(error, deadzone):
   return error
 
 class LatPIDController():
-  def __init__(self, k_p, k_i, k_f=1., pos_limit=None, neg_limit=None, rate=100, sat_limit=0.8, convert=None):
+  def __init__(self, k_p, k_i, k_d, k_f=1., pos_limit=None, neg_limit=None, rate=100, sat_limit=0.8, convert=None):
     self.op_params = opParams()
     self.enable_derivative = self.op_params.get('enable_lat_derivative')
     self._k_p = k_p  # proportional gain
     self._k_i = k_i  # integral gain
+    self._k_d = k_d  # derivative gain
     self.k_f = k_f  # feedforward gain
 
     self.pos_limit = pos_limit
@@ -39,6 +40,10 @@ class LatPIDController():
   @property
   def k_i(self):
     return interp(self.speed, self._k_i[0], self._k_i[1])
+
+  @property
+  def k_d(self):
+    return interp(self.speed, self._k_d[0], self._k_d[1]) * 20
 
   def _check_saturation(self, control, check_saturation, error):
     saturated = (control < self.neg_limit) or (control > self.pos_limit)
@@ -87,8 +92,10 @@ class LatPIDController():
     d = 0.
     self.enable_derivative = self.op_params.get('enable_lat_derivative')
     if self.enable_derivative:
-      # k_d = (0.2 + 0.05) / 2  # average of kp and ki
-      k_d = self.op_params.get('lat_d') * 20
+      if self._k_d[1][-1] == 0:
+        k_d = self.op_params.get('lat_d') * 20
+      else:
+        k_d = self.k_d
       d = k_d * (error - self.last_error)
 
     control = self.p + self.f + self.i + d
