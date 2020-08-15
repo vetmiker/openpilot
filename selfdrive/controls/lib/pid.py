@@ -92,10 +92,10 @@ class LatPIDController():
     d = 0.
     self.enable_derivative = self.op_params.get('enable_lat_derivative')
     if self.enable_derivative:
-      if self._k_d[1][-1] == 0:
-        k_d = self.op_params.get('lat_d') * 20
-      else:
-        k_d = self.k_d
+      # if self._k_d[1][-1] == 0:
+      #   k_d = self.op_params.get('lat_d') * 20
+      # else:
+      k_d = self.k_d
       d = k_d * (error - self.last_error)
 
     control = self.p + self.f + self.i + d
