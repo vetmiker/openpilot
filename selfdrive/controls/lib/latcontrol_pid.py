@@ -39,6 +39,10 @@ class LatControlPID():
       check_saturation = (CS.vEgo > 10) and not CS.steeringRateLimited and not CS.steeringPressed
       output_steer = self.pid.update(self.angle_steers_des, CS.steeringAngle, check_saturation=check_saturation, override=CS.steeringPressed,
                                      feedforward=steer_feedforward, speed=CS.vEgo, deadzone=deadzone)
+
+      with open('/data/latcontrol_pid_data', 'a') as f:
+        f.write('{}\n'.format({'angle_steers_des': self.angle_steers_des, 'angle_steers': CS.steeringAngle}))
+
       pid_log.active = True
       pid_log.p = self.pid.p
       pid_log.i = self.pid.i
