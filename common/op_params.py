@@ -95,8 +95,8 @@ class opParams:
                         'corollaTSS2_use_indi': Param(False, bool, 'Enable this to use INDI for lat with your Corolla with TSS2'),
                         'username': Param(None, [type(None), str, bool], 'Your identifier provided with any crash logs sent to Sentry.\n'
                                                                          'Helps the developer reach out to you if anything goes wrong'),
-                        'enable_lat_derivative': Param(False, bool),
-                        'lat_d': Param(0.125, VT.number),
+                        'enable_lat_derivative': Param(True, bool),
+                        'lat_d': Param(0.085, VT.number),
 
                         'op_edit_live_mode': Param(False, bool, 'This parameter controls which mode opEdit starts in. It should be hidden from the user with the hide key', hidden=True)}
 
