@@ -13,7 +13,7 @@ def apply_deadzone(error, deadzone):
     error = 0.
   return error
 
-class PIController():
+class LatPIDController():
   def __init__(self, k_p, k_i, k_f=1., pos_limit=None, neg_limit=None, rate=100, sat_limit=0.8, convert=None):
     self._k_p = k_p  # proportional gain
     self._k_i = k_i  # integral gain
@@ -57,6 +57,7 @@ class PIController():
     self.sat_count = 0.0
     self.saturated = False
     self.control = 0
+    self.last_error = 0.
 
   def update(self, setpoint, measurement, speed=0.0, check_saturation=True, override=False, feedforward=0., deadzone=0., freeze_integrator=False):
     self.speed = speed
@@ -81,11 +82,18 @@ class PIController():
          not freeze_integrator:
         self.i = i
 
-    control = self.p + self.f + self.i
+    ENABLE_DERIV = True
+    d = 0.
+    if ENABLE_DERIV:
+      k_d = (0.2 + 0.05) / 2  # average of kp and ki
+      d = k_d * (error - self.last_error)
+
+    control = self.p + self.f + self.i + d
     if self.convert is not None:
       control = self.convert(control, speed=self.speed)
 
     self.saturated = self._check_saturation(control, check_saturation, error)
+    self.last_error = float(error)
 
     self.control = clip(control, self.neg_limit, self.pos_limit)
     return self.control
