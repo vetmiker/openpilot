@@ -49,7 +49,7 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.init('pid')
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
       ret.lateralTuning.pid.kdBP = [17.88, 26.82, 35]
-      ret.lateralTuning.pid.KdV = [0, 0, 0]  # todo: temp until i tune each PI car
+      ret.lateralTuning.pid.kdV = [0, 0, 0]  # todo: temp until i tune each PI car
 
     if candidate == CAR.PRIUS:
       stop_and_go = True
@@ -115,7 +115,7 @@ class CarInterface(CarInterfaceBase):
         ret.lateralTuning.lqr.dcGain = 0.002237852961363602
       else:
         ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2], [0.05]]
-        ret.lateralTuning.pid.KdV = [0.05, 0.085, 0.1]
+        ret.lateralTuning.pid.kdV = [0.05, 0.085, 0.1]
         ret.lateralTuning.pid.kf = 0.00003   # full torque for 20 deg at 80mph means 0.00007818594
 
     elif candidate == CAR.LEXUS_RX:
