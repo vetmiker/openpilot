@@ -56,7 +56,7 @@ def main():
       gps = sm['gpsLocationExternal']
 
       # do not log when no fix or accuracy is too low, add lost_signal_count
-      if gps.flags % 2 == 0 or gps.accuracy < 5.:
+      if gps.flags % 2 == 0 or gps.accuracy > 5.:
         if log_count > 0:
           lost_signal_count += 1
       else:
