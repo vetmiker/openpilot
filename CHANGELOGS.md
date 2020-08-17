@@ -1,3 +1,12 @@
+2020-08-17 (0.7.7.0)
+========================
+* gpxd 只儲存高精度數據。(感謝 @arne182)
+* gpxd now only stored high accuracy data. (Thanks to @arne182)
+* gpxd 加入自動切換成 GCJ-02 格式。
+* added ability to switch to GCJ-02 format in gpxd.
+* 新增 (dp_reset_live_parameters_on_start) 每次發車重設 LiveParameters 值。(感謝 @eisenheim)
+* Added ability (dp_reset_live_param_on_start) to reset LiveParameters on each start. (Thanks @eisenheim)
+
 2020-08-12 (0.7.7.0)
 ========================
 * 修正同時開啟 dp_toyota_zss 和 dp_lqr 產生的錯誤。(感謝 @bobbydough)
