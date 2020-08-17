@@ -256,9 +256,11 @@ class CarController():
         
         # special cases
         if fr_step == 5 and ecu == Ecu.fwdCamera and bus == 1:
+          print(addr)
           cnt = int(((frame / 5) % 7) + 1) << 5
           vl = bytes([cnt]) + vl
         elif addr in (0x489, 0x48a) and bus == 0:
+          print(addr)
           # add counter for those 2 messages (last 4 bits)
           cnt = int((frame/100)%0xf) + 1
           if addr == 0x48a:
