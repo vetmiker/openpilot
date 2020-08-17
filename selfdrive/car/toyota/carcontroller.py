@@ -131,8 +131,8 @@ class CarController():
     apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady, enabled)
     factor = 2 if ludicrous_mode else 1
     apply_accel = clip(apply_accel * ACCEL_SCALE * factor, ACCEL_MIN, ACCEL_MAX)
-    if ludicrous_mode:
-      print(apply_accel)
+    #if ludicrous_mode:
+    #  print(apply_accel)
     if CS.CP.enableGasInterceptor:
       if CS.out.gasPressed:
         apply_accel = max(apply_accel, 0.06)
