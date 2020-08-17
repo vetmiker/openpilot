@@ -8,10 +8,12 @@ from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_comma
                                            create_fcw_command
 from selfdrive.car.toyota.values import Ecu, CAR, STATIC_MSGS, SteerLimitParams, TSS2_CAR
 from opendbc.can.packer import CANPacker
-#from common.op_params import opParams
+from common.op_params import opParams
 #import cereal.messaging as messaging
 
-#op_params = opParams()
+op_params = opParams()
+
+ludicrous_mode = op_params.get('ludicrous_mode', False)
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
@@ -127,7 +129,8 @@ class CarController():
       apply_accel = actuators.gas - actuators.brake
 
     apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady, enabled)
-    apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX)
+    factor = 2 if ludicrous_mode else 1
+    apply_accel = clip(apply_accel * ACCEL_SCALE * factor, ACCEL_MIN, ACCEL_MAX)
 
     if CS.CP.enableGasInterceptor:
       if CS.out.gasPressed:
