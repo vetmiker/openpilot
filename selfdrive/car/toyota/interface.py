@@ -103,7 +103,7 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.lqr.l = [0.3233671, 0.3185757]
       ret.lateralTuning.lqr.dcGain = 0.002237852961363602
 
-    elif candidate == CAR.COROLLA:
+    elif candidate in [CAR.COROLLA, CAR.COROLLA_2015]:
       stop_and_go = False
       ret.safetyParam = 100
       ret.wheelbase = 2.70
