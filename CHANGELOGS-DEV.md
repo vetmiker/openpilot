@@ -1,5 +1,11 @@
 dragonpilot 0.7.7.3
 ========================
+* 修正方向盤監控。
+* Fixed steering monitor timer param.
+* 修正行駛時關閉畫面導致當機的錯誤。(感謝 @salmankhan, @stevej99, @bobbydough 回報)
+* Fixed screen frozen issue when "screen off while driving" toggle is enabled. (Thanks to @salmankhan, @stevej99, @bobbydough)
+* 加回 Dev Mini UI 開關。(感謝 @Ninjaa 建議)
+* Re-added Dev Mini UI. (Thanks to @Ninjaa)
 * 新增 (dp_reset_live_parameters_on_start) 每次發車重設 LiveParameters 值。(感謝 @eisenheim)
 * Added ability (dp_reset_live_param_on_start) to reset LiveParameters on each start. (Thanks @eisenheim)
 * 修正同時開啟 dp_toyota_zss 和 dp_lqr 產生的錯誤。(感謝 @bobbydough)

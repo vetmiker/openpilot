@@ -48,8 +48,8 @@ def main():
   lost_signal_count = 0
   wait_helper = WaitTimeHelper()
   started_time = datetime.datetime.utcnow().isoformat()
-  outside_china_checked = False
-  outside_china = False
+  # outside_china_checked = False
+  # outside_china = False
   while True:
     sm.update()
     if sm.updated['gpsLocationExternal']:
@@ -62,11 +62,11 @@ def main():
       else:
         lng = gps.longitude
         lat = gps.latitude
-        if not outside_china_checked:
-          outside_china = out_of_china(lng, lat)
-          outside_china_checked = True
-        if not outside_china:
-          lng, lat = wgs84togcj02(lng, lat)
+        # if not outside_china_checked:
+        #   outside_china = out_of_china(lng, lat)
+        #   outside_china_checked = True
+        # if not outside_china:
+        #   lng, lat = wgs84togcj02(lng, lat)
         logs.append([datetime.datetime.utcfromtimestamp(gps.timestamp*0.001).isoformat(), lat, lng, gps.altitude])
         log_count += 1
         lost_signal_count = 0
