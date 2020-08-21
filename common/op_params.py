@@ -113,8 +113,12 @@ class opParams:
       if self._read():
         to_write = self._add_default_params()  # if new default data has been added
         to_write |= self._delete_old()  # or if old params have been deleted
-      else:  # don't overwrite corrupted params, just print
-        error("Can't read op_params.json file")
+      else:  # backup and re-create params file
+        error("Can't read op_params.json file, backing up to /data/op_params_corrupt.json and re-creating file!")
+        to_write = True
+        if os.path.isfile('/data/op_params_corrupt.json'):
+          os.remove('/data/op_params_corrupt.json')
+        os.rename(self._params_file, '/data/op_params_corrupt.json')
     else:
       to_write = True  # user's first time running a fork with op_params, write default params
 
@@ -156,7 +160,7 @@ class opParams:
 
   def _check_key_exists(self, key, met):
     if key not in self.fork_params or key not in self.params:
-      raise Exception('opParams: Tried to {} an unknown parameter! Key not in fork_params'.format(met))
+      raise Exception('opParams: Tried to {} an unknown parameter! Key not in fork_params: {}'.format(met, key))
 
   def _add_default_params(self):
     added = False
