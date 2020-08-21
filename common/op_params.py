@@ -93,6 +93,7 @@ class opParams:
                         'min_TR': Param(None, VT.none_or_number, 'The minimum allowed following distance in seconds. Default is 0.9 seconds.\n'
                                                                  'The range is limited from 0.85 to 1.3. Set to None to disable', live=True),
                         'use_virtual_middle_line': Param(False, bool, 'For roads over 4m wide, hug right. For roads under 2m wide, hug left.'),
+                        'uniqueID': Param(None, [type(None), str], 'User\'s unique ID'),
                         'ludicrous_mode': Param(False, bool, 'Double overall acceleration!')}
 
     self._params_file = '/data/op_params.json'
