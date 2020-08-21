@@ -92,11 +92,7 @@ class opParams:
                                                                   'localizer might not work correctly'),
                         'prius_use_pid': Param(False, bool, 'This enables the PID lateral controller with new a experimental derivative tune\nFalse: stock INDI, True: TSS2-tuned PID'),
                         'corolla_use_lqr': Param(False, bool, 'Enable this to use LQR for lateral control with your TSS1 Corolla\nFalse: PID, True: RAV4-tuned LQR'),
-                        'corollaTSS2_use_indi': Param(False, bool, 'Enable this to use INDI for lat with your Corolla with TSS2'),
-                        'username': Param(None, [type(None), str, bool], 'Your identifier provided with any crash logs sent to Sentry.\n'
-                                                                         'Helps the developer reach out to you if anything goes wrong'),
-
-                        'op_edit_live_mode': Param(False, bool, 'This parameter controls which mode opEdit starts in. It should be hidden from the user with the hide key', hidden=True)}
+                        'corollaTSS2_use_indi': Param(False, bool, 'Enable this to use INDI for lat with your Corolla with TSS2')}
 
     self._params_file = "/data/op_params.json"
     self._last_read_time = sec_since_boot()
@@ -105,6 +101,9 @@ class opParams:
     self._run_init()  # restores, reads, and updates params
 
   def _run_init(self):  # does first time initializing of default params
+    # Two required parameters for opEdit
+    self.fork_params['username'] = Param(None, [type(None), str, bool], 'Your identifier provided with any crash logs sent to Sentry.\nHelps the developer reach out to you if anything goes wrong')
+    self.fork_params['op_edit_live_mode'] = Param(False, bool, 'This parameter controls which mode opEdit starts in', hidden=True)
     self.params = self._get_all_params(default=True)  # in case file is corrupted
     if travis:
       return
