@@ -94,6 +94,7 @@ class opParams:
                                                                  'The range is limited from 0.85 to 1.3. Set to None to disable', live=True),
                         'use_virtual_middle_line': Param(False, bool, 'For roads over 4m wide, hug right. For roads under 2m wide, hug left.'),
                         'uniqueID': Param(None, [type(None), str], 'User\'s unique ID'),
+                        'autoUpdate': Param(True, bool, 'Whether to auto-update'),
                         'ludicrous_mode': Param(False, bool, 'Double overall acceleration!')}
 
     self._params_file = '/data/op_params.json'
