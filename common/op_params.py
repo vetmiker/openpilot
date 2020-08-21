@@ -94,7 +94,8 @@ class opParams:
                         'corolla_use_lqr': Param(False, bool, 'Enable this to use LQR for lateral control with your TSS1 Corolla\nFalse: PID, True: RAV4-tuned LQR'),
                         'corollaTSS2_use_indi': Param(False, bool, 'Enable this to use INDI for lat with your Corolla with TSS2')}
 
-    self._params_file = "/data/op_params.json"
+    self._params_file = '/data/op_params.json'
+    self._backup_file = '/data/op_params_corrupt.json'
     self._last_read_time = sec_since_boot()
     self.read_frequency = 2.5  # max frequency to read with self.get(...) (sec)
     self._to_delete = ['lane_hug_direction', 'lane_hug_angle_offset']  # a list of params you want to delete (unused)
@@ -116,9 +117,9 @@ class opParams:
       else:  # backup and re-create params file
         error("Can't read op_params.json file, backing up to /data/op_params_corrupt.json and re-creating file!")
         to_write = True
-        if os.path.isfile('/data/op_params_corrupt.json'):
-          os.remove('/data/op_params_corrupt.json')
-        os.rename(self._params_file, '/data/op_params_corrupt.json')
+        if os.path.isfile(self._backup_file):
+          os.remove(self._backup_file)
+        os.rename(self._params_file, self._backup_file)
     else:
       to_write = True  # user's first time running a fork with op_params, write default params
 
