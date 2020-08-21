@@ -29,7 +29,7 @@ def common_interface_atl(ret, atl):
 
 def common_interface_get_params_lqr(ret):
   if params.get('dp_lqr') == b'1':
-    ret.lateralTuning.init('lqr')co
+    ret.lateralTuning.init('lqr')
     ret.lateralTuning.lqr.scale = 1500.0
     ret.lateralTuning.lqr.ki = 0.05
 
