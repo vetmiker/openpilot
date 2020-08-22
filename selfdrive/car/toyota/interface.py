@@ -399,7 +399,7 @@ class CarInterface(CarInterfaceBase):
     ret_arne182 = arne182.CarStateArne182.new_message()
     ret.canValid = self.cp.can_valid
     if self.CP.carFingerprint != CAR.COROLLA_2015:
-      ret.canValid = self.canValid and self.cp_cam.can_valid
+      ret.canValid = ret.canValid and self.cp_cam.can_valid
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
     # gear except P, R
