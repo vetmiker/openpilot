@@ -397,8 +397,9 @@ class CarInterface(CarInterfaceBase):
 
     # create message
     ret_arne182 = arne182.CarStateArne182.new_message()
-
-    ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
+    ret.canValid = self.cp.can_valid
+    if self.CP.carFingerprint != CAR.COROLLA_2015:
+      ret.canValid = self.canValid and self.cp_cam.can_valid
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
     # gear except P, R
@@ -433,7 +434,7 @@ class CarInterface(CarInterfaceBase):
       events_arne182.add(EventNameArne182.longControlDisabled)
 
     ret.buttonEvents = []
-    if self.cp_cam.can_invalid_cnt >= 200 and self.CP.enableCamera:
+    if self.cp_cam.can_invalid_cnt >= 200 and self.CP.enableCamera and self.CP.carFingerprint != CAR.COROLLA_2015:
       events.add(EventName.invalidGiraffeToyota)
 
     if not self.waiting and ret.vEgo < 0.3 and not ret.gasPressed and self.CP.carFingerprint == CAR.RAV4H:
