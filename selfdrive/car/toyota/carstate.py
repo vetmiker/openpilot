@@ -14,8 +14,8 @@ from selfdrive.car.toyota.values import CAR, DBC, STEER_THRESHOLD, TSS2_CAR, NO_
 from common.op_params import opParams
 
 op_params = opParams()
-rsa_max_speed = op_params.get('rsa_max_speed', 24.5)
-limit_rsa = op_params.get('limit_rsa', False)
+rsa_max_speed = op_params.get('rsa_max_speed')
+limit_rsa = op_params.get('limit_rsa')
 
 class CarState(CarStateBase):
   def __init__(self, CP):

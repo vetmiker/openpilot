@@ -13,7 +13,7 @@ from common.op_params import opParams
 
 op_params = opParams()
 
-ludicrous_mode = op_params.get('ludicrous_mode', False)
+ludicrous_mode = op_params.get('ludicrous_mode')
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
@@ -96,7 +96,7 @@ class CarController():
     #if self.sm.updated['pathPlan']:
     #  blinker = CS.out.leftBlinker or CS.out.rightBlinker
     #  ldw_allowed = CS.out.vEgo > 12.5 and not blinker
-    #  CAMERA_OFFSET = op_params.get('camera_offset', 0.06)
+    #  CAMERA_OFFSET = op_params.get('camera_offset')
     #  right_lane_visible = self.sm['pathPlan'].rProb > 0.5
     #  left_lane_visible = self.sm['pathPlan'].lProb > 0.5
     #  self.rightLaneDepart = bool(ldw_allowed and self.sm['pathPlan'].rPoly[3] > -(0.93 + CAMERA_OFFSET) and right_lane_visible)

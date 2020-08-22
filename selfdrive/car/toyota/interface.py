@@ -8,7 +8,7 @@ from selfdrive.car.interfaces import CarInterfaceBase
 from common.op_params import opParams
 
 op_params = opParams()
-spairrowtuning = op_params.get('spairrowtuning', False)
+spairrowtuning = op_params.get('spairrowtuning')
 
 GearShifter = car.CarState.GearShifter
 
